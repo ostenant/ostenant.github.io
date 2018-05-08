@@ -1,0 +1,485 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java NIO系列(四) - Selector | Coding | Madison&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="baidu-site-verification" content="0aFfZiB4tV" />
+  
+  
+  <meta name="description" content="前言Selector 是 Java NIO 中的一个组件，用于检查一个或多个通道 Channel 的状态是否处于可读、可写状态。如此可以实现单线程管理多个通道，也就是可以管理多个网络连接。">
+<meta name="keywords" content="NIO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java NIO系列(四) - Selector">
+<meta property="og:url" content="https://ostenant.coding.me/2017/12/31/Java NIO系列(四) - Selector/index.html">
+<meta property="og:site_name" content="Coding | Madison&#39;s Blog">
+<meta property="og:description" content="前言Selector 是 Java NIO 中的一个组件，用于检查一个或多个通道 Channel 的状态是否处于可读、可写状态。如此可以实现单线程管理多个通道，也就是可以管理多个网络连接。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Selector_Channel.png">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-05-08T02:49:46.092Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java NIO系列(四) - Selector">
+<meta name="twitter:description" content="前言Selector 是 Java NIO 中的一个组件，用于检查一个或多个通道 Channel 的状态是否处于可读、可写状态。如此可以实现单线程管理多个通道，也就是可以管理多个网络连接。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Selector_Channel.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Coding | Madison&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+ 
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Coding | Madison&#39;s Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">上善若水任方猿</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">主页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="https://github.com/ostenant">Github</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="ostenant.coding.me">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-Java NIO系列(四) - Selector" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/31/Java NIO系列(四) - Selector/" class="article-date">
+  <time datetime="2017-12-31T04:16:00.000Z" itemprop="datePublished">2017-12-31</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java NIO系列(四) - Selector
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Selector</code> 是 <code>Java NIO</code> 中的一个组件，用于检查<strong>一个</strong>或<strong>多个</strong>通道 <code>Channel</code> 的状态是否处于<strong>可读</strong>、<strong>可写</strong>状态。如此可以实现<strong>单线程</strong>管理<strong>多个通道</strong>，也就是可以管理多个<strong>网络连接</strong>。</p>
+<a id="more"></a>
+<h2 id="为什么使用Selector"><a href="#为什么使用Selector" class="headerlink" title="为什么使用Selector?"></a>为什么使用Selector?</h2><p>用<strong>单线程</strong>处理多个 <code>Channel</code> 的好处是我需要更少的线程来处理 <code>Channel</code> 。实际上，你甚至可以用<strong>一个线程</strong>来处理所有的<code>Channel</code>。从操作系统的角度来看，<strong>切换线程的开销</strong>是比较昂贵的，并且<strong>每个线程</strong>都需要占用<strong>系统资源</strong>，因此暂用线程越少越好。</p>
+<p>简而言之，通过 <code>Selector</code> 我们可以实现<strong>单线程</strong>操作多个 <code>Channel</code>。下面是<strong>单线程</strong>使用一个 <code>Selector</code> 处理 <code>3</code> 个 <code>Channel</code> 的示例图：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Selector_Channel.png" alt=""></p>
+<hr>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="Selector的组件"><a href="#Selector的组件" class="headerlink" title="Selector的组件"></a>Selector的组件</h2><p><code>Java NIO Selector</code>中有三个重要的组成：<code>Selector</code>、<code>SelectableChannel</code> 和 <code>SelectionKey</code>。</p>
+<h3 id="一-选择器-Selector"><a href="#一-选择器-Selector" class="headerlink" title="(一) 选择器(Selector)"></a>(一) 选择器(Selector)</h3><p><code>Selector</code><strong>选择器类</strong>管理着一个<strong>被注册</strong>的<strong>通道集合</strong>的信息和它们的<strong>就绪状态</strong>。<strong>选择器</strong>所在线程不停地更新通道的<strong>就绪状态</strong>，对通道注册的<strong>连接</strong>、<strong>数据读写事件</strong>等事件进行响应。</p>
+<h3 id="二-可选择通道-SelectableChannel"><a href="#二-可选择通道-SelectableChannel" class="headerlink" title="(二) 可选择通道(SelectableChannel)"></a>(二) 可选择通道(SelectableChannel)</h3><p><code>SelectableChannel</code> 是一个<strong>抽象类</strong>，提供了<strong>通道</strong>的<strong>可选择性</strong>所需要的<strong>公共方法</strong>的实现，它是所有支持<strong>就绪检查</strong>的<strong>通道类</strong>的<strong>父类</strong>。</p>
+<p>因为 <code>FileChannel</code> 类没有继承 <code>SelectableChannel</code>，因此不是<strong>可选通道</strong>。而所有 <code>Socket</code> <strong>通道</strong>都是可选择的，包括从<strong>管道</strong> (<code>Pipe</code>) 对象的中获得的通道。<br><code>SelectableChannel</code> 可以被注册到 <code>Selector</code> 对象上，并且注册时可以指定<strong>感兴趣</strong>的事件操作，比如：<strong>数据读取</strong>、<strong>数据写入</strong>操作。一个<strong>通道</strong>可以被注册到<strong>多个选择器</strong>上，但对<strong>每个</strong>选择器而言只能被注册<strong>一次</strong>。</p>
+<h3 id="三-选择键-SelectionKey"><a href="#三-选择键-SelectionKey" class="headerlink" title="(三) 选择键(SelectionKey)"></a>(三) 选择键(SelectionKey)</h3><p><strong>选择键</strong>封装了<strong>特定的通道</strong>与<strong>特定的选择器</strong>的注册关系。<strong>选择键</strong>对象由被 <code>SelectableChannel.register()</code> 返回并提供一个表示这种<strong>注册关系</strong>的标记。选择键包含了<strong>两个比特集</strong>(以整数的形式进行编码)，指示了该注册关系所关心的<strong>通道操作</strong>，以及通道已经准备好的操作。</p>
+<h2 id="Selector的使用"><a href="#Selector的使用" class="headerlink" title="Selector的使用"></a>Selector的使用</h2><h3 id="一-创建Selector对象"><a href="#一-创建Selector对象" class="headerlink" title="(一) 创建Selector对象"></a>(一) 创建Selector对象</h3><p><code>Selector</code> 对象是通过调用静态工厂方法 <code>open()</code> 来实例化的，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Selector Selector = Selector.open();</span><br></pre></td></tr></table></figure>
+<h3 id="二-将SelectableChannel注册到Selector"><a href="#二-将SelectableChannel注册到Selector" class="headerlink" title="(二) 将SelectableChannel注册到Selector"></a>(二) 将SelectableChannel注册到Selector</h3><p>为了将 <code>Channel</code> 和 <code>Selector</code> 配合使用，必须将 <code>Channel</code> 注册到 <code>Selector</code> 上。通过 <code>SelectableChannel.register()</code> 方法来实现，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">channel.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line"><span class="comment">// 对读操作感兴趣，向Selector注册读事件</span></span><br><span class="line">SelectionKey key = channel.register(selector, Selectionkey.OP_READ);</span><br></pre></td></tr></table></figure>
+<p>与 <code>Selector</code> 一起使用时，<code>Channel</code> 必须处于<strong>非阻塞模式</strong>下。这意味着不能将 <code>FileChannel</code> 与 <code>Selector</code> 一起使用，因为 <code>FileChannel</code> 不能切换到<strong>非阻塞模式</strong>，而<strong>套接字通道</strong>都可以。</p>
+<p>注意 <code>register()</code> 方法的<strong>第二个参数</strong>。这是一个兴趣 (<code>interest</code>) 集合，意思是在通过 <code>Selector</code> 监听 <code>Channel</code> 时对什么事件感兴趣。可以监听四种不同类型的事件：</p>
+<ul>
+<li><strong>连接操作(Connect)</strong>：监听 <code>SocketChannel</code> 到来的连接事件。</li>
+<li><strong>接受操作(Accept)</strong>：对应<strong>常量</strong> <code>SelectionKey.OP_ACCEPT</code>，专注于监听 <code>ServerSocketChannel</code> 接受 <code>SocketChannel</code> 的事件。</li>
+<li><strong>读操作(Read)</strong>：对应<strong>常量</strong> <code>SelectionKey.OP_READ</code>，监听数据完全到达，<strong>通道可读</strong>的事件。</li>
+<li><strong>写操作(Write)</strong>：对应<strong>常量</strong> <code>SelectionKey.OP_READ</code>，监听数据准备完成，<strong>通道可写</strong>的事件。</li>
+</ul>
+<blockquote>
+<p><strong>注意</strong>：并非<strong>所有的操作</strong>在所有的<strong>可选择通道</strong>上都能被支持。比如 <code>ServerSocketChannel</code> 支持 <code>Accept</code>操作，而 <code>SocketChannel</code> 中不支持。我们可以通过通道上的 <code>validOps()</code> 方法来获取特定通道下所有支持的<strong>操作集合</strong>。</p>
+</blockquote>
+<p>以上<strong>四种事件</strong>用 <code>SelectionKey</code> 的四个常量来表示：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> OP_READ = <span class="number">1</span> &lt;&lt; <span class="number">0</span>;  <span class="comment">// 1</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> OP_WRITE = <span class="number">1</span> &lt;&lt; <span class="number">2</span>;  <span class="comment">// 4</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> OP_CONNECT = <span class="number">1</span> &lt;&lt; <span class="number">3</span>;  <span class="comment">// 8</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> OP_ACCEPT = <span class="number">1</span> &lt;&lt; <span class="number">4</span>;  <span class="comment">// 16</span></span><br></pre></td></tr></table></figure>
+<p>如果<strong>一个通道</strong>同时对<strong>多种操作</strong>感兴趣，可以用 “<strong>位或</strong>” 操作符将常量连接起来，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> interestSet = SelectionKey.OP_READ | SelectionKey.OP_WRITE;</span><br></pre></td></tr></table></figure>
+<h3 id="三-为SelectionKey绑定附加对象"><a href="#三-为SelectionKey绑定附加对象" class="headerlink" title="(三) 为SelectionKey绑定附加对象"></a>(三) 为SelectionKey绑定附加对象</h3><p>可以将<strong>一个对象</strong>或者<strong>更多信息</strong>附着到 <code>SelectionKey</code> 上，这样就能方便的识别<strong>某个给定的通道</strong>。例如，可以附加与<strong>通道</strong>一起使用的 <code>Buffer</code>，或是<strong>包含聚集数据</strong>的某个对象。使用方法如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">selectionKey.attach(theObject);</span><br><span class="line">Object attachedObj = selectionKey.attachment();</span><br></pre></td></tr></table></figure>
+<p>还可以在用 <code>register()</code> 方法向 <code>Selector</code> 注册 <code>Channel</code> 的时候附加对象，例如：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SelectionKey key = channel.register(selector, SelectionKey.OP_READ, theObject);</span><br></pre></td></tr></table></figure>
+<p>如果要取消该对象，则可以通过该种方式:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">selectionKey.attach(<span class="keyword">null</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="四-通过Selector选择通道"><a href="#四-通过Selector选择通道" class="headerlink" title="(四) 通过Selector选择通道"></a>(四) 通过Selector选择通道</h3><p>一旦向 <code>Selector</code> 注册了一或多个通道，就可以调用几个<strong>重载</strong>的 <code>select()</code> 方法。这些方法返回你所感兴趣的事件 (如<strong>连接</strong>、<strong>接受</strong>、<strong>读</strong>或<strong>写</strong>) 已经准备就绪的那些通道。换句话说，如果你对“<strong>读就绪</strong>”的通道感兴趣，<code>select()</code> 方法会返回<strong>读事件已经就绪</strong>的那些通道的 <code>SelectionKey</code>。</p>
+<p>下面是 <code>select()</code> 方法的几个重载：</p>
+<ul>
+<li><strong>int select()</strong>：<strong>阻塞</strong>到至少有一个<strong>通道</strong>在此<strong>选择器</strong>注册的事件上就绪了。</li>
+<li><strong>int select(long timeout)</strong>：<code>select(long timeout)</code> 和 <code>select()</code> 一样，除了<strong>最长会阻塞</strong><code>timeout</code>毫秒(参数)。</li>
+<li><strong>int selectNow()</strong>：<strong>不会阻塞</strong>，不管什么通道就绪都<strong>立刻返回</strong>。如果<strong>没有通道</strong>变成可选择的，则此方法直接返回 <code>0</code>。</li>
+</ul>
+<p>也可以通过<strong>遍历</strong> <code>SelectionKey</code> 上的<strong>已选择键集合</strong>来访问<strong>就绪</strong>的通道，如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">Set&lt;SelectionKey&gt; selectedKeys = selector.selectedKeys();</span><br><span class="line">Iterator&lt;SelectionKey&gt; keyIterator = selectedKeys.iterator();</span><br><span class="line"><span class="keyword">while</span>(keyIterator.hasNext()) &#123;</span><br><span class="line">    SelectionKey key = keyIterator.next();</span><br><span class="line">    <span class="keyword">if</span>(key.isAcceptable()) &#123;</span><br><span class="line">        <span class="comment">// 一个连接被ServerSocketChannel接受</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (key.isConnectable()) &#123;</span><br><span class="line">        <span class="comment">// 与远程服务器建立了连接</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (key.isReadable()) &#123;</span><br><span class="line">        <span class="comment">// 一个channel做好了读准备</span></span><br><span class="line">    &#125; <span class="keyword">else</span> <span class="keyword">if</span> (key.isWritable()) &#123;</span><br><span class="line">        <span class="comment">// 一个channel做好了写准备</span></span><br><span class="line">    &#125;</span><br><span class="line">    keyIterator.remove();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>注意</strong>：每次迭代完成时 <code>Selector</code> 自己不会将已经处理完成的 <code>SelectionKey</code>实例移除，在迭代的末尾需要调用 <code>keyIterator.remove()</code> 方法手动移除。</p>
+</blockquote>
+<p><code>SelectionKey.channel()</code> 方法返回的<strong>通道</strong>需要<strong>强转</strong>为你要处理的类型，如：<code>ServerSocketChannel</code> 或 <code>SocketChannel</code> 等。</p>
+<h2 id="Selector完整实例"><a href="#Selector完整实例" class="headerlink" title="Selector完整实例"></a>Selector完整实例</h2><h3 id="服务端代码"><a href="#服务端代码" class="headerlink" title="服务端代码"></a>服务端代码</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();</span><br><span class="line">serverSocketChannel.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line">serverSocketChannel.socket().bind(<span class="keyword">new</span> InetSocketAddress(port));</span><br><span class="line"></span><br><span class="line">Selector selector = Selector.open();</span><br><span class="line">serverSocketChannel.register(selector, SelectionKey.OP_ACCEPT);</span><br><span class="line"></span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    <span class="keyword">int</span> number = selector.select();</span><br><span class="line">    <span class="keyword">if</span> (number == <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line"></span><br><span class="line">    Set&lt;SelectionKey&gt; selectionKeys = selector.selectedKeys();</span><br><span class="line">    Iterator&lt;SelectionKey&gt; iterator = selectionKeys.iterator();</span><br><span class="line">    <span class="keyword">while</span> (iterator.hasNext()) &#123;</span><br><span class="line">        SelectionKey selectionKey = iterator.next();</span><br><span class="line">        <span class="keyword">if</span> (selectionKey.isAcceptable()) &#123;</span><br><span class="line">            <span class="comment">// 获取客户端通道</span></span><br><span class="line">            SocketChannel socketChannel = (SocketChannel) selectionKey.channel();</span><br><span class="line">            socketChannel.configureBlocking(<span class="keyword">false</span>);</span><br><span class="line">            <span class="comment">// 将客户端通道注册到选择器上</span></span><br><span class="line">            socketChannel.register(selector, SelectionKey.OP_READ, ByteBuffer.allocate(bufferSize));</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (selectionKey.isReadable()) &#123;</span><br><span class="line">            handleRead(selectionKey);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (selectionKey.isWritable()) &#123;</span><br><span class="line">            handleWrite(selectionKey);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (selectionKey.isConnectable()) &#123;</span><br><span class="line">            System.out.println(<span class="string">"Isonnectable := true"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        iterator.remove();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="服务端操作过程"><a href="#服务端操作过程" class="headerlink" title="服务端操作过程"></a>服务端操作过程</h3><ol>
+<li>创建 <code>ServerSocketChannel</code> 实例，设置为<strong>非阻塞</strong>模式，并绑定指定的<strong>服务端口</strong>；</li>
+<li>创建 <code>Selector</code> 实例；</li>
+<li>将 <code>serverSocketChannel</code> 注册到 <code>selector</code> 上面，并指定事件 <code>OP_ACCEPT</code>，最底层的 <code>socket</code> 通过 <code>channel</code> 和 <code>selector</code> 建立关联；</li>
+<li>如果没有准备好 (<code>Accept</code>) 的<code>socket</code>，<code>select</code>方法会被<strong>阻塞一段时间</strong>并返回 <code>0</code>；</li>
+<li>如果底层有 <code>socket</code> 已经准备好，<code>selector</code> 的 <code>select()</code> 方法会返回 <code>socket</code> 的个数，而且 <code>selectedKeys</code> 方法会返回 <code>socket</code> 对应的<strong>事件</strong>(<code>connect</code>、<code>accept</code>、<code>read</code> 和 <code>write</code>)；</li>
+<li>根据<strong>事件类型</strong>，进行不同的处理逻辑。</li>
+</ol>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这里简单的介绍了 <code>Java NIO</code> 中选择器的用法，有关 <code>Selector</code> 底层的实现原理需要进一步查看源码。</p>
+<hr>
+<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="https://ostenant.coding.me/2017/12/31/Java NIO系列(四) - Selector/" data-id="cjgx4eioe0014684ubzscx0l7" class="article-share-link" data-share="baidu" data-title="Java NIO系列(四) - Selector">分享到</a>
+      
+
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NIO/">NIO</a></li></ul>
+
+    </footer>
+	
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2018/01/04/深入浅出OAuth 2.0授权机制/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          深入浅出OAuth 2.0授权机制
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/27/Java NIO系列(三) - Channel/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">Java NIO系列(三) - Channel</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+
+
+
+</section>
+      
+      <aside id="sidebar">
+  
+    
+<div class="widget-wrap">
+  <h3 class="widget-title">关于我</h3>
+  <ul class="widget about-me">
+    
+    <li><img class="author" title="About me" src="/img/favicon.png" /></li>
+    
+    
+    <li>ostenant@163.com</li>
+    
+    <li>一枚热爱生活，追逐自由的小技术！</li>
+    
+  </ul>
+</div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ECMAScript基础系列/">ECMAScript基础系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECMAScript/">ECMAScript</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/Docker/" style="font-size: 13.33px;">Docker</a> <a href="/tags/ECMAScript/" style="font-size: 11.67px;">ECMAScript</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/RPC/" style="font-size: 18.33px;">RPC</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/SOFA-RPC/" style="font-size: 10px;">SOFA-RPC</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/04/29/蚂蚁金服RPC框架SOFA-RPC(一) - 初体验/">蚂蚁金服RPC框架SOFA-RPC(一) - 初体验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/28/分布式理论(四) - 3PC协议/">分布式理论(四) - 3PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/25/分布式理论(三) - 2PC协议/">分布式理论(三) - 2PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/24/分布式理论(二) - BASE理论/">分布式理论(二) - BASE理论</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/23/分布式理论(一) - CAP定理/">分布式理论(一) - CAP定理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+          </li>
+        
+          <li>
+            <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+          </li>
+        
+          <li>
+            <a href="http://ifeve.com" target="_blank">并发编程网</a>
+          </li>
+        
+          <li>
+            <a href="https://juejin.im" target="_blank">掘金</a>
+          </li>
+        
+          <li>
+            <a href="http://www.jianshu.com" target="_blank">简书</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com" target="_blank">Github</a>
+          </li>
+        
+          <li>
+            <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+          </li>
+        
+          <li>
+            <a href="http://www.infoq.com" target="_blank">Infoq</a>
+          </li>
+        
+          <li>
+            <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+          </li>
+        
+          <li>
+            <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Chen Madison<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">主页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="https://github.com/ostenant" class="mobile-nav-link">Github</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!--
+
+-->
+
+
+
+   
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+                processEscapes: true
+                    
+}
+  
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+                  
+}
+    
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i=0; i < all.length; i += 1) {
+                            all[i].SourceElement().parentNode.className += ' has-jax';
+                                    
+            }
+                
+        });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.5.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<script src="/js/script.js"></script>
+
+
+</div>
+</body>
+</html>

@@ -1,0 +1,570 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java NIO系列(二) - Buffer | Coding | Madison&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="baidu-site-verification" content="0aFfZiB4tV" />
+  
+  
+  <meta name="description" content="前言在Java NIO中，缓冲区用来临时存储数据，可以理解为是I/O操作中数据暂存的中转站。缓冲区直接为通道(Channel)服务，数据是从通道读入缓冲区，从缓冲区写入到通道中的。 缓冲区本质上是一块可以写入数据，然后可以从中读取数据的内存。这块内存被包装成NIO Buffer对象，并提供了一组方法，用来方便的访问这块内存。">
+<meta name="keywords" content="NIO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java NIO系列(二) - Buffer">
+<meta property="og:url" content="https://ostenant.coding.me/2017/12/26/Java NIO系列(二) - Buffer/index.html">
+<meta property="og:site_name" content="Coding | Madison&#39;s Blog">
+<meta property="og:description" content="前言在Java NIO中，缓冲区用来临时存储数据，可以理解为是I/O操作中数据暂存的中转站。缓冲区直接为通道(Channel)服务，数据是从通道读入缓冲区，从缓冲区写入到通道中的。 缓冲区本质上是一块可以写入数据，然后可以从中读取数据的内存。这块内存被包装成NIO Buffer对象，并提供了一组方法，用来方便的访问这块内存。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Buffer_Class_diagram.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Buffer_capacity_limit_position.png">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-05-08T02:49:46.091Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java NIO系列(二) - Buffer">
+<meta name="twitter:description" content="前言在Java NIO中，缓冲区用来临时存储数据，可以理解为是I/O操作中数据暂存的中转站。缓冲区直接为通道(Channel)服务，数据是从通道读入缓冲区，从缓冲区写入到通道中的。 缓冲区本质上是一块可以写入数据，然后可以从中读取数据的内存。这块内存被包装成NIO Buffer对象，并提供了一组方法，用来方便的访问这块内存。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Buffer_Class_diagram.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Coding | Madison&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+ 
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Coding | Madison&#39;s Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">上善若水任方猿</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">主页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="https://github.com/ostenant">Github</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="ostenant.coding.me">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-Java NIO系列(二) - Buffer" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/26/Java NIO系列(二) - Buffer/" class="article-date">
+  <time datetime="2017-12-26T13:41:00.000Z" itemprop="datePublished">2017-12-26</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java NIO系列(二) - Buffer
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在<code>Java NIO</code>中，<strong>缓冲区</strong>用来<strong>临时</strong>存储数据，可以理解为是<code>I/O</code>操作中数据暂存的中转站。<strong>缓冲区</strong>直接为<strong>通道</strong>(<code>Channel</code>)服务，数据是从<strong>通道</strong>读入<strong>缓冲区</strong>，从<strong>缓冲区</strong>写入到<strong>通道</strong>中的。</p>
+<p><strong>缓冲区</strong>本质上是一块可以<strong>写入数据</strong>，然后可以从中<strong>读取数据</strong>的内存。这块内存被包装成<code>NIO Buffer</code>对象，并提供了一组方法，用来方便的访问<strong>这块内存</strong>。</p>
+<a id="more"></a>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="Buffer的类型"><a href="#Buffer的类型" class="headerlink" title="Buffer的类型"></a>Buffer的类型</h2><p><code>Java NIO</code>提供以下几种<code>Buffer</code>类型：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Buffer_Class_diagram.png" alt=""></p>
+<ul>
+<li><strong>ByteBuffer</strong></li>
+<li><strong>MappedByteBuffer</strong></li>
+<li><strong>ShortBuffer</strong></li>
+<li><strong>LongBuffer</strong></li>
+<li><strong>FloatBuffer</strong></li>
+<li><strong>CharBuffer</strong></li>
+<li><strong>IntBuffer</strong></li>
+<li><strong>DoubleBuffer</strong></li>
+</ul>
+<p>这些<code>Buffer</code>类型代表了<code>Java</code>中7种基本数据类型。换句话说，就是可以通过<code>byte</code>、<code>char</code>、<code>short</code>、<code>int</code>、<code>long</code>、<code>float</code>或<code>double</code>类型来操作<strong>缓冲区</strong>中的数据。</p>
+<h2 id="Buffer的基本用法"><a href="#Buffer的基本用法" class="headerlink" title="Buffer的基本用法"></a>Buffer的基本用法</h2><p>使用<code>Buffer</code>读写数据一般遵循以下四个步骤：</p>
+<ol>
+<li>写入数据到<code>Buffer</code>中；</li>
+<li>调用<code>Buffer</code>的<code>flip()</code>方法；</li>
+<li>从<code>Buffer</code>中读取数据；</li>
+<li>调用<code>clear()</code>方法或者<code>compact()</code>方法。</li>
+</ol>
+<p>当向<code>Buffer</code>写入数据时，<code>Buffer</code>会记录下写了多少数据。一旦要读取数据，需要通过<code>flip()</code>方法将<code>Buffer</code>从<strong>写模式</strong>切换到<strong>读模式</strong>。在<strong>读模式</strong>下，可以读取之前写入到<code>Buffer</code>的所有数据。</p>
+<p>一旦读完了所有的数据，就需要<strong>清空缓冲区</strong>，让它可以再次被写入。两种方式能清空缓冲区：调用<code>clear()</code>或<code>compact()</code>方法。</p>
+<ul>
+<li><p><strong>clear()方法</strong>：清空<strong>整个</strong>缓冲区，包括<strong>已读</strong>和<strong>未读</strong>的数据。</p>
+</li>
+<li><p><strong>compact()方法</strong>：只会清空<strong>已读</strong>的数据，<strong>未读</strong>的数据都被移到<strong>缓冲区</strong>的<strong>起始处</strong>，新写入的数据将放到缓冲区<strong>未读数据</strong>的<strong>后面</strong>。</p>
+</li>
+</ul>
+<p>下面给出一个<code>ByteBuffer</code>的简单使用示例，其他缓冲区<code>API</code>的使用类似：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">testReadFromBuffer</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        RandomAccessFile file = <span class="keyword">new</span> RandomAccessFile(<span class="string">"D://test.txt"</span>, <span class="string">"rw"</span>);</span><br><span class="line">        FileChannel fileChannel = file.getChannel();</span><br><span class="line">        <span class="comment">//创建容量为10byte的buffer</span></span><br><span class="line">        ByteBuffer byteBuffer = ByteBuffer.allocate(<span class="number">10</span>);</span><br><span class="line">        <span class="comment">// 不断地写入缓冲区，写一次读一次</span></span><br><span class="line">        <span class="keyword">while</span> (fileChannel.read(byteBuffer) != -<span class="number">1</span>) &#123;</span><br><span class="line">            <span class="comment">// 设置buffer切换模式为读模式</span></span><br><span class="line">            byteBuffer.flip();</span><br><span class="line">            <span class="keyword">while</span> (byteBuffer.hasRemaining()) &#123;</span><br><span class="line">                <span class="comment">// 每次读取1byte，也就是一个字节</span></span><br><span class="line">                System.out.print((<span class="keyword">char</span>) byteBuffer.get());</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 清空整个缓存区，准备下次写入</span></span><br><span class="line">            byteBuffer.clear();</span><br><span class="line">        &#125;</span><br><span class="line">        fileChannel.close();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Buffer的重要属性"><a href="#Buffer的重要属性" class="headerlink" title="Buffer的重要属性"></a>Buffer的重要属性</h2><p>为了理解<code>Buffer</code>的工作原理，需要熟悉它的<code>4</code>个核心属性：</p>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th style="text-align:center">含义</th>
+<th style="text-align:center">具体描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>capacity</td>
+<td style="text-align:center">容量</td>
+<td style="text-align:center">缓冲区可以容纳的最大数据量，在缓冲区创建时被设定并且不能改变</td>
+</tr>
+<tr>
+<td>limit</td>
+<td style="text-align:center">上界</td>
+<td style="text-align:center">缓冲区中当前已使用的数据量</td>
+</tr>
+<tr>
+<td>position</td>
+<td style="text-align:center">位置</td>
+<td style="text-align:center">缓冲区下一个要被读或写的元素的索引</td>
+</tr>
+<tr>
+<td>mark</td>
+<td style="text-align:center">标记</td>
+<td style="text-align:center">调用mark()来设置mark=position，再调用reset()可以让position恢复到标记的位置即position=mark</td>
+</tr>
+</tbody>
+</table>
+<p>其中，<code>position</code>和<code>limit</code>的含义取决于<code>Buffer</code>处在<strong>读模式</strong>还是<strong>写模式</strong>。不管<code>Buffer</code>处在什么模式，<code>capacity</code>的含义总是一样的。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Buffer_capacity_limit_position.png" alt=""></p>
+<h3 id="capacity"><a href="#capacity" class="headerlink" title="capacity"></a>capacity</h3><p>作为一个<strong>内存块</strong>，<code>Buffer</code>有一个固定的大小值，也叫<code>capacity</code>。你最多只能写入<code>capacity</code>个的<code>byte</code>、<code>char</code>、<code>int</code>、<code>long</code>等类型数据。一旦<code>Buffer</code>满了，需要将其<strong>清空</strong>（通过<strong>读数据</strong>或者<strong>清除数据</strong>）才能继续往里写数据。</p>
+<h3 id="position"><a href="#position" class="headerlink" title="position"></a>position</h3><ul>
+<li><strong>写入数据时</strong>：</li>
+</ul>
+<p>当你写数据到<code>Buffer</code>中时，<code>position</code>表示下一个<strong>可写入</strong>的数据的位置。<code>position</code>的<strong>初始位置</strong>为<code>0</code>，当一个<code>byte</code>、<code>char</code>、<code>int</code>、<code>long</code>等数据写到<code>Buffer</code>后，<code>position</code>会向前移动到<strong>下一个可插入</strong>数据的<code>Buffer</code>单元。<code>position</code>最大可为<code>capacity – 1</code>。</p>
+<ul>
+<li><strong>读取数据时</strong>：</li>
+</ul>
+<p>当从<code>Buffer</code>读取数据时，<code>position</code>表示下一个<strong>可读取</strong>的数据的位置。当将<code>Buffer</code>从<strong>写模式</strong>切换到<strong>读模式</strong>，<code>position</code>会被重置为<code>0</code>。当从<code>Buffer</code>的<code>position</code>处<strong>读取数据</strong>时，<code>position</code>向前移动到下一个<strong>可读</strong>的位置。</p>
+<h3 id="limit"><a href="#limit" class="headerlink" title="limit"></a>limit</h3><ul>
+<li><strong>写入数据时</strong>：</li>
+</ul>
+<p>在<strong>写模式</strong>下，<code>Buffer</code>的<code>limit</code>表示你最多能往<code>Buffer</code>里写多少数据。写模式下，<code>limit</code>等于<code>Buffer</code>的<code>capacity</code>，也就是内存块的最大容量。</p>
+<ul>
+<li><strong>写入数据时</strong>：</li>
+</ul>
+<p>当切换<code>Buffer</code>到读模式时，<code>limit</code>会被设置成<strong>写模式</strong>下的<code>position</code>值，<code>limit</code>表示你最多能读到多少数据。<code>limit</code>被设置成<strong>已写</strong>数据的数量，这个值在<strong>写模式</strong>下就是<code>position</code>。</p>
+<h2 id="Buffer的方法"><a href="#Buffer的方法" class="headerlink" title="Buffer的方法"></a>Buffer的方法</h2><h3 id="Buffer的分配"><a href="#Buffer的分配" class="headerlink" title="Buffer的分配"></a>Buffer的分配</h3><p>要想获得一个<code>Buffer</code>对象首先要进行分配，每一<code>个Buffer</code>类都有一个<code>allocate()</code>方法。下面是一个分配<code>10</code>字节<code>capacity</code>的<code>ByteBuffer</code>的例子：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ByteBuffer buf = ByteBuffer.allocate(<span class="number">10</span>);</span><br></pre></td></tr></table></figure>
+<p>这是分配一个可存储<code>1024</code>个字符的<code>CharBuffer</code>：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CharBuffer buf = CharBuffer.allocate(<span class="number">1024</span>);</span><br></pre></td></tr></table></figure>
+<h3 id="向Buffer中写入数据"><a href="#向Buffer中写入数据" class="headerlink" title="向Buffer中写入数据"></a>向Buffer中写入数据</h3><p>写数据到<code>Buffer</code>有两种方式：</p>
+<ul>
+<li>从<code>Channel</code>将数据写入<code>Buffer</code>。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> bytesRead = channel.read(buffer);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过<code>Buffer</code>的<code>put()</code>方法写到<code>Buffer</code>中。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">buffer.put(<span class="number">1</span>);</span><br></pre></td></tr></table></figure>
+<p><code>put()</code>在<code>ByteBuffer</code>中为抽象方法，在<code>ByteBuffer</code>有很多的重载，由其子类<code>HeapByteBuffer</code>和<code>DirectByteBuffer</code>实现。</p>
+<h3 id="写模式切换为读模式"><a href="#写模式切换为读模式" class="headerlink" title="写模式切换为读模式"></a>写模式切换为读模式</h3><p><code>flip()</code>方法将<code>Buffer</code>从<strong>写模式</strong>切换到<strong>读模式</strong>。调用<code>flip()</code>方法会将<code>position</code>设回<code>0</code>，并将<code>limit</code>设置成之前<code>position</code>的值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">buffer.flip();</span><br></pre></td></tr></table></figure>
+<p>查看<code>flip()</code>方法的源码确认：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">flip</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    limit = position;</span><br><span class="line">    position = <span class="number">0</span>;</span><br><span class="line">    mark = -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="从Buffer从读取数据"><a href="#从Buffer从读取数据" class="headerlink" title="从Buffer从读取数据"></a>从Buffer从读取数据</h3><p>从<code>Buffer</code>中读取数据也有两种方式：</p>
+<ul>
+<li>从<code>Buffer</code>读取数据到<code>Channel</code>中。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">int</span> bytesWritten = channel.write(buf);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>通过<code>Buffer</code>的<code>get()</code>方法从<code>Buffer</code>中读取数据。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">byte</span> b = buffer.get();</span><br></pre></td></tr></table></figure>
+<p><code>get()</code>方法和<code>put()</code>一样有很多的重载，允许以不同的方式从<code>Buffer</code>中读取数据。例如：从指定<code>position</code>读取，或者从<code>Buffer</code>中读取数据到字节数组。</p>
+<h3 id="clear-和compact-方法"><a href="#clear-和compact-方法" class="headerlink" title="clear()和compact()方法"></a>clear()和compact()方法</h3><p>一旦读完<code>Buffer</code>中的数据，需要让<code>Buffer</code>准备好再次被写入。前面也说了，可以通过<code>clear()</code>或<code>compact()</code>方法来完成。</p>
+<h4 id="clear-方法"><a href="#clear-方法" class="headerlink" title="clear()方法"></a>clear()方法</h4><p>如果调用的是<code>clear()</code>方法，<code>position</code>将被设回<code>0</code>，<code>limit</code>被设置成<code>capacity</code>的值。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">buffer.clear();</span><br></pre></td></tr></table></figure>
+<p>查看<code>clear()</code>方法的源码确认：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">clear</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    position = <span class="number">0</span>;</span><br><span class="line">    limit = capacity;</span><br><span class="line">    mark = -<span class="number">1</span>;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>换句话说，<code>Buffer</code>被清空了。<code>Buffer</code>中的<strong>数据并未清除</strong>，只是这些标记告诉我们可以从哪里开始往<code>Buffer</code>里写数据。</p>
+<h4 id="compact-方法"><a href="#compact-方法" class="headerlink" title="compact()方法"></a>compact()方法</h4><p>如果调用的是<code>compact()</code>方法，所有的<strong>未读数据</strong>都将被拷贝到<code>Buffer</code>的起始位置，<code>position</code>会设置为最后一个未读元素的后面。<code>limit()</code>方法和<code>clear()</code>方法一样，会被设置为<code>capacity</code>的大小。</p>
+<p>查看<code>compact()</code>方法的实现，此方法在<code>ByteBuffer</code>中为抽象方法，查看其子类<code>HeapByteBuffer</code>的实现：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> ByteBuffer <span class="title">compact</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="comment">// 将未读的数据往前移动</span></span><br><span class="line">    System.arraycopy(hb, ix(position()), hb, ix(<span class="number">0</span>), remaining());</span><br><span class="line">    <span class="comment">// 设置postion为最后一个未读数据后面的位置</span></span><br><span class="line">    position(remaining());</span><br><span class="line">    <span class="comment">// 设置limit为最大的容量</span></span><br><span class="line">    limit(capacity());</span><br><span class="line">    <span class="comment">// 清除标记位</span></span><br><span class="line">    discardMark();</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>现在<code>Buffer</code>准备好写数据了，但是<strong>不会覆盖未读</strong>的数据。</p>
+<h3 id="mark-与reset-方法"><a href="#mark-与reset-方法" class="headerlink" title="mark()与reset()方法"></a>mark()与reset()方法</h3><p>通过调用<code>mark()</code>方法，可以标记<code>Buffer</code>中的一个特定<code>position</code>。之后可以通过调用<code>reset()</code>方法恢复到这个<code>position</code>。例如：</p>
+<h4 id="mark-方法"><a href="#mark-方法" class="headerlink" title="mark()方法"></a>mark()方法</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">buffer.mark();</span><br></pre></td></tr></table></figure>
+<p>查看<code>mark()</code>方法的源码，<code>mark</code>变量被设置为<code>position</code>的值：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">mark</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    mark = position;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="reset-方法"><a href="#reset-方法" class="headerlink" title="reset()方法"></a>reset()方法</h4><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">buffer.reset();</span><br></pre></td></tr></table></figure>
+<p>查看<code>mark()</code>方法的源码，<code>position</code>变量被设置为之前的<code>mark</code>的值：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">final</span> Buffer <span class="title">reset</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">int</span> m = mark;</span><br><span class="line">    <span class="keyword">if</span> (m &lt; <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">throw</span> <span class="keyword">new</span> InvalidMarkException();</span><br><span class="line">    position = m;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">this</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="equals-与compareTo-方法"><a href="#equals-与compareTo-方法" class="headerlink" title="equals()与compareTo()方法"></a>equals()与compareTo()方法</h3><p>可以使用<code>equals()</code>和<code>compareTo()</code>方法比较两个<code>Buffer</code>。</p>
+<h4 id="equals-方法"><a href="#equals-方法" class="headerlink" title="equals()方法"></a>equals()方法</h4><p>当同时满足下列条件时，表示两个<code>Buffer</code>相等：</p>
+<ol>
+<li>有相同的<strong>类型</strong>(<code>byte</code>、<code>char</code>、<code>int</code>和<code>long</code>类型等)。</li>
+<li><code>Buffer</code>中剩余的<code>byte</code>、<code>char</code>等元素的<strong>个数</strong>相等。</li>
+<li><code>Buffer</code>中所有剩余的<code>byte</code>、<code>char</code>等都相同。</li>
+</ol>
+<p><code>equals()</code>方法比较的实际是<code>Buffer</code>中的<strong>剩余元素</strong>是否相等。它只是比较<code>Buffer</code>的一部分，不是每一个在它里面的元素都比较。</p>
+<h4 id="compareTo-方法"><a href="#compareTo-方法" class="headerlink" title="compareTo()方法"></a>compareTo()方法</h4><p><code>compareTo()</code>方法比较两个<code>Buffer</code>的剩余元素(<code>byte</code>、<code>char</code>等)。<br>当满足下列条件时，则认为一个<code>Buffer</code><strong>小于</strong>另一个<code>Buffer</code>。</p>
+<ol>
+<li>第一个<strong>不相等</strong>的元素<strong>小于</strong>另一个<code>Buffer</code>中对应的元素。</li>
+<li>所有元素都相等，但第一个<code>Buffer</code>比另一个<strong>先耗尽</strong>(第一个<code>Buffer</code>的元素个数比另一个少)。</li>
+</ol>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>这里只是对<code>Buffer</code>进行了入门的介绍，具体深入学习还需要查看各种<strong>缓冲区</strong>以及相关的具体实现。</p>
+<hr>
+<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="https://ostenant.coding.me/2017/12/26/Java NIO系列(二) - Buffer/" data-id="cjgx4eiod0012684uh0tnfuix" class="article-share-link" data-share="baidu" data-title="Java NIO系列(二) - Buffer">分享到</a>
+      
+
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NIO/">NIO</a></li></ul>
+
+    </footer>
+	
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/27/Java NIO系列(三) - Channel/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          Java NIO系列(三) - Channel
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/25/一天一个设计模式(五) - 适配器模式(Adapter)/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">一天一个设计模式(五) - 适配器模式(Adapter)</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+
+
+
+</section>
+      
+      <aside id="sidebar">
+  
+    
+<div class="widget-wrap">
+  <h3 class="widget-title">关于我</h3>
+  <ul class="widget about-me">
+    
+    <li><img class="author" title="About me" src="/img/favicon.png" /></li>
+    
+    
+    <li>ostenant@163.com</li>
+    
+    <li>一枚热爱生活，追逐自由的小技术！</li>
+    
+  </ul>
+</div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ECMAScript基础系列/">ECMAScript基础系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECMAScript/">ECMAScript</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/Docker/" style="font-size: 13.33px;">Docker</a> <a href="/tags/ECMAScript/" style="font-size: 11.67px;">ECMAScript</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/RPC/" style="font-size: 18.33px;">RPC</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/SOFA-RPC/" style="font-size: 10px;">SOFA-RPC</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/04/29/蚂蚁金服RPC框架SOFA-RPC(一) - 初体验/">蚂蚁金服RPC框架SOFA-RPC(一) - 初体验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/28/分布式理论(四) - 3PC协议/">分布式理论(四) - 3PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/25/分布式理论(三) - 2PC协议/">分布式理论(三) - 2PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/24/分布式理论(二) - BASE理论/">分布式理论(二) - BASE理论</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/23/分布式理论(一) - CAP定理/">分布式理论(一) - CAP定理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+          </li>
+        
+          <li>
+            <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+          </li>
+        
+          <li>
+            <a href="http://ifeve.com" target="_blank">并发编程网</a>
+          </li>
+        
+          <li>
+            <a href="https://juejin.im" target="_blank">掘金</a>
+          </li>
+        
+          <li>
+            <a href="http://www.jianshu.com" target="_blank">简书</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com" target="_blank">Github</a>
+          </li>
+        
+          <li>
+            <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+          </li>
+        
+          <li>
+            <a href="http://www.infoq.com" target="_blank">Infoq</a>
+          </li>
+        
+          <li>
+            <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+          </li>
+        
+          <li>
+            <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Chen Madison<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">主页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="https://github.com/ostenant" class="mobile-nav-link">Github</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!--
+
+-->
+
+
+
+   
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+                processEscapes: true
+                    
+}
+  
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+                  
+}
+    
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i=0; i < all.length; i += 1) {
+                            all[i].SourceElement().parentNode.className += ' has-jax';
+                                    
+            }
+                
+        });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.5.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<script src="/js/script.js"></script>
+
+
+</div>
+</body>
+</html>

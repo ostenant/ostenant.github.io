@@ -1,0 +1,727 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>大型Web网站架构演变 | Coding | Madison&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="baidu-site-verification" content="0aFfZiB4tV" />
+  
+  
+  <meta name="description" content="前言我们以Java Web为例，来搭建一个简单的电商系统，看看这个系统可以如何一步步演变。该系统具备的功能：  用户模块：用户注册和管理 商品模块：商品展示和管理 交易模块：创建交易和管理">
+<meta name="keywords" content="Web">
+<meta property="og:type" content="article">
+<meta property="og:title" content="大型Web网站架构演变">
+<meta property="og:url" content="https://ostenant.coding.me/2017/03/24/大型Web网站架构演变/index.html">
+<meta property="og:site_name" content="Coding | Madison&#39;s Blog">
+<meta property="og:description" content="前言我们以Java Web为例，来搭建一个简单的电商系统，看看这个系统可以如何一步步演变。该系统具备的功能：  用户模块：用户注册和管理 商品模块：商品展示和管理 交易模块：创建交易和管理">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-1.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-2.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-3-1.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-3-2.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-4.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-5.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-6.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-7.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-7-2.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-8-1.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-8-2.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-9.png">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-05-08T02:49:46.096Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="大型Web网站架构演变">
+<meta name="twitter:description" content="前言我们以Java Web为例，来搭建一个简单的电商系统，看看这个系统可以如何一步步演变。该系统具备的功能：  用户模块：用户注册和管理 商品模块：商品展示和管理 交易模块：创建交易和管理">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/stage-1.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Coding | Madison&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+ 
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Coding | Madison&#39;s Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">上善若水任方猿</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">主页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="https://github.com/ostenant">Github</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="ostenant.coding.me">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-大型Web网站架构演变" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/03/24/大型Web网站架构演变/" class="article-date">
+  <time datetime="2017-03-24T07:55:00.000Z" itemprop="datePublished">2017-03-24</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/架构学习系列/">架构学习系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      大型Web网站架构演变
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>我们以Java Web为例，来搭建一个简单的电商系统，看看这个系统可以如何一步步演变。<br>该系统具备的功能：</p>
+<ul>
+<li>用户模块：用户注册和管理</li>
+<li>商品模块：商品展示和管理</li>
+<li>交易模块：创建交易和管理</li>
+</ul>
+<a id="more"></a>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><hr>
+<h2 id="阶段一、单机构建网站"><a href="#阶段一、单机构建网站" class="headerlink" title="阶段一、单机构建网站"></a>阶段一、单机构建网站</h2><p>网站的初期，我们经常会在单机上跑我们所有的程序和软件。此时我们使用一个容器，如<code>Tomcat</code>、<code>Jetty</code>、<code>Jboss</code>，然后直接使用JSP/Servlet技术，或者使用一些开源的框架如<code>Maven + Spring + Struts + Hibernate</code>、<code>Maven + Spring + Spring MVC + Mybatis</code>。最后再选择一个数据库管理系统来存储数据，如<code>MySQL</code>、<code>SqlServer</code>、<code>Oracle</code>，然后通过<code>JDBC</code>进行数据库的连接和操作。</p>
+<p>把以上的所有软件包括数据库、应用程序都装载同一台机器上，应用跑起来了，也算是一个小系统了。此时系统结果如下：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/stage-1.png" alt=""></p>
+<h2 id="阶段二、应用服务器与数据库分离"><a href="#阶段二、应用服务器与数据库分离" class="headerlink" title="阶段二、应用服务器与数据库分离"></a>阶段二、应用服务器与数据库分离</h2><p>随着网站的上线，访问量逐步上升，服务器的负载慢慢提高，在服务器还没有超载的时候，我们应该就要做好准备，提升网站的负载能力。假如我们<strong>代码层面</strong>已难以优化，在不提高单台机器的性能的情况下，采用<strong>增加机器</strong>是一个不错的方式，不仅可以有效地提高系统的负载能力，而且性价比高。</p>
+<p>增加的机器用来做什么呢？此时我们可以把<strong>数据库服务器</strong>和<strong>Web服务器</strong>拆分开来，这样不仅提高了单台机器的负载能力，也提高了容灾能力。</p>
+<p>应用服务器与数据库分开后的架构如下图所示：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/stage-2.png" alt=""></p>
+<h2 id="阶段三、应用服务器集群"><a href="#阶段三、应用服务器集群" class="headerlink" title="阶段三、应用服务器集群"></a>阶段三、应用服务器集群</h2><p>随着访问量继续增加，单台应用服务器已经无法满足需求了。在假设数据库服务器没有压力的情况下，我们可以把应用服务器从<strong>一台</strong>变成了<strong>两台甚至多台</strong>，把用户的请求分散到不同的服务器中，从而提高负载能力。而<strong>多台应用服务器</strong>之间没有直接的交互，他们都是依赖数据库各自对外提供服务。著名的做<strong>故障切换</strong>的软件有<code>KeepAlived</code>，<code>KeepAlived</code>是一个类似于Layer3、4、7交换机制的软件，他不是某个具体软件故障切换的专属品，而是可以适用于各种软件的一款产品。<code>KeepAlived</code>配合上<code>ipvsadm</code>又可以做<strong>负载均衡</strong>，可谓是神器。</p>
+<p>我们以增加了一台应用服务器为例，增加后的系统结构图如下：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/stage-3-1.png" alt=""></p>
+<p>系统演变到这里，将会出现下面<strong>四个问题</strong>：</p>
+<ol>
+<li>用户的请求由谁来转发到到具体的应用服务器？</li>
+<li>有那些转发的算法和策略可以使用？</li>
+<li>应用服务器如何返回用户的请求？</li>
+<li>用户如果每次访问到的服务器不一样，那么如何维护session的一致性？</li>
+</ol>
+<p>针对以上问题，常用的<strong>解决方案</strong>如下：</p>
+<h4 id="1、负载均衡的问题"><a href="#1、负载均衡的问题" class="headerlink" title="1、负载均衡的问题"></a>1、负载均衡的问题</h4><p>一般以下有5种解决方案：</p>
+<p>1、HTTP重定向</p>
+<blockquote>
+<p><code>HTTP</code>重定向就是应用层的请求转发。用户的请求其实已经到了<code>HTTP</code>重定向负载均衡服务器，服务器根据算法要求用户重定向，用户收到重定向请求后，再次请求真正的集群</p>
+</blockquote>
+<ul>
+<li>优点：简单易用；</li>
+<li>缺点：性能较差。</li>
+</ul>
+<p>2、DNS域名解析负载均衡</p>
+<blockquote>
+<p><code>DNS</code>域名解析负载均衡就是在用户请求DNS服务器，获取域名对应的IP地址时，DNS服务器直接给出负载均衡后的服务器IP。</p>
+</blockquote>
+<ul>
+<li>优点：交给<code>DNS</code>，不用我们去维护负载均衡服务器；</li>
+<li>缺点：当一个应用服务器挂了，不能及时通知<code>DNS</code>，而且<code>DNS</code>负载均衡的控制权在域名服务商那里，网站无法做更多的改善和更强大的管理。</li>
+</ul>
+<p>3、反向代理服务器</p>
+<blockquote>
+<p>在用户的请求到达反向代理服务器时（已经到达网站机房），由反向代理服务器根据算法转发到具体的服务器。常用的<code>Apache</code>，<code>Nginx</code>都可以充当反向代理服务器。</p>
+</blockquote>
+<ul>
+<li>优点：部署简单；</li>
+<li>缺点：代理服务器可能成为性能的瓶颈，特别是一次上传大文件。</li>
+</ul>
+<p>4、IP层负载均衡</p>
+<blockquote>
+<p>在请求到达负载均衡器后，负载均衡器通过修改请求的目的<code>IP</code>地址，从而实现请求的转发，做到负载均衡。</p>
+</blockquote>
+<ul>
+<li>优点：性能更好；</li>
+<li>缺点：负载均衡器的宽带成为瓶颈。</li>
+</ul>
+<p>5、数据链路层负载均衡</p>
+<blockquote>
+<p>在请求到达负载均衡器后，负载均衡器通过修改请求的<code>MAC</code>地址，从而做到负载均衡，与<code>IP</code>负载均衡不一样的是，当请求访问完服务器之后，直接返回客户。而无需再经过负载均衡器。</p>
+</blockquote>
+<h4 id="2、集群调度转发算法"><a href="#2、集群调度转发算法" class="headerlink" title="2、集群调度转发算法"></a>2、集群调度转发算法</h4><p>1、rr轮询调度算法</p>
+<blockquote>
+<p>顾名思义，轮询分发请求。</p>
+</blockquote>
+<ul>
+<li>优点：实现简单</li>
+<li>缺点：不考虑每台服务器的处理能力</li>
+</ul>
+<p>2、wrr加权调度算法</p>
+<blockquote>
+<p>我们给每个服务器设置权值<code>Weight</code>，负载均衡调度器根据权值调度服务器，服务器被调用的次数跟权值成正比。</p>
+</blockquote>
+<ul>
+<li>优点：考虑了服务器处理能力的不同</li>
+</ul>
+<p>3、sh原地址散列算法</p>
+<blockquote>
+<p>提取用户<code>IP</code>，根据散列函数得出一个<code>key</code>，再根据静态映射表，查处对应的<code>value</code>，即目标服务器<code>IP</code>。过目标机器超负荷，则返回空。</p>
+</blockquote>
+<ul>
+<li>优点：实现同一个用户访问同一个服务器。</li>
+</ul>
+<p>4、dh目标地址散列算法</p>
+<blockquote>
+<p>原理同上，只是现在提取的是目标地址的<code>IP</code>来做哈希。</p>
+</blockquote>
+<ul>
+<li>优点：实现同一个用户访问同一个服务器。</li>
+</ul>
+<p>5、lc最少连接算法</p>
+<blockquote>
+<p>优先把请求转发给连接数少的服务器。</p>
+</blockquote>
+<ul>
+<li>优点：使得集群中各个服务器的负载更加均匀。</li>
+</ul>
+<p>6、wlc加权最少连接算法</p>
+<blockquote>
+<p>在<code>lc</code>的基础上，为每台服务器加上权值。算法为：<code>（活动连接数 * 256 + 非活动连接数） ÷ 权重</code>，计算出来的值小的服务器优先被选择。</p>
+</blockquote>
+<ul>
+<li>优点：可以根据服务器的能力分配请求。</li>
+</ul>
+<p>7、sed最短期望延迟算法</p>
+<blockquote>
+<p>其实sed跟wlc类似，区别是不考虑非活动连接数。算法为：<code>（活动连接数 +1 ) * 256 ÷ 权重</code>，同样计算出来的值小的服务器优先被选择。</p>
+</blockquote>
+<p>8、nq永不排队算法</p>
+<blockquote>
+<p>改进的<code>sed</code>算法。我们想一下什么情况下才能“永不排队”，那就是服务器的连接数为0的时候，那么假如有服务器连接数为0，均衡器直接把请求转发给它，无需经过sed的计算。</p>
+</blockquote>
+<p>9、LBLC基于局部性最少连接算法</p>
+<blockquote>
+<p>负载均衡器根据请求的目的<code>IP</code>地址，找出该<code>IP</code>地址最近被使用的服务器，把请求转发之。若该服务器超载，最采用最少连接数算法。</p>
+</blockquote>
+<p>10、LBLCR带复制的基于局部性最少连接算法</p>
+<blockquote>
+<p>负载均衡器根据请求的目的IP地址，找出该IP地址最近使用的“服务器组”，注意，并不是具体某个服务器，然后采用最少连接数从该组中挑出具体的某台服务器出来，把请求转发之。若该服务器超载，那么根据最少连接数算法，在集群的非本服务器组的服务器中，找出一台服务器出来，加入本服务器组，然后把请求转发。</p>
+</blockquote>
+<h4 id="3、集群请求返回模式问题"><a href="#3、集群请求返回模式问题" class="headerlink" title="3、集群请求返回模式问题"></a>3、集群请求返回模式问题</h4><p>1、NAT</p>
+<blockquote>
+<p>负载均衡器接收用户的请求，转发给具体服务器，服务器处理完请求返回给均衡器，均衡器再重新返回给用户。</p>
+</blockquote>
+<p>2、DR</p>
+<blockquote>
+<p>负载均衡器接收用户的请求，转发给具体服务器，服务器出来玩请求后直接返回给用户。需要系统支持<code>IP Tunneling</code>协议，<strong>难以跨平台</strong>。</p>
+</blockquote>
+<p>3、TUN</p>
+<blockquote>
+<p>同上，但无需<code>IP Tunneling</code>协议，<strong>跨平台性好</strong>，大部分系统都可以支持。</p>
+</blockquote>
+<h4 id="4、集群Session一致性问题"><a href="#4、集群Session一致性问题" class="headerlink" title="4、集群Session一致性问题"></a>4、集群Session一致性问题</h4><p>1、Session Sticky</p>
+<blockquote>
+<p><code>Session sticky</code>就是把同一个用户在某一个会话中的请求，都分配到固定的某一台服务器中，这样我们就不需要解决跨服务器的<code>session</code>问题了，常见的算法有<code>ip_hash</code>算法，即上面提到的两种散列算法。</p>
+</blockquote>
+<ul>
+<li>优点：实现简单；</li>
+<li>缺点：应用服务器重启则session消失。</li>
+</ul>
+<p>2、Session Replication</p>
+<blockquote>
+<p><code>Session replication</code>就是在集群中复制<code>session</code>，使得每个服务器都保存有全部用户的<code>session</code>数据。</p>
+</blockquote>
+<ul>
+<li>优点：减轻负载均衡服务器的压力，不需要要实现ip_hasp算法来转发请求；</li>
+<li>缺点：复制时网络带宽开销大，访问量大的话<code>Session</code>占用内存大且浪费。</li>
+</ul>
+<p>3、Session数据集中存储</p>
+<blockquote>
+<p><code>Session</code>数据集中存储就是利用数据库来存储<code>session</code>数据，实现了<code>session</code>和应用服务器的解耦。</p>
+</blockquote>
+<ul>
+<li>优点：相比<code>Session replication</code>的方案，集群间对于宽带和内存的压力大幅减少；</li>
+<li>缺点：需要维护存储<code>Session</code>的数据库。</li>
+</ul>
+<p>4、Cookie Base</p>
+<blockquote>
+<p><code>Cookie base</code>就是把<code>Session</code>存在<code>Cookie</code>中，由浏览器来告诉应用服务器我的<code>session</code>是什么，同样实现了<code>session</code>和应用服务器的解耦。</p>
+</blockquote>
+<ul>
+<li>优点：实现简单，基本免维护。</li>
+<li>缺点：cookie长度限制，安全性低，带宽消耗。</li>
+</ul>
+<p>值得一提的是：</p>
+<ul>
+<li><code>Nginx</code>目前支持的负载均衡算法有<code>wrr</code>、<code>sh</code>（支持一致性哈希）、<code>fair</code>（lc）。但<code>Nginx</code>作为均衡器的话，还可以一同作为<strong>静态资源服务器</strong>。</li>
+<li><code>Keepalived + ipvsadm</code>比较强大，目前支持的算法有：<code>rr</code>、<code>wrr</code>、<code>lc</code>、<code>wlc</code>、<code>lblc</code>、<code>sh</code>、<code>dh</code></li>
+<li><code>Keepalived</code>支持集群模式有：<code>NAT</code>、<code>DR</code>、<code>TUN</code></li>
+<li><code>Nginx</code>本身并没有提供<code>session</code>同步的解决方案，而<code>Apache</code>则提供了<code>session</code>共享的支持。</li>
+</ul>
+<p>解决了以上的问题之后，系统的结构如下：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/stage-3-2.png" alt=""></p>
+<h2 id="阶段四、数据库读写分离化"><a href="#阶段四、数据库读写分离化" class="headerlink" title="阶段四、数据库读写分离化"></a>阶段四、数据库读写分离化</h2><p>上面我们总是假设数据库负载正常，但随着访问量的的提高，数据库的负载也在慢慢增大。那么可能有人马上就想到跟应用服务器一样，把数据库一份为二再负载均衡即可。</p>
+<p>但对于数据库来说，并没有那么简单。假如我们简单的把数据库一分为二，然后对于数据库的请求，分别负载到A机器和B机器，那么显而易见会造成两台数据库数据不统一的问题。那么对于这种情况，我们可以先考虑使用<strong>读写分离</strong>和<strong>主从复制</strong>的方式。</p>
+<p>读写分离后的系统结构如下：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/stage-4.png" alt=""></p>
+<p>这个结构变化后也会带来两个问题：</p>
+<ul>
+<li>主从数据库之间数据同步问题。</li>
+<li>应用对于数据源的选择问题。</li>
+</ul>
+<p>解决方案：</p>
+<ul>
+<li>使用<code>MySQL</code>自带的<code>Master + Slave</code>的方式实现<strong>主从复制</strong>。</li>
+<li>采用<strong>第三方数据库中间件</strong>，例如<code>MyCat</code>。<code>MyCat</code>是从<code>Cobar</code>发展而来的，而<code>Cobar</code>是阿里开源的数据库中间件，后来停止开发。<code>MyCat</code>是国内比较好的<code>MySql</code>开源数据库分库分表中间件。</li>
+</ul>
+<h2 id="阶段五、用搜索引擎缓解读库的压力"><a href="#阶段五、用搜索引擎缓解读库的压力" class="headerlink" title="阶段五、用搜索引擎缓解读库的压力"></a>阶段五、用搜索引擎缓解读库的压力</h2><p>数据库做读库的话，常常对<strong>模糊查找</strong>力不从心，即使做了读写分离，这个问题还未能解决。以我们所举的交易网站为例，发布的商品存储在数据库中，用户最常使用的功能就是查找商品，尤其是根据商品的标题来查找对应的商品。对于这种需求，一般我们都是通过<code>like</code>功能来实现的，但是这种方式的代价非常大，而且结果非常不准确。此时我们可以使用<strong>搜索引擎</strong>的<strong>倒排索引</strong>来完成。</p>
+<blockquote>
+<p>搜索引擎具有的优点：它能够大大提高查询速度和搜索准确性。</p>
+</blockquote>
+<h4 id="引入搜索引擎的开销"><a href="#引入搜索引擎的开销" class="headerlink" title="引入搜索引擎的开销"></a>引入搜索引擎的开销</h4><ul>
+<li>带来大量的维护工作，我们需要自己实现索引的构建过程，设计全量/增加的构建方式来应对非实时与实时的查询需求。</li>
+<li>需要维护搜索引擎集群</li>
+</ul>
+<blockquote>
+<p>搜索引擎并不能替代数据库，它解决了某些场景下的精准、快速、高效的“读”操作，是否引入搜索引擎，需要综合考虑整个系统的需求。</p>
+</blockquote>
+<p>引入搜索引擎后的系统结构如下：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/stage-5.png" alt=""></p>
+<h2 id="阶段六、用缓存缓解读库的压力"><a href="#阶段六、用缓存缓解读库的压力" class="headerlink" title="阶段六、用缓存缓解读库的压力"></a>阶段六、用缓存缓解读库的压力</h2><p>常用的缓存机制包括页面级缓存、应用数据缓存和数据库缓存。</p>
+<h3 id="应用层和数据库层的缓存"><a href="#应用层和数据库层的缓存" class="headerlink" title="应用层和数据库层的缓存"></a>应用层和数据库层的缓存</h3><p>随着访问量的增加，逐渐出现了许多用户访问同一部分<strong>热门内容</strong>的情况，对于这些比较热门的内容，没必要每次都从数据库读取。我们可以使用<strong>缓存技术</strong>，例如可以使用Google的开源缓存技术<code>Guava</code>或者使用<code>Memecahed</code>作为<strong>应用层</strong>的缓存，也可以使用<code>Redis</code>作为<strong>数据库层</strong>的缓存。</p>
+<blockquote>
+<p>另外，在某些场景下，关系型数据库并不是很适合，例如我想做一个“每日输入密码错误次数限制”的功能，思路大概是在用户登录时，如果登录错误，则记录下该用户的<code>IP</code>和错误次数，那么这个数据要放在哪里呢？假如放在内存中，那么显然会占用太大的内容；假如放在关系型数据库中，那么既要建立数据库表，还要简历对应的<code>Java bean</code>，还要写<code>SQL</code>等等。而分析一下我们要存储的数据，无非就是类似<code>{ip:errorNumber}</code>这样的<code>key:value</code>数据。对于这种数据，我们可以用<code>NOSQL</code>数据库来代替传统的关系型数据库。</p>
+</blockquote>
+<h3 id="页面缓存"><a href="#页面缓存" class="headerlink" title="页面缓存"></a>页面缓存</h3><p>除了数据缓存，还有页面缓存。比如使用<code>HTML5</code>的<code>localstroage</code>或者<code>Cookie</code>。除了页面缓存带来的性能提升外，对于并发访问且页面置换频率小的页面，应尽量使用页面静态化技术。</p>
+<ul>
+<li>优点：减轻数据库的压力， 大幅度提高访问速度；</li>
+<li>缺点：需要维护缓存服务器，提高了编码的复杂性。</li>
+</ul>
+<p>值得一提的是：</p>
+<blockquote>
+<p>缓存集群的调度算法不同与上面提到的应用服务器和数据库。最好采用<strong>一致性哈希算</strong>，这样才能提高<strong>命中率</strong>。</p>
+</blockquote>
+<p>加入缓存后的系统结构如下：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/stage-6.png" alt=""></p>
+<h2 id="阶段七、数据库水平拆分与垂直拆分"><a href="#阶段七、数据库水平拆分与垂直拆分" class="headerlink" title="阶段七、数据库水平拆分与垂直拆分"></a>阶段七、数据库水平拆分与垂直拆分</h2><p>我们的网站演进到现在，交易、商品、用户的数据都还在同一个数据库中。尽管采取了增加<strong>缓存</strong>和<strong>读写分离</strong>的方式，但随着数据库的压力继续增加，数据库数据量的<strong>瓶颈</strong>越来越突出，此时，我们可以有数据<strong>垂直拆分</strong>和<strong>水平拆分</strong>两种选择。</p>
+<h3 id="数据垂直拆分"><a href="#数据垂直拆分" class="headerlink" title="数据垂直拆分"></a>数据垂直拆分</h3><p>垂直拆分的意思是把数据库中不同的业务数据拆分到不同的数据库中，结合现在的例子，就是把交易、商品、用户的数据分开。</p>
+<p>优点：</p>
+<ul>
+<li>解决了原来把所有业务放在一个数据库中的压力问题；</li>
+<li>可以根据业务的特点进行更多的优化。</li>
+</ul>
+<p>缺点：</p>
+<ul>
+<li>需要维护多个数据库的状态一致性和数据同步。</li>
+</ul>
+<p>问题：</p>
+<ul>
+<li>需要考虑原来跨业务的事务；</li>
+<li>跨数据库的<code>Join</code>。</li>
+</ul>
+<p>解决问题方案：</p>
+<ul>
+<li>应该在应用层尽量避免跨数据库的<strong>分布式事务</strong>，如果非要跨数据库，尽量在<strong>代码</strong>中控制。</li>
+<li>通过<strong>第三方中间件</strong>来解决，如上面提到的<code>MyCat</code>，<code>MyCat</code>提供了丰富的跨库<code>Join</code>方案，详情可参考<code>MyCat</code>官方文档。</li>
+</ul>
+<p>数据垂直拆分后的结构如下：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/stage-7.png" alt=""></p>
+<h3 id="数据水平拆分"><a href="#数据水平拆分" class="headerlink" title="数据水平拆分"></a>数据水平拆分</h3><p>数据<strong>水平拆分</strong>就是把同一个表中的数据拆分到<strong>两个</strong>甚至<strong>多个</strong>数据库中。产生数据水平拆分的原因是某个业务的<strong>数据量</strong>或者更新量到达了<strong>单个数据库</strong>的瓶颈，这时就可以把这个表拆分到两个或更多个数据库中。</p>
+<p>优点：</p>
+<ul>
+<li>如果能克服以上问题，那么我们将能够很好地对数据量及写入量增长的情况。</li>
+</ul>
+<p>问题：</p>
+<ul>
+<li>访问用户信息的应用系统需要解决<code>SQL路由</code>的问题，因为现在用户信息分在了两个数据库中，需要在进行数据操作时了解需要操作的数据在哪里。</li>
+<li><strong>主键</strong> 的处理也变得不同，例如原来<strong>自增字段</strong>，现在不能简单地继续使用。</li>
+<li>如果需要<strong>分页</strong>查询，那就更加麻烦。</li>
+</ul>
+<p>解决问题方案：</p>
+<ul>
+<li>我们还是可以通过可以解决第三方中间件，如<code>MyCat</code>。<code>MyCat</code>可以通过<code>SQL</code>解析模块对我们的<code>SQL</code>进行解析，再根据我们的配置，把请求转发到具体的某个数据库。<br>我们可以通过<code>UUID</code>保证唯一或自定义ID方案来解决。</li>
+<li><code>MyCat</code>也提供了丰富的<strong>分页查询方案</strong>，比如先从每个数据库做分页查询，再合并数据做一次分页查询等等。</li>
+</ul>
+<p>数据水平拆分后的结构如下：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/stage-7-2.png" alt=""></p>
+<h2 id="阶段八、应用的拆分"><a href="#阶段八、应用的拆分" class="headerlink" title="阶段八、应用的拆分"></a>阶段八、应用的拆分</h2><h3 id="按微服务拆分应用"><a href="#按微服务拆分应用" class="headerlink" title="按微服务拆分应用"></a>按微服务拆分应用</h3><p>随着业务的发展，业务越来越多，应用越来越大。我们需要考虑如何避免让应用越来越<strong>臃肿</strong>。这就需要把应用拆开，从一个应用变为俩个甚至更多。还是以我们上面的例子，我们可以把用户、商品、交易拆分开。变成“用户、商品”和“用户，交易”两个子系统。　　</p>
+<p>拆分后的结构：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/stage-8-1.png" alt=""></p>
+<p>问题：</p>
+<blockquote>
+<p>这样拆分后，可能会有一些相同的代码，如用户相关的代码，商品和交易都需要用户信息，所以在两个系统中都保留差不多的操作用户信息的代码。如何保证这些代码可以复用是一个需要解决的问题。</p>
+</blockquote>
+<p>解决问题：</p>
+<blockquote>
+<p>通过走服务化SOA的路线来解决频繁公共的服务。</p>
+</blockquote>
+<h3 id="走SOA服务化治理道路"><a href="#走SOA服务化治理道路" class="headerlink" title="走SOA服务化治理道路"></a>走SOA服务化治理道路</h3><p>为了解决上面拆分应用后所出现的问题，我们把<strong>公共</strong>的服务拆分出来，形成一种<strong>服务化</strong>的模式，简称<code>SOA</code>。</p>
+<p>采用服务化之后的系统结构：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/stage-8-2.png" alt=""></p>
+<p>优点：</p>
+<ul>
+<li>相同的代码不会散落在不同的应用中了，这些实现放在了<strong>各个服务中心</strong>，使代码得到更好的维护。</li>
+<li>我们把对数据库的交互业务放在了各个服务中心，让前端的Web应用更注重与浏览器交互的工作。</li>
+</ul>
+<p>问题：</p>
+<blockquote>
+<p>如何进行远程的服务调用？</p>
+</blockquote>
+<p>解决方法：</p>
+<blockquote>
+<p>可以通过下面的引入消息中间件来解决。</p>
+</blockquote>
+<h2 id="阶段九、引入消息中间件"><a href="#阶段九、引入消息中间件" class="headerlink" title="阶段九、引入消息中间件"></a>阶段九、引入消息中间件</h2><p>随着网站的继续发展，的系统中可能出现<strong>不同语言</strong>开发的子模块和部署在不同平台的子系统。此时我们需要一个平台来传递可靠的，与平台和语言无关的数据，并且能够把<strong>负载均衡透明化</strong>，能在调用过程中<strong>收集</strong>并<strong>分析</strong>调用数据，推测出<strong>网站的访问增长率</strong>等等一系列需求，对于网站应该如何成长做出预测。开源消息中间件有阿里的<code>Dubbo</code>，可以搭配Google开源的分布式程序协调服务<code>Zookeeper</code>实现服务器的<strong>注册</strong>与<strong>发现</strong>。</p>
+<p>引入消息中间件后的结构：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/stage-9.png" alt=""></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>以上的演变过程只是一个例子，并不适合所有的网站，实际中网站演进过程与自身业务和不同遇到的问题有密切的关系，没有固定的模式。只有认真的分析和不断地探究，才能发现适合自己网站的架构。</p>
+<hr>
+<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="https://ostenant.coding.me/2017/03/24/大型Web网站架构演变/" data-id="cjgx4eip7002m684uz7tflmld" class="article-share-link" data-share="baidu" data-title="大型Web网站架构演变">分享到</a>
+      
+
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Web/">Web</a></li></ul>
+
+    </footer>
+	
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/04/14/ECMAScript 6入门篇(一) - var, let, const命令/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          ECMAScript 6入门篇(一) - var, let, const命令
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/02/25/HTTP协议详解/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">HTTP协议详解</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+
+
+
+</section>
+      
+      <aside id="sidebar">
+  
+    
+<div class="widget-wrap">
+  <h3 class="widget-title">关于我</h3>
+  <ul class="widget about-me">
+    
+    <li><img class="author" title="About me" src="/img/favicon.png" /></li>
+    
+    
+    <li>ostenant@163.com</li>
+    
+    <li>一枚热爱生活，追逐自由的小技术！</li>
+    
+  </ul>
+</div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ECMAScript基础系列/">ECMAScript基础系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECMAScript/">ECMAScript</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/Docker/" style="font-size: 13.33px;">Docker</a> <a href="/tags/ECMAScript/" style="font-size: 11.67px;">ECMAScript</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/RPC/" style="font-size: 18.33px;">RPC</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/SOFA-RPC/" style="font-size: 10px;">SOFA-RPC</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/04/29/蚂蚁金服RPC框架SOFA-RPC(一) - 初体验/">蚂蚁金服RPC框架SOFA-RPC(一) - 初体验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/28/分布式理论(四) - 3PC协议/">分布式理论(四) - 3PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/25/分布式理论(三) - 2PC协议/">分布式理论(三) - 2PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/24/分布式理论(二) - BASE理论/">分布式理论(二) - BASE理论</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/23/分布式理论(一) - CAP定理/">分布式理论(一) - CAP定理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+          </li>
+        
+          <li>
+            <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+          </li>
+        
+          <li>
+            <a href="http://ifeve.com" target="_blank">并发编程网</a>
+          </li>
+        
+          <li>
+            <a href="https://juejin.im" target="_blank">掘金</a>
+          </li>
+        
+          <li>
+            <a href="http://www.jianshu.com" target="_blank">简书</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com" target="_blank">Github</a>
+          </li>
+        
+          <li>
+            <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+          </li>
+        
+          <li>
+            <a href="http://www.infoq.com" target="_blank">Infoq</a>
+          </li>
+        
+          <li>
+            <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+          </li>
+        
+          <li>
+            <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Chen Madison<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">主页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="https://github.com/ostenant" class="mobile-nav-link">Github</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!--
+
+-->
+
+
+
+   
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+                processEscapes: true
+                    
+}
+  
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+                  
+}
+    
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i=0; i < all.length; i += 1) {
+                            all[i].SourceElement().parentNode.className += ' has-jax';
+                                    
+            }
+                
+        });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.5.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<script src="/js/script.js"></script>
+
+
+</div>
+</body>
+</html>

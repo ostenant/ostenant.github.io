@@ -1,0 +1,573 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>JVM系列(三) - JVM对象探秘 | Coding | Madison&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="baidu-site-verification" content="0aFfZiB4tV" />
+  
+  
+  <meta name="description" content="前言对于 JVM 运行时区域有了一定了解以后，本文将更进一步介绍虚拟机内存中的数据的细节信息。以JVM虚拟机(Hotspot)的内存区域Java堆为例，探讨Java堆是如何创建对象、如何布局对象以及如何访问对象的。">
+<meta name="keywords" content="JVM,Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM系列(三) - JVM对象探秘">
+<meta property="og:url" content="https://ostenant.coding.me/2017/04/28/JVM系列(三) - JVM对象探秘/index.html">
+<meta property="og:site_name" content="Coding | Madison&#39;s Blog">
+<meta property="og:description" content="前言对于 JVM 运行时区域有了一定了解以后，本文将更进一步介绍虚拟机内存中的数据的细节信息。以JVM虚拟机(Hotspot)的内存区域Java堆为例，探讨Java堆是如何创建对象、如何布局对象以及如何访问对象的。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/jpg/jvm_handle.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/jpg/jvm_point.png">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-05-08T02:49:46.089Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JVM系列(三) - JVM对象探秘">
+<meta name="twitter:description" content="前言对于 JVM 运行时区域有了一定了解以后，本文将更进一步介绍虚拟机内存中的数据的细节信息。以JVM虚拟机(Hotspot)的内存区域Java堆为例，探讨Java堆是如何创建对象、如何布局对象以及如何访问对象的。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/image/jpg/jvm_handle.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Coding | Madison&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+ 
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Coding | Madison&#39;s Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">上善若水任方猿</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">主页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="https://github.com/ostenant">Github</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="ostenant.coding.me">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-JVM系列(三) - JVM对象探秘" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/04/28/JVM系列(三) - JVM对象探秘/" class="article-date">
+  <time datetime="2017-04-28T03:22:00.000Z" itemprop="datePublished">2017-04-28</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      JVM系列(三) - JVM对象探秘
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对于 <code>JVM</code> 运行时区域有了一定了解以后，本文将更进一步介绍虚拟机内存中的数据的细节信息。以<code>JVM</code>虚拟机(<code>Hotspot</code>)的内存区域<code>Java</code>堆为例，探讨<code>Java</code>堆是如何<strong>创建对象</strong>、如何<strong>布局对象</strong>以及如何<strong>访问对象</strong>的。</p>
+<a id="more"></a>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><hr>
+<h2 id="一-对象的创建"><a href="#一-对象的创建" class="headerlink" title="(一). 对象的创建"></a>(一). 对象的创建</h2><p>说到对象的创建，首先让我们看看 <code>Java</code> 中提供的几种对象创建方式：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Header</th>
+<th style="text-align:left">解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">使用new关键字</td>
+<td style="text-align:left">调用了构造函数</td>
+</tr>
+<tr>
+<td style="text-align:left">使用Class的newInstance方法</td>
+<td style="text-align:left">调用了构造函数</td>
+</tr>
+<tr>
+<td style="text-align:left">使用Constructor类的newInstance方法</td>
+<td style="text-align:left">调用了构造函数</td>
+</tr>
+<tr>
+<td style="text-align:left">使用clone方法</td>
+<td style="text-align:left">没有调用构造函数</td>
+</tr>
+<tr>
+<td style="text-align:left">使用反序列化</td>
+<td style="text-align:left">没有调用构造函数</td>
+</tr>
+</tbody>
+</table>
+<p>下面举例说明五种方式的具体操作方式：</p>
+<p>Employee.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Employee</span> <span class="keyword">implements</span> <span class="title">Cloneable</span>, <span class="title">Serializable</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1L</span>;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Employee</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Employee</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">hashCode</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="keyword">int</span> prime = <span class="number">31</span>;</span><br><span class="line">        <span class="keyword">int</span> result = <span class="number">1</span>;</span><br><span class="line">        result = prime * result + ((name == <span class="keyword">null</span>) ? <span class="number">0</span> : name.hashCode());</span><br><span class="line">        <span class="keyword">return</span> result;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">equals</span><span class="params">(Object obj)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="keyword">this</span> == obj)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">        <span class="keyword">if</span> (obj == <span class="keyword">null</span>)</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">if</span> (getClass() != obj.getClass())</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        Employee other = (Employee) obj;</span><br><span class="line">        <span class="keyword">if</span> (name == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (other.name != <span class="keyword">null</span>)</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!name.equals(other.name))</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="string">"Employee [name="</span> + name + <span class="string">"]"</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Object <span class="title">clone</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        Object obj = <span class="keyword">null</span>;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            obj = <span class="keyword">super</span>.clone();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (CloneNotSupportedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> obj;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<h4 id="1-new关键字"><a href="#1-new关键字" class="headerlink" title="1. new关键字"></a>1. new关键字</h4><p>这是最常见也是最简单的创建对象的方式了。通过这种方式，我们可以调用任意的构造函数(无参的和带参数的)。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Employee emp1 = <span class="keyword">new</span> Employee();</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Employee emp1 = <span class="keyword">new</span> Employee(name);</span><br></pre></td></tr></table></figure>
+<h4 id="2-Class类的newInstance方法"><a href="#2-Class类的newInstance方法" class="headerlink" title="2. Class类的newInstance方法"></a>2. Class类的newInstance方法</h4><p>我们也可以使用<code>Class</code>类的<code>newInstance</code>方法创建对象。这个<code>newInstance</code>方法调用<strong>无参</strong>的构造函数创建对象。</p>
+<ul>
+<li><p><strong>方式一：</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Employee emp2 = (Employee) Class.forName(<span class="string">"org.ostenant.jvm.instance.Employee"</span>).newInstance();</span><br></pre></td></tr></table></figure>
+</li>
+<li><p><strong>方式二：</strong></p>
+</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Employee emp2 = Employee.class.newInstance();</span><br></pre></td></tr></table></figure>
+<h4 id="3-Constructor类的newInstance方法"><a href="#3-Constructor类的newInstance方法" class="headerlink" title="3. Constructor类的newInstance方法"></a>3. Constructor类的newInstance方法</h4><p>和<code>Class</code>类的<code>newInstance</code>方法很像， <code>java.lang.reflect.Constructor</code>类里也有一个<code>newInstance</code>方法可以创建对象。我们可以通过这个<code>newInstance</code>方法调用<strong>有参数</strong>的和<strong>私有</strong>的<strong>构造函数</strong>。其中，<code>Constructor</code>可以从对应的<code>Class</code>类中获得。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Constructor&lt;Employee&gt; constructor = Employee.class.getConstructor();</span><br><span class="line">Employee emp3 = constructor.newInstance();</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>这两种newInstance方法就是大家所说的反射。事实上Class的newInstance方法内部调用Constructor的newInstance方法。</p>
+</blockquote>
+<h4 id="4-Clone方法"><a href="#4-Clone方法" class="headerlink" title="4. Clone方法"></a>4. Clone方法</h4><p>无论何时我们调用一个对象的<code>clone</code>方法，<code>JVM</code>都会创建一个新的对象，将前面对象的内容全部<strong>拷贝</strong>进去。用<code>clone</code>方法创建对象并不会调用任何构造函数。</p>
+<p>为了使用<code>clone</code>方法，我们需要先实现<code>Cloneable</code>接口并实现其定义的<code>clone</code>方法。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Employee emp4 = (Employee) emp3.clone();</span><br></pre></td></tr></table></figure>
+<h4 id="5-反序列化"><a href="#5-反序列化" class="headerlink" title="5. 反序列化"></a>5. 反序列化</h4><p>当我们<strong>序列化</strong>和<strong>反序列化</strong>一个对象，<code>JVM</code>会给我们创建一个<strong>单独</strong>的对象。在反序列化时，<code>JVM</code>创建对象并不会调用任何构造函数。</p>
+<p>为了反序列化一个对象，我们需要让我们的类实现<code>Serializable</code>接口。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ByteArrayOutputStream out = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">ObjectOutputStream oos = <span class="keyword">new</span> ObjectOutputStream(out);</span><br><span class="line">oos.writeObject(emp4);</span><br><span class="line"></span><br><span class="line">ByteArrayInputStream in = <span class="keyword">new</span> ByteArrayInputStream(oos.toByteArray());</span><br><span class="line">ObjectInputStream ois =<span class="keyword">new</span> ObjectInputStream(in);</span><br><span class="line"></span><br><span class="line">Employee emp5 = (Employee) in.readObject();</span><br></pre></td></tr></table></figure>
+<p><br></p>
+<hr>
+
+<p>本文以<code>new</code>关键字为例，讲述<code>JVM</code>堆中对象实例的创建过程如下：</p>
+<ol>
+<li><p>当虚拟机遇到一条<code>new</code>指令时，首先会检查这个<strong>指令的参数</strong>能否在<strong>常量池</strong>中定位一个<strong>符号引用</strong>。然后检查这个<strong>符号引用</strong>的类字节码对象是否<strong>加载、解析和初始化</strong>。如果没有，将执行对应的类加载过程。</p>
+</li>
+<li><p><strong>类加载</strong> 完成以后，虚拟机将会为新生对象<strong>分配</strong>内存区域，对象所需内存空间大小在类加载完成后就已确定。</p>
+</li>
+<li><p><strong>内存分配</strong> 完成以后，虚拟机将分配到的内存空间都初始化为<strong>零值</strong>。</p>
+</li>
+<li><p>虚拟机对对象进行一系列的<strong>设置</strong>，如<strong>所属类的元信息</strong>、<strong>对象的哈希码</strong>、<strong>对象GC分带年龄</strong> 、<strong>线程持有的锁</strong> 、<strong>偏向线程ID</strong> 等信息。这些信息存储在<strong>对象头</strong> (<code>Object Header</code>)。</p>
+</li>
+</ol>
+<p>上述工作完成以后，从虚拟机的角度来说，一个新的对象已经产生了。然而，从<code>Java</code>程序的角度来说，对象创建才刚开始。</p>
+<p><br></p>
+<h2 id="二-对象的布局"><a href="#二-对象的布局" class="headerlink" title="(二). 对象的布局"></a>(二). 对象的布局</h2><p><code>HotSpot</code>虚拟机中，对象在内存中存储的布局可以分为三块区域：<strong>对象头</strong>（<code>Header</code>）、<strong>实例数据</strong>（<code>Instance Data</code>）和<strong>对齐填充</strong>（<code>Padding</code>）。</p>
+<h3 id="对象头"><a href="#对象头" class="headerlink" title="对象头"></a>对象头</h3><p>在<code>HotSpot</code>虚拟机中，对象头有两部分信息组成：<strong>运行时数据</strong> 和 <strong>类型指针</strong>。</p>
+<p><strong>1. 运行时数据</strong><br>用于存储对象自身运行时的数据，如<strong>哈希码</strong>（hashCode）、<strong>GC分带年龄</strong>、<strong>线程持有的锁</strong>、<strong>偏向线程ID</strong> 等信息。</p>
+<p>这部分数据的长度在<code>32</code>位和<code>64</code>位的虚拟机（暂不考虑开启压缩指针的场景）中分别为<code>32</code>个和<code>64</code>个<code>Bit</code>，官方称它为 <code>“Mark Word”</code>。</p>
+<blockquote>
+<p>在32位的HotSpot虚拟机中对象未被锁定的状态下，Mark Word的32个Bit空间中的25Bit用于存储对象哈希码（HashCode），4Bit用于存储对象分代年龄，2Bits用于存储锁标志位，1Bit固定为0。</p>
+</blockquote>
+<p>在其他状态（轻量级锁定、重量级锁定、GC标记、可偏向）下对象的存储内容如下表所示：</p>
+<table>
+<thead>
+<tr>
+<th>存储内容</th>
+<th style="text-align:left">标志位</th>
+<th style="text-align:left">状态</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>对象哈希码、对象分代年龄</td>
+<td style="text-align:left">01</td>
+<td style="text-align:left">未锁定</td>
+</tr>
+<tr>
+<td>指向锁记录的指针</td>
+<td style="text-align:left">00</td>
+<td style="text-align:left">轻量级锁定</td>
+</tr>
+<tr>
+<td>指向重量级锁的指针</td>
+<td style="text-align:left">10</td>
+<td style="text-align:left">膨胀（重量级锁定）</td>
+</tr>
+<tr>
+<td>空，不需要记录信息</td>
+<td style="text-align:left">11</td>
+<td style="text-align:left">GC标记</td>
+</tr>
+<tr>
+<td>偏向线程ID、偏向时间戳、对象分代年龄</td>
+<td style="text-align:left">01</td>
+<td style="text-align:left">可偏向</td>
+</tr>
+</tbody>
+</table>
+<p><strong>2. 类型指针</strong><br>指向实例对象的<strong>类元数据</strong>的指针，虚拟机通过这个指针来确定这个对象是哪个类的实例。</p>
+<p>如果对象是一个<code>Java</code>数组，那在<strong>对象头</strong>中还必须有一块用于记录<strong>数组长度</strong>的数据。</p>
+<h3 id="实例数据"><a href="#实例数据" class="headerlink" title="实例数据"></a>实例数据</h3><p><strong>实例数据</strong> 部分是对象真正存储的<strong>有效信息</strong>，无论是从<strong>父类继承</strong>下来的还是该类<strong>自身的</strong>，都需要记录下来，而这部分的<strong>存储顺序</strong>受虚拟机的<strong>分配策略</strong>和<strong>定义的顺序</strong>的影响。</p>
+<p>默认分配策略：</p>
+<blockquote>
+<p>long/double -&gt; int/float -&gt; short/char -&gt; byte/boolean -&gt; reference</p>
+</blockquote>
+<p>如果设置了<code>-XX:FieldsAllocationStyle=0</code>（默认是<code>1</code>），那么<strong>引用类型</strong>数据就会优先分配存储空间：</p>
+<blockquote>
+<p>reference -&gt; long/double -&gt; int/float -&gt; short/char -&gt; byte/boolean</p>
+</blockquote>
+<p><strong>结论：</strong></p>
+<blockquote>
+<p>分配策略总是按照字节大小由大到小的顺序排列，相同字节大小的放在一起。</p>
+</blockquote>
+<h3 id="对齐填充"><a href="#对齐填充" class="headerlink" title="对齐填充"></a>对齐填充</h3><p><code>HotSpot</code>虚拟机要求每个对象的<strong>起始地址</strong>必须是<code>8</code>字节的整数倍，也就是对象的大小必须是<code>8</code>字节的<strong>整数倍</strong>。而<strong>对象头部分</strong>正好是<code>8</code>字节的倍数（<code>32</code>位为<code>1</code>倍，<code>64</code>位为<code>2</code>倍），因此，当对象实例数据部分没有对齐的时候，就需要通过<strong>对齐填充</strong>来补全。</p>
+<h2 id="三-对象的访问定位"><a href="#三-对象的访问定位" class="headerlink" title="(三). 对象的访问定位"></a>(三). 对象的访问定位</h2><p><code>Java</code>程序需要通过 <code>JVM</code> 栈上的引用访问堆中的具体对象。对象的访问方式取决于 <code>JVM</code> 虚拟机的实现。目前主流的访问方式有 <strong>句柄</strong> 和 <strong>直接指针</strong> 两种方式。</p>
+<blockquote>
+<p><strong>指针：</strong> 指向对象，代表一个对象在内存中的起始地址。<br><strong>句柄：</strong> 可以理解为指向指针的指针，维护着对象的指针。句柄不直接指向对象，而是指向对象的指针（句柄不发生变化，指向固定内存地址），再由对象的指针指向对象的真实内存地址。</p>
+</blockquote>
+<h3 id="1-句柄"><a href="#1-句柄" class="headerlink" title="1. 句柄"></a>1. 句柄</h3><p><code>Java</code>堆中划分出一块内存来作为<strong>句柄池</strong>，引用中存储对象的<strong>句柄地址</strong>，而句柄中包含了<strong>对象实例数据</strong>与<strong>对象类型数据</strong>各自的<strong>具体地址</strong>信息，具体构造如下图所示：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/jpg/jvm_handle.png" alt=""></p>
+<p><strong>优势</strong>：引用中存储的是<strong>稳定</strong>的句柄地址，在对象被移动（垃圾收集时移动对象是非常普遍的行为）时只会改变<strong>句柄中</strong>的<strong>实例数据指针</strong>，而<strong>引用</strong>本身不需要修改。</p>
+<h3 id="2-直接指针"><a href="#2-直接指针" class="headerlink" title="2. 直接指针"></a>2. 直接指针</h3><p>如果使用<strong>直接指针</strong>访问，<strong>引用</strong> 中存储的直接就是<strong>对象地址</strong>，那么<code>Java</code>堆对象内部的布局中就必须考虑如何放置访问<strong>类型数据</strong>的相关信息。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/jpg/jvm_point.png" alt=""></p>
+<p><strong>优势</strong>：速度更<strong>快</strong>，节省了<strong>一次指针定位</strong>的时间开销。由于对象的访问在<code>Java</code>中非常频繁，因此这类开销积少成多后也是非常可观的执行成本。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>周志明，深入理解Java虚拟机：JVM高级特性与最佳实践，机械工业出版社</p>
+<hr>
+<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="https://ostenant.coding.me/2017/04/28/JVM系列(三) - JVM对象探秘/" data-id="cjgx4einy000b684u540pbt3j" class="article-share-link" data-share="baidu" data-title="JVM系列(三) - JVM对象探秘">分享到</a>
+      
+
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JVM/">JVM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
+
+    </footer>
+	
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/05/02/JVM系列(四) - JVM GC回收算法/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          JVM系列(四) - JVM GC回收算法
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/04/25/JVM系列(二) - JVM内存区域和内存溢出异常详解/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">JVM系列(二) - JVM内存区域和内存溢出异常详解</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+
+
+
+</section>
+      
+      <aside id="sidebar">
+  
+    
+<div class="widget-wrap">
+  <h3 class="widget-title">关于我</h3>
+  <ul class="widget about-me">
+    
+    <li><img class="author" title="About me" src="/img/favicon.png" /></li>
+    
+    
+    <li>ostenant@163.com</li>
+    
+    <li>一枚热爱生活，追逐自由的小技术！</li>
+    
+  </ul>
+</div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ECMAScript基础系列/">ECMAScript基础系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECMAScript/">ECMAScript</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/Docker/" style="font-size: 13.33px;">Docker</a> <a href="/tags/ECMAScript/" style="font-size: 11.67px;">ECMAScript</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/RPC/" style="font-size: 18.33px;">RPC</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/SOFA-RPC/" style="font-size: 10px;">SOFA-RPC</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/04/29/蚂蚁金服RPC框架SOFA-RPC(一) - 初体验/">蚂蚁金服RPC框架SOFA-RPC(一) - 初体验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/28/分布式理论(四) - 3PC协议/">分布式理论(四) - 3PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/25/分布式理论(三) - 2PC协议/">分布式理论(三) - 2PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/24/分布式理论(二) - BASE理论/">分布式理论(二) - BASE理论</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/23/分布式理论(一) - CAP定理/">分布式理论(一) - CAP定理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+          </li>
+        
+          <li>
+            <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+          </li>
+        
+          <li>
+            <a href="http://ifeve.com" target="_blank">并发编程网</a>
+          </li>
+        
+          <li>
+            <a href="https://juejin.im" target="_blank">掘金</a>
+          </li>
+        
+          <li>
+            <a href="http://www.jianshu.com" target="_blank">简书</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com" target="_blank">Github</a>
+          </li>
+        
+          <li>
+            <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+          </li>
+        
+          <li>
+            <a href="http://www.infoq.com" target="_blank">Infoq</a>
+          </li>
+        
+          <li>
+            <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+          </li>
+        
+          <li>
+            <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Chen Madison<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">主页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="https://github.com/ostenant" class="mobile-nav-link">Github</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!--
+
+-->
+
+
+
+   
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+                processEscapes: true
+                    
+}
+  
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+                  
+}
+    
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i=0; i < all.length; i += 1) {
+                            all[i].SourceElement().parentNode.className += ' has-jax';
+                                    
+            }
+                
+        });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.5.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<script src="/js/script.js"></script>
+
+
+</div>
+</body>
+</html>

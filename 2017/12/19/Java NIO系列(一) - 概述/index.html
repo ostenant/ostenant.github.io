@@ -1,0 +1,536 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>Java NIO系列(一) - 概述 | Coding | Madison&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="baidu-site-verification" content="0aFfZiB4tV" />
+  
+  
+  <meta name="description" content="前言Java NIO全称java non-blocking IO，是指jdk1.4及以上版本里提供的新api(New IO)，为所有的原始类型(boolean类型除外)提供缓存支持的数据容器，使用它可以提供非阻塞式的高伸缩性网络。">
+<meta name="keywords" content="Java,NIO">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java NIO系列(一) - 概述">
+<meta property="og:url" content="https://ostenant.coding.me/2017/12/19/Java NIO系列(一) - 概述/index.html">
+<meta property="og:site_name" content="Coding | Madison&#39;s Blog">
+<meta property="og:description" content="前言Java NIO全称java non-blocking IO，是指jdk1.4及以上版本里提供的新api(New IO)，为所有的原始类型(boolean类型除外)提供缓存支持的数据容器，使用它可以提供非阻塞式的高伸缩性网络。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Channel_Buffer.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Selector_Channel.png">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-05-08T02:49:46.091Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java NIO系列(一) - 概述">
+<meta name="twitter:description" content="前言Java NIO全称java non-blocking IO，是指jdk1.4及以上版本里提供的新api(New IO)，为所有的原始类型(boolean类型除外)提供缓存支持的数据容器，使用它可以提供非阻塞式的高伸缩性网络。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Channel_Buffer.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Coding | Madison&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+ 
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Coding | Madison&#39;s Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">上善若水任方猿</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">主页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="https://github.com/ostenant">Github</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="ostenant.coding.me">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-Java NIO系列(一) - 概述" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/12/19/Java NIO系列(一) - 概述/" class="article-date">
+  <time datetime="2017-12-19T03:23:00.000Z" itemprop="datePublished">2017-12-19</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      Java NIO系列(一) - 概述
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Java NIO</code>全称<code>java non-blocking IO</code>，是指<code>jdk1.4</code>及以上版本里提供的新<code>api</code>(<code>New IO</code>)，为所有的<strong>原始类型</strong>(<code>boolean</code>类型除外)提供<strong>缓存支持</strong>的<strong>数据容器</strong>，使用它可以提供<strong>非阻塞式</strong>的<strong>高伸缩性网络</strong>。</p>
+<a id="more"></a>
+<p><code>Java NIO</code>提供了与<strong>标准</strong><code>IO</code>不同的<code>IO</code>工作方式，<code>Channel</code>、<code>Buffer</code>和<code>Selector</code>构成了核心的<code>API</code>。其它组件，如<code>Pipe</code>和<code>FileLock</code>，只不过是与三个核心组件共同使用的<strong>工具类</strong>。</p>
+<ul>
+<li><strong>通道和缓冲区</strong> (<code>Channel and Buffer</code>)：</li>
+</ul>
+<p>标准的<code>IO</code>基于<strong>字节流</strong>和<strong>字符流</strong>进行<strong>单向的数据读写</strong>操作。而<code>NIO</code>是基于<strong>通道</strong>(<code>Channel</code>)和<strong>缓冲区</strong>(<code>Buffer</code>)进行操作，数据总是从<strong>通道</strong>中<strong>读取</strong>到<strong>缓冲区</strong>中，或者从<strong>缓冲区</strong>中<strong>写入</strong>到<strong>通道</strong>中。</p>
+<ul>
+<li><strong>异步IO</strong> (<code>Asynchronous IO</code>)：</li>
+</ul>
+<p><code>Java NIO</code>可以让你<strong>异步</strong>的使用<code>IO</code>，例如：当<strong>线程</strong>从通道<strong>读取</strong>数据到<strong>缓冲区</strong>时，线程还是可以进行其他事情；当数据被线程<strong>写入</strong>到<strong>缓冲区</strong>时，线程可以继续处理它。从<strong>缓冲区</strong>写入<strong>通道</strong>也类似。</p>
+<ul>
+<li><strong>选择器</strong> (<code>Selector</code>)：</li>
+</ul>
+<p><code>Java NIO</code>引入了<strong>选择器</strong>的概念，<strong>选择器</strong>用于<strong>监听多个通道的事件</strong>（比如：<strong>连接打开</strong>，<strong>数据读取</strong>和<strong>数据写入</strong>）。因此，<strong>单个</strong>的线程可以监听<strong>多个</strong>数据通道。</p>
+<p>下面就来详细介绍<code>Java NIO</code>的相关知识。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="1-Java-NIO概述"><a href="#1-Java-NIO概述" class="headerlink" title="1. Java NIO概述"></a>1. Java NIO概述</h2><p><code>Java NIO</code>由以下几个核心部分组成：</p>
+<ul>
+<li>Channel</li>
+<li>Buffer</li>
+<li>Selector</li>
+</ul>
+<h3 id="1-1-Channel和Buffer"><a href="#1-1-Channel和Buffer" class="headerlink" title="1.1. Channel和Buffer"></a>1.1. Channel和Buffer</h3><p>基本上，所有的<code>IO</code> <code>在</code>NIO<code>中都从一个</code>Channel`开始：</p>
+<p><strong>通道</strong><code>Channel</code>有点像<strong>流</strong>(<code>Stream</code>)，两者可以做个简单对比：</p>
+<ul>
+<li>流是<strong>单向的</strong>，一个<strong>流对象</strong>要么是<strong>输出流</strong>、要么是<strong>输入流</strong>。</li>
+<li>通道是<strong>全双工的</strong>，一个<strong>通道</strong>通常搭配<strong>缓存</strong>一起使用。数据可以从<code>Channel</code>读到<code>Buffer</code>中，也可以从<code>Buffer</code>写到<code>Channel</code>中。</li>
+</ul>
+<p>这里有个图示：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Channel_Buffer.png" alt=""></p>
+<p><code>Channel和</code>Buffer`有好几种类型。</p>
+<p><code>JAVA NIO</code>中的一些主要<code>Channel</code>的实现，主要涵盖了文件<code>IO</code>和<code>UDP</code>、<code>TCP</code>的网络<code>IO</code>：</p>
+<ul>
+<li>FileChannel：从<strong>文件</strong>中读写数据</li>
+<li>ServerSocketChannel：能通过<code>UDP</code>读写网络中的数据</li>
+<li>SocketChannel：能通过<code>TCP</code>读写网络中的数据</li>
+<li>DatagramChannel：可以<strong>监听</strong>新进来的<code>TCP</code>连接，像<code>Web</code>服务器那样。对每一个新进来的连接都会创建一个<code>SocketChannel</code>。</li>
+</ul>
+<p><code>JAVA NIO</code>中关键的<code>Buffer</code>实现，涵盖了除<code>boolean</code>的其余<code>7</code>种<strong>基本数据类型</strong>(<code>byte</code>、<code>short</code>、<code>int</code>、<code>long</code>、<code>float</code>、<code>double</code> 和 <code>char</code>)：</p>
+<ul>
+<li>ByteBuffer</li>
+<li>CharBuffer</li>
+<li>ShortBuffer</li>
+<li>IntBuffer</li>
+<li>LongBuffer</li>
+<li>FloatBuffer</li>
+<li>DoubleBuffer</li>
+</ul>
+<h3 id="1-2-Selector"><a href="#1-2-Selector" class="headerlink" title="1.2. Selector"></a>1.2. Selector</h3><p><code>Selector</code>允许<strong>单线程</strong>处理多个<code>Channel</code>的<strong>连接事件</strong>和<strong>数据读写</strong>。如果你的应用打开了<strong>多个连接</strong>（<strong>通道</strong>），但每个连接的<strong>流量都很低</strong>，使用<code>Selector</code>就会很方便，例如：一个聊天服务器。</p>
+<p>这是在一个<strong>单线程</strong>中使用一个<code>Selector</code>处理<code>3</code>个<code>Channel</code>的图示：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Selector_Channel.png" alt=""></p>
+<p>要使用<code>Selector</code>，得向<code>Selector</code>注册<code>Channel</code>，然后调用它的<code>select()</code>方法。这个方法会一直<strong>阻塞</strong>到某个注册的通道有<strong>事件就绪</strong>。一旦这个<strong>方法返回</strong>，线程就可以处理这些事件。</p>
+<p><strong>事件类型</strong>主要包括：新连接进来、数据接收、数据发送等。</p>
+<h2 id="2-Java-NIO对比IO"><a href="#2-Java-NIO对比IO" class="headerlink" title="2. Java NIO对比IO"></a>2. Java NIO对比IO</h2><p>上面提到了<code>NIO</code>主要的组件和特性，在实际的<code>IO</code>操作中，应该如何在标准<code>IO</code>和<code>NIO</code>进行选择，这里就需要具体对比两者的差异，并引入一些概念。</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>IO</th>
+<th>NIO</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>底层读写实现</td>
+<td>面向流读写</td>
+<td>面向缓冲区读写</td>
+</tr>
+<tr>
+<td>是否有选择器</td>
+<td>无</td>
+<td>基于选择器的事件分离</td>
+</tr>
+<tr>
+<td>IO是否阻塞</td>
+<td>阻塞式IO</td>
+<td>非阻塞式IO</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-1-底层读写实现"><a href="#2-1-底层读写实现" class="headerlink" title="2.1. 底层读写实现"></a>2.1. 底层读写实现</h3><p><code>Java NIO</code>和<code>IO</code>之间第一个最大的区别是，<code>IO</code>是<strong>面向流</strong>的，<code>NIO</code>是<strong>面向缓冲区</strong>的。</p>
+<ul>
+<li><strong>面向流</strong></li>
+</ul>
+<p><code>Java IO</code>面向流意味着每次从流中读一个或多个字节，直至读取所有字节，它们没有被缓存在任何地方。此外，它不能前后移动流中的数据。如果需要前后移动从流中读取的数据，需要先将它缓存到一个缓冲区。</p>
+<ul>
+<li><strong>面向缓冲区</strong></li>
+</ul>
+<p><code>Java NIO</code>的缓冲导向方法略有不同。数据读取到一个它稍后处理的缓冲区，需要时可在缓冲区中前后移动。这就增加了处理过程中的灵活性。但是，还需要检查是否该缓冲区中包含所有您需要处理的数据。而且，需确保当更多的数据读入缓冲区时，不要覆盖缓冲区里尚未处理的数据。</p>
+<h3 id="2-2-是否有选择器"><a href="#2-2-是否有选择器" class="headerlink" title="2.2. 是否有选择器"></a>2.2. 是否有选择器</h3><p><code>Java NIO</code>的<strong>选择器</strong>允许一个<strong>单独的线程</strong>来监视<strong>多个输入通道</strong>。</p>
+<blockquote>
+<p>IO的读写速度和CPU的处理速度相差了一个数量级，导致IO事件延长了CPU的空闲等待时间，导致性能上的瓶颈。为了尽量的缩短CPU的等待时间，在单个IO操作进行时CPU可以抽出身来去做别的事情(其他IO)，<code>NIO</code>引入单线程处理多IO事件的概念，从而充分利用CPU分配的资源。</p>
+</blockquote>
+<p><code>Java NIO</code>允许已注册的<strong>多个通道</strong>使用一个<strong>选择器</strong>，然后使用一个单独的线程来<strong>选择</strong>通道。这种选择机制，使得一个<strong>单线程</strong>很容易地管理<strong>多个通道</strong>。</p>
+<h3 id="2-3-IO是否阻塞"><a href="#2-3-IO是否阻塞" class="headerlink" title="2.3. IO是否阻塞"></a>2.3. IO是否阻塞</h3><p>所谓阻塞，就是线程在进行<code>IO</code>操作时，不能抽出身来去干其他事情，必须等待数据读写完成。</p>
+<ul>
+<li><p><code>Java IO</code>的各种流是<strong>阻塞的</strong>。</p>
+<ul>
+<li>当一个线程调用<code>read()</code>或<code>write()</code>时，该线程被阻塞，直到有一些数据被读取，或数据完全写入。该线程在此期间不能再干任何事情。</li>
+</ul>
+</li>
+<li><p><code>Java NIO</code>的<strong>非阻塞的</strong>。</p>
+<ul>
+<li>当监听某个通道的<strong>读操作</strong>事件时，线程向该通道发送请求<strong>读取数据</strong>，之后这个线程就可以去干别的事情。</li>
+<li>当监听某个通道的<strong>写操作</strong>事件时，线程向请求向该通道<strong>写入数据</strong>，但不需要等待它完全写入，这个线程同时可以去做别的事情。</li>
+</ul>
+<p>线程通常将<strong>非阻塞</strong><code>IO</code>的<strong>空闲时间</strong>用于在其它通道上<strong>执行IO操作</strong>，所以一个<strong>单独的线程</strong>现在可以管理<strong>多个输入</strong>和<strong>输出通道</strong>(<code>channel</code>)。</p>
+</li>
+</ul>
+<hr>
+<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="https://ostenant.coding.me/2017/12/19/Java NIO系列(一) - 概述/" data-id="cjgx4eio8000t684ui5ux4gmo" class="article-share-link" data-share="baidu" data-title="Java NIO系列(一) - 概述">分享到</a>
+      
+
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NIO/">NIO</a></li></ul>
+
+    </footer>
+	
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/12/19/一天一个设计模式(三) - Builder建造者模式/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          一天一个设计模式(三) - 建造者模式(Builder)
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/12/18/Java基础篇 - 强引用、弱引用、软引用和虚引用/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">Java基础篇 - 强引用、弱引用、软引用和虚引用</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+
+
+
+</section>
+      
+      <aside id="sidebar">
+  
+    
+<div class="widget-wrap">
+  <h3 class="widget-title">关于我</h3>
+  <ul class="widget about-me">
+    
+    <li><img class="author" title="About me" src="/img/favicon.png" /></li>
+    
+    
+    <li>ostenant@163.com</li>
+    
+    <li>一枚热爱生活，追逐自由的小技术！</li>
+    
+  </ul>
+</div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ECMAScript基础系列/">ECMAScript基础系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECMAScript/">ECMAScript</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/Docker/" style="font-size: 13.33px;">Docker</a> <a href="/tags/ECMAScript/" style="font-size: 11.67px;">ECMAScript</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/RPC/" style="font-size: 18.33px;">RPC</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/SOFA-RPC/" style="font-size: 10px;">SOFA-RPC</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/04/29/蚂蚁金服RPC框架SOFA-RPC(一) - 初体验/">蚂蚁金服RPC框架SOFA-RPC(一) - 初体验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/28/分布式理论(四) - 3PC协议/">分布式理论(四) - 3PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/25/分布式理论(三) - 2PC协议/">分布式理论(三) - 2PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/24/分布式理论(二) - BASE理论/">分布式理论(二) - BASE理论</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/23/分布式理论(一) - CAP定理/">分布式理论(一) - CAP定理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+          </li>
+        
+          <li>
+            <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+          </li>
+        
+          <li>
+            <a href="http://ifeve.com" target="_blank">并发编程网</a>
+          </li>
+        
+          <li>
+            <a href="https://juejin.im" target="_blank">掘金</a>
+          </li>
+        
+          <li>
+            <a href="http://www.jianshu.com" target="_blank">简书</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com" target="_blank">Github</a>
+          </li>
+        
+          <li>
+            <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+          </li>
+        
+          <li>
+            <a href="http://www.infoq.com" target="_blank">Infoq</a>
+          </li>
+        
+          <li>
+            <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+          </li>
+        
+          <li>
+            <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Chen Madison<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">主页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="https://github.com/ostenant" class="mobile-nav-link">Github</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!--
+
+-->
+
+
+
+   
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+                processEscapes: true
+                    
+}
+  
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+                  
+}
+    
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i=0; i < all.length; i += 1) {
+                            all[i].SourceElement().parentNode.className += ' has-jax';
+                                    
+            }
+                
+        });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.5.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<script src="/js/script.js"></script>
+
+
+</div>
+</body>
+</html>

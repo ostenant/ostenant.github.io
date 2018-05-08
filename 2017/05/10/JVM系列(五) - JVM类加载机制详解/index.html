@@ -1,0 +1,736 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>JVM系列(五) - JVM类加载机制详解 | Coding | Madison&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="baidu-site-verification" content="0aFfZiB4tV" />
+  
+  
+  <meta name="description" content="前言本文将由浅及深，介绍Java类加载的过程和原理，进一步对类加载器的进行源码分析，完成一个自定义的类加载器。">
+<meta name="keywords" content="Java,JDK">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM系列(五) - JVM类加载机制详解">
+<meta property="og:url" content="https://ostenant.coding.me/2017/05/10/JVM系列(五) - JVM类加载机制详解/index.html">
+<meta property="og:site_name" content="Coding | Madison&#39;s Blog">
+<meta property="og:description" content="前言本文将由浅及深，介绍Java类加载的过程和原理，进一步对类加载器的进行源码分析，完成一个自定义的类加载器。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/jvm_method_area_heap.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/jvm_loader.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/class_loaders.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_loadClass.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClasslOADER_findLoadedClass.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_fidnBootstrapOrNull.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_findClass.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_defineClass.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_LoadSequence_Parent.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_LoadSequence_Children.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_LoadSequence_Tester.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_LoadSequence_Tester._Result.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_With_Parent_Children_In_Project.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/Class_Loader_Situation_1_Result.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_Target_Folder_Class.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_Without_Parent_Children_In_Project.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_Situation_2_Console.png">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-05-08T02:49:46.090Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JVM系列(五) - JVM类加载机制详解">
+<meta name="twitter:description" content="前言本文将由浅及深，介绍Java类加载的过程和原理，进一步对类加载器的进行源码分析，完成一个自定义的类加载器。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Coding | Madison&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+ 
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Coding | Madison&#39;s Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">上善若水任方猿</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">主页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="https://github.com/ostenant">Github</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="ostenant.coding.me">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-JVM系列(五) - JVM类加载机制详解" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/05/10/JVM系列(五) - JVM类加载机制详解/" class="article-date">
+  <time datetime="2017-05-10T03:17:00.000Z" itemprop="datePublished">2017-05-10</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      JVM系列(五) - JVM类加载机制详解
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>本文将由浅及深，介绍<code>Java</code>类加载的过程和原理，进一步对类加载器的进行源码分析，完成一个自定义的类加载器。</p>
+<a id="more"></a>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6.png" alt=""></p>
+<hr>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="一-类加载器是什么"><a href="#一-类加载器是什么" class="headerlink" title="(一). 类加载器是什么"></a>(一). 类加载器是什么</h2><p>类加载器简言之，就是用于把<code>.class</code>文件中的<strong>字节码信息</strong>转化为具体<code>的java.lang.Class</code><strong>对象</strong>的过程的工具。</p>
+<p>具体过程：</p>
+<ol>
+<li>在实际类加载过程中，<code>JVM</code>会将所有的<code>.class</code>字节码文件中的<strong>二进制数据</strong>读入内存中，导入运行时数据区的<strong>方法区</strong>中。</li>
+<li>当一个类首次被<strong>主动加载</strong>或<strong>被动加载</strong>时，类加载器会对此类执行类加载的流程 – <strong>加载</strong>、<strong>连接</strong>（<strong>验证</strong>、<strong>准备</strong>、<strong>解析</strong>）、<strong>初始化</strong>。</li>
+<li>如果类加载成功，<strong>堆内存</strong>中会产生一个新的<code>Class</code>对象，<code>Class</code>对象封装了类在<strong>方法区</strong>内的<strong>数据结构</strong>。</li>
+</ol>
+<p><code>Class</code>对象的创建过程描述：<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/jvm_method_area_heap.png" alt=""></p>
+<h2 id="二-类加载的过程"><a href="#二-类加载的过程" class="headerlink" title="(二). 类加载的过程"></a>(二). 类加载的过程</h2><p>类加载的过程分为三个步骤(五个阶段) ：<strong>加载</strong> -&gt; <strong>连接</strong>（<strong>验证</strong>、<strong>准备</strong>、<strong>解析</strong>）-&gt; <strong>初始化</strong>。</p>
+<p><strong>加载</strong>、<strong>验证</strong>、<strong>准备</strong>和<strong>初始化</strong>这四个阶段发生的顺序是<strong>确定的</strong>，而<strong>解析阶段</strong>可以在初始化阶段之后发生，也称为<strong>动态绑定</strong>或<strong>晚期绑定</strong>。</p>
+<p>类加载的过程描述：<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/jvm_loader.png" alt=""></p>
+<h3 id="1-加载"><a href="#1-加载" class="headerlink" title="1. 加载"></a>1. 加载</h3><p>加载：查找并加载类的<strong>二进制数据</strong>的过程。</p>
+<h4 id="加载的过程描述："><a href="#加载的过程描述：" class="headerlink" title="加载的过程描述："></a>加载的过程描述：</h4><ol>
+<li>通过类的<strong>全限定名</strong>定位<code>.class</code>文件，并获取其<strong>二进制字节流</strong>。</li>
+<li>把字节流所代表的<strong>静态存储结构</strong>转换为<strong>方法区</strong>的<strong>运行时数据结构</strong>。</li>
+<li>在<code>Java</code><strong>堆</strong>中生成一个此类的<code>java.lang.Class</code>对象，作为方法区中这些数据的<strong>访问入口</strong>。</li>
+</ol>
+<h3 id="2-连接"><a href="#2-连接" class="headerlink" title="2. 连接"></a>2. 连接</h3><p>连接：包括<strong>验证</strong>、<strong>准备</strong>、<strong>解析</strong>三步。</p>
+<h3 id="a-验证"><a href="#a-验证" class="headerlink" title="a). 验证"></a>a). 验证</h3><p>验证：确保被加载的类的<strong>正确性</strong>。验证是连接阶段的第一步，用于确保<code>Class</code>字节流中的信息是否符合虚拟机的要求。</p>
+<h4 id="具体验证形式："><a href="#具体验证形式：" class="headerlink" title="具体验证形式："></a>具体验证形式：</h4><ol>
+<li><strong>文件格式验证</strong>：验证字节流是否符合<code>Class</code>文件格式的规范；例如：是否以<code>0xCAFEBABE</code>开头、主次版本号是否在当前虚拟机的处理范围之内、常量池中的常量是否有不被支持的类型。</li>
+<li><strong>元数据验证</strong>：对字节码描述的信息进行语义分析（注意：对比<code>javac</code>编译阶段的语义分析），以保证其描述的信息符合Java语言规范的要求；例如：这个类是否有父类，除了<code>java.lang.Object</code>之外。</li>
+<li><strong>字节码验证</strong>：通过数据流和控制流分析，确定程序语义是合法的、符合逻辑的。</li>
+<li><strong>符号引用验证</strong>：确保解析动作能正确执行。</li>
+</ol>
+<h3 id="b-准备"><a href="#b-准备" class="headerlink" title="b). 准备"></a>b). 准备</h3><p>准备：为类的<strong>静态变量</strong>分配内存，并将其初始化为<strong>默认值</strong>。准备过程通常分配一个结构用来存储类信息，这个结构中包含了类中定义的<strong>成员变量</strong>，<strong>方法</strong>和<strong>接口信息</strong>等。</p>
+<h4 id="具体行为："><a href="#具体行为：" class="headerlink" title="具体行为："></a>具体行为：</h4><ol>
+<li>这时候进行内存分配的仅包括<strong>类变量</strong>(<code>static</code>)，而不包括<strong>实例变量</strong>，<strong>实例变量</strong>会在对象<strong>实例化</strong>时随着对象一块分配在<code>Java</code><strong>堆</strong>中。</li>
+<li>这里所设置的<strong>初始值</strong>通常情况下是数据类型<strong>默认的零值</strong>（如<code>0</code>、<code>0L</code>、<code>null</code>、<code>false</code>等），而不是被在<code>Java</code>代码中被<strong>显式赋值</strong>。</li>
+</ol>
+<h3 id="c-解析"><a href="#c-解析" class="headerlink" title="c). 解析"></a>c). 解析</h3><p>解析：把类中对<strong>常量池</strong>内的<strong>符号引用</strong>转换为<strong>直接引用</strong>。</p>
+<p>解析动作主要针对<strong>类或接口</strong>、<strong>字段</strong>、<strong>类方法</strong>、<strong>接口方法</strong>、<strong>方法类型</strong>、<strong>方法句柄</strong>和<strong>调用点限定符</strong>等7类符号引用进行。</p>
+<h3 id="3-初始化"><a href="#3-初始化" class="headerlink" title="3. 初始化"></a>3. 初始化</h3><p>初始化：对<strong>类静态变量</strong>赋予正确的初始值 (注意和连接时的<strong>解析过程</strong>区分开)。</p>
+<h4 id="初始化的目标"><a href="#初始化的目标" class="headerlink" title="初始化的目标"></a>初始化的目标</h4><ol>
+<li>实现对声明<strong>类静态变量</strong>时指定的初始值的初始化；</li>
+<li>实现对使用<strong>静态代码块</strong>设置的初始值的初始化。</li>
+</ol>
+<h4 id="初始化的步骤"><a href="#初始化的步骤" class="headerlink" title="初始化的步骤"></a>初始化的步骤</h4><ol>
+<li>如果此类没被<strong>加载</strong>、<strong>连接</strong>，则先<strong>加载</strong>、<strong>连接</strong>此类；</li>
+<li>如果此类的<strong>直接父类</strong>还未被初始化，则先<strong>初始化</strong>其直接父类；</li>
+<li>如果类中有<strong>初始化语句</strong>，则按照顺序依次执行初始化语句。</li>
+</ol>
+<h4 id="初始化的时机"><a href="#初始化的时机" class="headerlink" title="初始化的时机"></a>初始化的时机</h4><ol>
+<li>创建类的实例(<code>new</code>关键字)；</li>
+<li><code>java.lang.reflect</code>包中的方法(如：<code>Class.forName(“xxx”)</code>)；</li>
+<li>对类的<strong>静态变量</strong>进行访问或赋值；</li>
+<li>访问调用类的<strong>静态方法</strong>；</li>
+<li>初始化一个类的<strong>子类</strong>，<strong>父类</strong>本身也会被初始化；</li>
+<li>作为程序的<strong>启动入口</strong>，包含<code>main</code>方法(如：<code>SpringBoot</code>入口类)。<br>
+
+</li>
+</ol>
+<h2 id="三-类的主动引用和被动引用"><a href="#三-类的主动引用和被动引用" class="headerlink" title="(三). 类的主动引用和被动引用"></a>(三). 类的主动引用和被动引用</h2><h3 id="主动引用"><a href="#主动引用" class="headerlink" title="主动引用"></a>主动引用</h3><p>主动引用：在类加载阶段，只执行<strong>加载</strong>、<strong>连接</strong>操作，不执行<strong>初始化</strong>操作。</p>
+<h4 id="主动引用的几种形式"><a href="#主动引用的几种形式" class="headerlink" title="主动引用的几种形式"></a>主动引用的几种形式</h4><ol>
+<li>创建类的实例(<code>new</code>关键字)；</li>
+<li><code>java.lang.reflect</code>包中的方法(如：<code>Class.forName(“xxx”)</code>)；</li>
+<li>对类的<strong>静态变量</strong>进行访问或赋值；</li>
+<li>访问调用类的<strong>静态方法</strong>；</li>
+<li>初始化一个类的<strong>子类</strong>，<strong>父类</strong>本身也会被初始化；</li>
+<li>作为程序的<strong>启动入口</strong>，包含<code>main</code>方法(如：<code>SpringBoot</code>入口类)。</li>
+</ol>
+<h4 id="主动引用1-main方法在初始类中"><a href="#主动引用1-main方法在初始类中" class="headerlink" title="主动引用1 - main方法在初始类中"></a>主动引用1 - main方法在初始类中</h4><p>代码示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OptimisticReference0</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        System.out.println(OptimisticReference0.class.getSimpleName() + <span class="string">" is referred!"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：</p>
+<blockquote>
+<p>OptimisticReference0 is referred!</p>
+</blockquote>
+<h4 id="主动引用2-–-创建子类会触发父类的初始化"><a href="#主动引用2-–-创建子类会触发父类的初始化" class="headerlink" title="主动引用2 – 创建子类会触发父类的初始化"></a>主动引用2 – 创建子类会触发父类的初始化</h4><p>代码示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OptimisticReference1</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Parent</span> </span>&#123;</span><br><span class="line">        <span class="keyword">static</span> &#123;</span><br><span class="line">            System.out.println(Parent.class.getSimpleName() + <span class="string">" is referred!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Child</span> <span class="keyword">extends</span> <span class="title">Parent</span> </span>&#123;</span><br><span class="line">        <span class="keyword">static</span> &#123;</span><br><span class="line">            System.out.println(Child.class.getSimpleName() + <span class="string">" is referred!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">new</span> Child();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：</p>
+<blockquote>
+<p>Parent is referred!<br>Child is referred!</p>
+</blockquote>
+<h4 id="主动引用3-–-访问一个类静态变量"><a href="#主动引用3-–-访问一个类静态变量" class="headerlink" title="主动引用3 – 访问一个类静态变量"></a>主动引用3 – 访问一个类静态变量</h4><p>代码示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OptimisticReference2</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Child</span> </span>&#123;</span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">static</span> String name;</span><br><span class="line">        <span class="keyword">static</span> &#123;</span><br><span class="line">            System.out.println(Child.class.getSimpleName() + <span class="string">" is referred!"</span>);</span><br><span class="line">            name = <span class="string">"Child"</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(Child.name);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：</p>
+<blockquote>
+<p>Child is referred!<br>Child</p>
+</blockquote>
+<h4 id="主动引用4-–-对类的静态变量进行赋值"><a href="#主动引用4-–-对类的静态变量进行赋值" class="headerlink" title="主动引用4 – 对类的静态变量进行赋值"></a>主动引用4 – 对类的静态变量进行赋值</h4><p>代码示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OptimisticReference3</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Child</span> </span>&#123;</span><br><span class="line">        <span class="keyword">protected</span> <span class="keyword">static</span> String name;</span><br><span class="line">        <span class="keyword">static</span> &#123;</span><br><span class="line">            System.out.println(Child.class.getSimpleName() + <span class="string">" is referred!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Child.name = <span class="string">"Child"</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：</p>
+<blockquote>
+<p>Child is referred!</p>
+</blockquote>
+<h4 id="主动引用5-–-使用java-lang-reflect包提供的反射机制"><a href="#主动引用5-–-使用java-lang-reflect包提供的反射机制" class="headerlink" title="主动引用5 – 使用java.lang.reflect包提供的反射机制"></a>主动引用5 – 使用java.lang.reflect包提供的反射机制</h4><p>代码示例：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">OptimisticReference4</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> ClassNotFoundException </span>&#123;</span><br><span class="line">        Class.forName(<span class="string">"org.ostenant.jdk8.learning.examples.reference.optimistic.Child"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>运行结果：</p>
+<blockquote>
+<p>Child is referred!</p>
+</blockquote>
+<h3 id="被动引用"><a href="#被动引用" class="headerlink" title="被动引用"></a>被动引用</h3><p>被动引用： 在类加载阶段，会执行<strong>加载</strong>、<strong>连接</strong>和<strong>初始化</strong>操作。</p>
+<p>被动引用的几种形式：</p>
+<ol>
+<li>通过子类引用<strong>父类</strong>的的<strong>静态字段</strong>，不会导致<strong>子类</strong>初始化；</li>
+<li>定义类的<strong>数组引用</strong>而<strong>不赋值</strong>，不会触发此类的初始化；</li>
+<li>访问类定义的<strong>常量</strong>，不会触发此类的初始化。</li>
+</ol>
+<h4 id="被动引用1-–-子类引用父类的的静态字段，不会导致子类初始化"><a href="#被动引用1-–-子类引用父类的的静态字段，不会导致子类初始化" class="headerlink" title="被动引用1 – 子类引用父类的的静态字段，不会导致子类初始化"></a>被动引用1 – 子类引用父类的的静态字段，不会导致子类初始化</h4><p>代码示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NegativeReference0</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Parent</span> </span>&#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">static</span> String name = <span class="string">"Parent"</span>;</span><br><span class="line">        <span class="keyword">static</span> &#123;</span><br><span class="line">            System.out.println(Parent.class.getSimpleName() + <span class="string">" is referred!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Child</span> <span class="keyword">extends</span> <span class="title">Parent</span> </span>&#123;</span><br><span class="line">        <span class="keyword">static</span> &#123;</span><br><span class="line">            System.out.println(Child.class.getSimpleName() + <span class="string">" is referred!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(Child.name);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：</p>
+<blockquote>
+<p>Parent is referred!<br>Parent</p>
+</blockquote>
+<h4 id="被动引用2-–-定义类的数组引用而不赋值，不会触发此类的初始化"><a href="#被动引用2-–-定义类的数组引用而不赋值，不会触发此类的初始化" class="headerlink" title="被动引用2 – 定义类的数组引用而不赋值，不会触发此类的初始化"></a>被动引用2 – 定义类的数组引用而不赋值，不会触发此类的初始化</h4><p>代码示例：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NegativeReference1</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Child</span> </span>&#123;</span><br><span class="line">        <span class="keyword">static</span> &#123;</span><br><span class="line">            System.out.println(Child.class.getSimpleName() + <span class="string">" is referred!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Child[] childs = <span class="keyword">new</span> Child[<span class="number">10</span>];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：</p>
+<blockquote>
+<p>无输出</p>
+</blockquote>
+<h4 id="被动引用3-–-访问类定义的常量，不会触发此类的初始化"><a href="#被动引用3-–-访问类定义的常量，不会触发此类的初始化" class="headerlink" title="被动引用3 – 访问类定义的常量，不会触发此类的初始化"></a>被动引用3 – 访问类定义的常量，不会触发此类的初始化</h4><p>示例代码：<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">NegativeReference2</span> </span>&#123;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">Child</span> </span>&#123;</span><br><span class="line">        <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String name = <span class="string">"Child"</span>;</span><br><span class="line">        <span class="keyword">static</span> &#123;</span><br><span class="line">            System.out.println(Child.class.getSimpleName() + <span class="string">" is referred!"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        System.out.println(Child.name);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>运行结果：</p>
+<blockquote>
+<p>Child</p>
+</blockquote>
+<h2 id="四-三种类加载器"><a href="#四-三种类加载器" class="headerlink" title="(四). 三种类加载器"></a>(四). 三种类加载器</h2><p>类加载器：<strong>类加载器</strong>负责加载程序中的<strong>类型</strong>（类和接口），并赋予唯一的名字予以标识。</p>
+<h4 id="类加载器的组织结构"><a href="#类加载器的组织结构" class="headerlink" title="类加载器的组织结构"></a>类加载器的组织结构</h4><p><img src="http://ols3fdyll.bkt.clouddn.com/class_loaders.png" alt=""></p>
+<h4 id="类加载器的关系"><a href="#类加载器的关系" class="headerlink" title="类加载器的关系"></a>类加载器的关系</h4><ol>
+<li><code>Bootstrap Classloader</code> 是在<code>Java</code>虚拟机启动后初始化的。</li>
+<li><code>Bootstrap Classloader</code> 负责加载 <code>ExtClassLoader</code>，并且将 <code>ExtClassLoader</code>的父加载器设置为 <code>Bootstrap Classloader</code></li>
+<li><code>Bootstrap Classloader</code> 加载完 <code>ExtClassLoader</code> 后，就会加载 <code>AppClassLoader</code>，并且将 <code>AppClassLoader</code> 的父加载器指定为 <code>ExtClassLoader</code>。</li>
+</ol>
+<h4 id="类加载器的作用"><a href="#类加载器的作用" class="headerlink" title="类加载器的作用"></a>类加载器的作用</h4><table>
+<thead>
+<tr>
+<th style="text-align:right">Class Loader</th>
+<th style="text-align:left">实现方式</th>
+<th style="text-align:left">具体实现类</th>
+<th style="text-align:left">负责加载的目标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">Bootstrap Loader</td>
+<td style="text-align:left">C++</td>
+<td style="text-align:left">由C++实现</td>
+<td style="text-align:left"><code>%JAVA_HOME%/jre/lib/rt.jar</code>以及<code>-Xbootclasspath</code>参数指定的路径以及中的类库</td>
+</tr>
+<tr>
+<td style="text-align:right">Extension ClassLoader</td>
+<td style="text-align:left">Java</td>
+<td style="text-align:left">sun.misc.Launcher$ExtClassLoader</td>
+<td style="text-align:left"><code>%JAVA_HOME%/jre/lib/ext</code>路径下以及<code>java.ext.dirs</code>系统变量指定的路径中类库</td>
+</tr>
+<tr>
+<td style="text-align:right">Application ClassLoader</td>
+<td style="text-align:left">Java</td>
+<td style="text-align:left">sun.misc.Launcher$AppClassLoader</td>
+<td style="text-align:left"><code>Classpath</code>以及<code>-classpath</code>、<code>-cp</code>指定目录所指定的位置的类或者是<code>jar</code>文档，它也是<code>Java</code>程序默认的类加载器</td>
+</tr>
+</tbody>
+</table>
+<h4 id="类加载器的特点"><a href="#类加载器的特点" class="headerlink" title="类加载器的特点"></a>类加载器的特点</h4><ul>
+<li><strong>层级结构</strong>：Java里的类装载器被组织成了有父子关系的层级结构。Bootstrap类装载器是所有装载器的父亲。</li>
+<li><strong>代理模式</strong>： 基于层级结构，类的代理可以在装载器之间进行代理。当装载器装载一个类时，首先会检查它在父装载器中是否进行了装载。如果上层装载器已经装载了这个类，这个类会被直接使用。反之，类装载器会请求装载这个类</li>
+<li><strong>可见性限制</strong>：一个子装载器可以查找父装载器中的类，但是一个父装载器不能查找子装载器里的类。</li>
+<li><strong>不允许卸载</strong>：类装载器可以装载一个类但是不可以卸载它，不过可以删除当前的类装载器，然后创建一个新的类装载器装载。</li>
+</ul>
+<h4 id="类加载器的隔离问题"><a href="#类加载器的隔离问题" class="headerlink" title="类加载器的隔离问题"></a>类加载器的隔离问题</h4><p>每个<strong>类装载器</strong>都有一个自己的<strong>命名空间</strong>用来保存已装载的类。当一个类装载器装载一个类时，它会通过保存在命名空间里的<strong>类全局限定名</strong>(<code>Fully Qualified Class Name</code>) 进行搜索来检测这个类是否已经被加载了。</p>
+<p><code>JVM</code> 及 <code>Dalvik</code> 对类唯一的识别是 <code>ClassLoader id</code> + <code>PackageName</code> + <code>ClassName</code>，所以一个运行程序中是有可能存在两个<strong>包名</strong>和<strong>类名</strong>完全一致的类的。并且如果这两个<strong>类</strong>不是由一个 <code>ClassLoader</code> 加载，是无法将一个类的实例<strong>强转</strong>为另外一个类的，这就是 <code>ClassLoader</code> 隔离性。</p>
+<p>为了解决类加载器的<strong>隔离问题</strong>，<code>JVM</code>引入了<strong>双亲委托机制</strong>。</p>
+<h2 id="五-双亲委托机制"><a href="#五-双亲委托机制" class="headerlink" title="(五). 双亲委托机制"></a>(五). 双亲委托机制</h2><p>核心思想：其一，<strong>自底向上</strong>检查类是否<strong>已加载</strong>；其二，<strong>自顶向下</strong>尝试<strong>加载类</strong>。</p>
+<h4 id="具体加载过程"><a href="#具体加载过程" class="headerlink" title="具体加载过程"></a>具体加载过程</h4><ol>
+<li>当<code>AppClassLoader</code>加载一个<code>class</code>时，它首先不会自己去尝试加载这个类，而是把类加载请求<strong>委派</strong>给<strong>父类加载器</strong><code>ExtClassLoader</code>去完成。</li>
+<li>当<code>ExtClassLoader</code>加载一个<code>class</code>时，它首先也不会自己去尝试加载这个类，而是把类加载请求<strong>委派</strong>给<code>BootStrapClassLoader</code>去完成。</li>
+<li>如果<code>BootStrapClassLoader</code>加载失败（例如在<code>%JAVA_HOME%/jre/lib</code>里未查找到该<code>class</code>），会使用<code>ExtClassLoader</code>来尝试加载；</li>
+<li>如果<code>ExtClassLoader</code>也加载失败，则会使用<code>AppClassLoader</code>来加载，如果<code>AppClassLoader</code>也加载失败，则会报出异常<code>ClassNotFoundException</code>。</li>
+</ol>
+<h4 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h4><p>ClassLoader.class</p>
+<ol>
+<li><strong>loadClass()</strong>：通过指定类的<strong>全限定名称</strong>，由类加载器<strong>检测</strong>、<strong>装载</strong>、<strong>创建</strong>并返回该类的<code>java.lang.Class</code>对象。<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_loadClass.png" alt=""><blockquote>
+<p><code>ClassLoader</code>通过<code>loadClass()</code>方法实现了<strong>双亲委托机制</strong>，用于类的<strong>动态加载</strong>。</p>
+</blockquote>
+</li>
+</ol>
+<p><code>loadClass()</code>本身是一个<strong>递归向上调用</strong>的过程。</p>
+<ul>
+<li><p><strong>自底向上</strong>检查类是否<strong>已加载</strong></p>
+<ol>
+<li>先通过<code>findLoadedClass()</code>方法从最<strong>底端类加载器</strong>开始检查类是否已经加载。</li>
+<li>如果已经加载，则根据<code>resolve</code>参数决定是否要执行<strong>连接</strong>过程，并返回<code>Class</code>对象。</li>
+<li>如果没有加载，则通过<code>parent.loadClass()</code>委托其父类加载器执行相同的检查操作(默认不做连接处理)。</li>
+<li>直到<strong>顶级类加载器</strong>，即<code>parent</code>为空时，由<code>findBootstrapClassOrNull()</code>方法尝试到<code>Bootstrap ClassLoader</code>中检查目标类。</li>
+</ol>
+</li>
+<li><p><strong>自顶向下</strong>尝试<strong>加载类</strong></p>
+<ol>
+<li>如果仍然没有找到目标类，则从<code>Bootstrap ClassLoader</code>开始，通过<code>findClass()</code>方法尝试到对应的<strong>类目录</strong>下去加载目标类。</li>
+<li>如果加载成功，则根据<code>resolve</code>参数决定是否要执行<strong>连接</strong>过程，并返回<code>Class</code>对象。</li>
+<li>如果加载失败，则由其<strong>子类加载器</strong>尝试加载，直到最<strong>底端类加载器</strong>也加载失败，最终抛出<code>ClassNotFoundException</code>。</li>
+</ol>
+</li>
+</ul>
+<ol start="2">
+<li><strong>findLoadedClass()</strong><br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClasslOADER_findLoadedClass.png" alt=""><blockquote>
+<p>查找当前<strong>类加载器的缓存中</strong>是否已经加载目标类。<code>findLoadedClass()</code>实际调用了底层的<code>native</code>方法<code>findLoadedClass0()</code>。</p>
+</blockquote>
+</li>
+</ol>
+<ol start="3">
+<li><strong>findBootstrapClassOrNull()</strong><br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_fidnBootstrapOrNull.png" alt=""><blockquote>
+<p>查找最顶端<code>Bootstrap</code><strong>类加载器</strong>的是否已经加载目标类。同样，<code>findBootstrapClassOrNull()</code>实际调用了底层的<code>native</code>方法<code>findBootstrapClass()</code>。</p>
+</blockquote>
+</li>
+</ol>
+<ol start="4">
+<li><strong>findClass()</strong><br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_findClass.png" alt=""><blockquote>
+<p><code>ClassLoader</code>是<code>java.lang</code>包下的<strong>抽象类</strong>，也是所有类加载器(除了<code>Bootstrap</code>)的基类，<code>findClass()</code>是<code>ClassLoader</code>对子类提供的加载目标类的抽象方法。</p>
+<p><strong>注意</strong>：<code>Bootstrap ClassLoader</code>并不属于<code>JVM</code>的层次，它不遵守<code>ClassLoader</code>的加载规则，<code>Bootstrap classLoader</code>并没有子类。</p>
+</blockquote>
+</li>
+</ol>
+<ol start="5">
+<li><strong>defineClass()</strong><br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_defineClass.png" alt=""><blockquote>
+<p><code>defineClass()</code>是<code>ClassLoader</code>向子类提供的方法，它可以将.<code>class</code>文件的<strong>二进制数据</strong>转换为合法的<code>java.lang.Class</code>对象。</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="六-类的动态加载"><a href="#六-类的动态加载" class="headerlink" title="(六). 类的动态加载"></a>(六). 类的动态加载</h2><h4 id="类的几种加载方式"><a href="#类的几种加载方式" class="headerlink" title="类的几种加载方式"></a>类的几种加载方式</h4><ul>
+<li>通过<strong>命令行</strong>启动时由<code>JVM</code>初始化加载；</li>
+<li>通过<code>Class.forName()</code>方法动态加载；</li>
+<li>通过<code>ClassLoader.loadClass()</code>方法动态加载。</li>
+</ul>
+<h4 id="Class-forName-和ClassLoader-loadClass"><a href="#Class-forName-和ClassLoader-loadClass" class="headerlink" title="Class.forName()和ClassLoader.loadClass()"></a>Class.forName()和ClassLoader.loadClass()</h4><ul>
+<li><strong>Class.forName()</strong>：把类的<code>.class</code>文件加载到<code>JVM</code>中，对类进行解释的同时执行类中的<code>static</code><strong>静态代码块</strong>；</li>
+<li><strong>ClassLoader.loadClass()</strong>：只是把.class文件加载到<code>JVM</code>中，不会执行<code>static</code><strong>代码块</strong>中的内容，只有在<code>newInstance</code>才会去执行。</li>
+</ul>
+<h2 id="七-对象的初始化"><a href="#七-对象的初始化" class="headerlink" title="(七). 对象的初始化"></a>(七). 对象的初始化</h2><h4 id="对象的初始化顺序"><a href="#对象的初始化顺序" class="headerlink" title="对象的初始化顺序"></a>对象的初始化顺序</h4><p>静态变量/静态代码块 -&gt; 普通代码块 -&gt; 构造函数</p>
+<ol>
+<li>父类<strong>静态变量</strong>和<strong>静态代码块</strong>（先声明的先执行）；</li>
+<li>子类<strong>静态变量</strong>和<strong>静态代码块</strong>（先声明的先执行）；</li>
+<li>父类<strong>普通成员变量</strong>和<strong>普通代码块</strong>（先声明的先执行）；</li>
+<li>父类的<strong>构造函数</strong>；</li>
+<li>子类<strong>普通成员变量</strong>和<strong>普通代码块</strong>（先声明的先执行）；</li>
+<li>子类的<strong>构造函数</strong>。</li>
+</ol>
+<h4 id="对象的初始化示例"><a href="#对象的初始化示例" class="headerlink" title="对象的初始化示例"></a>对象的初始化示例</h4><p>Parent.java<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_LoadSequence_Parent.png" alt=""></p>
+<p>Children.java<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_LoadSequence_Children.png" alt=""></p>
+<p>Tester.java<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_LoadSequence_Tester.png" alt=""></p>
+<p>测试结果：<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_LoadSequence_Tester._Result.png" alt=""></p>
+<p>测试结果表明：<code>JVM</code>在创建对象时，遵守以上对象的初始化顺序。</p>
+<h2 id="八-自定义类加载器"><a href="#八-自定义类加载器" class="headerlink" title="(八). 自定义类加载器"></a>(八). 自定义类加载器</h2><h4 id="编写自己的类加载器"><a href="#编写自己的类加载器" class="headerlink" title="编写自己的类加载器"></a>编写自己的类加载器</h4><p>在源码分析阶段，我们已经解读了如何实现<strong>自定义类加载器</strong>，现在我们开始<strong>怼</strong>自己的类加载器。</p>
+<blockquote>
+<p>Step 1：定义待加载的目标类<code>Parent.java</code>和<code>Children.java</code>。</p>
+</blockquote>
+<p>Parent.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.ostenant.jdk8.learning.examples.classloader.custom;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Parent</span> </span>&#123;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> String CLASS_NAME;</span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">static</span> String CLASS_LOADER_NAME;</span><br><span class="line">    <span class="keyword">protected</span> String instanceID;</span><br><span class="line"></span><br><span class="line">	<span class="comment">// 1.先执行静态变量和静态代码块（只在类加载期间执行一次）</span></span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        CLASS_NAME = Parent.class.getName();</span><br><span class="line">        CLASS_LOADER_NAME = Parent.class.getClassLoader().toString();</span><br><span class="line">        System.out.println(<span class="string">"Step a: "</span> + CLASS_NAME + <span class="string">" is loaded by "</span> + CLASS_LOADER_NAME);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 2.然后执行变量和普通代码块（每次创建实例都会执行）</span></span><br><span class="line">    &#123;</span><br><span class="line">        instanceID = <span class="keyword">this</span>.toString();</span><br><span class="line">        System.out.println(<span class="string">"Step c: Parent instance is created: "</span> + CLASS_LOADER_NAME + <span class="string">" -&gt; "</span> + instanceID);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="comment">// 3.然后执行构造方法</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Parent</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Step d: Parent instance："</span> + instanceID + <span class="string">", constructor is invoked"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">say</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"My first class loader..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>Children.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> org.ostenant.jdk8.learning.examples.classloader.custom;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Children</span> <span class="keyword">extends</span> <span class="title">Parent</span> </span>&#123;</span><br><span class="line">    <span class="keyword">static</span> &#123;</span><br><span class="line">        CLASS_NAME = Children.class.getName();</span><br><span class="line">        CLASS_LOADER_NAME = Children.class.getClassLoader().toString();</span><br><span class="line">        System.out.println(<span class="string">"Step b: "</span> + CLASS_NAME + <span class="string">" is loaded by "</span> + CLASS_LOADER_NAME);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    &#123;</span><br><span class="line">        instanceID = <span class="keyword">this</span>.toString();</span><br><span class="line">        System.out.println(<span class="string">"Step e: Children instance is created: "</span> + CLASS_LOADER_NAME + <span class="string">" -&gt; "</span> + instanceID);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Children</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"Step f: Children instance："</span> + instanceID + <span class="string">", constructor is invoked"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">say</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"My first class loader..."</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>Step 2：实现自定义类加载器<code>CustomClassLoader</code></p>
+</blockquote>
+<p>CustomClassLoader.java<br><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CustomClassLoader</span> <span class="keyword">extends</span> <span class="title">ClassLoader</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String classPath;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">CustomClassLoader</span><span class="params">(String classPath)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.classPath = classPath;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="keyword">protected</span> Class&lt;?&gt; findClass(String name) <span class="keyword">throws</span> ClassNotFoundException &#123;</span><br><span class="line">        Class&lt;?&gt; c = findLoadedClass(name); <span class="comment">// 可省略</span></span><br><span class="line">        <span class="keyword">if</span> (c == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">byte</span>[] data = loadClassData(name);</span><br><span class="line">            <span class="keyword">if</span> (data == <span class="keyword">null</span>) &#123;</span><br><span class="line">                <span class="keyword">throw</span> <span class="keyword">new</span> ClassNotFoundException();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> defineClass(name, data, <span class="number">0</span>, data.length);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">protected</span> <span class="keyword">byte</span>[] loadClassData(String name) &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">// package -&gt; file folder</span></span><br><span class="line">            name = name.replace(<span class="string">"."</span>, <span class="string">"//"</span>);</span><br><span class="line">            FileInputStream fis = <span class="keyword">new</span> FileInputStream(<span class="keyword">new</span> File(classPath + <span class="string">"//"</span> + name + <span class="string">".class"</span>));</span><br><span class="line">            ByteArrayOutputStream baos = <span class="keyword">new</span> ByteArrayOutputStream();</span><br><span class="line">            <span class="keyword">int</span> len = -<span class="number">1</span>;</span><br><span class="line">            <span class="keyword">byte</span>[] b = <span class="keyword">new</span> <span class="keyword">byte</span>[<span class="number">2048</span>];</span><br><span class="line">            <span class="keyword">while</span> ((len = fis.read(b)) != -<span class="number">1</span>) &#123;</span><br><span class="line">                baos.write(b, <span class="number">0</span>, len);</span><br><span class="line">            &#125;</span><br><span class="line">            fis.close();</span><br><span class="line">            <span class="keyword">return</span> baos.toByteArray();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<blockquote>
+<p>Step 3：测试类加载器的加载过程</p>
+</blockquote>
+<p>CustomerClassLoaderTester.java</p>
+<ol>
+<li><p>测试程序启动时，逐一<strong>拷贝</strong>并<strong>加载</strong>待加载的<strong>目标类源文件</strong>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String CHILDREN_SOURCE_CODE_NAME = SOURCE_CODE_LOCATION + <span class="string">"Children.java"</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String PARENT_SOURCE_CODE_NAME = SOURCE_CODE_LOCATION + <span class="string">"Parent.java"</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> List&lt;String&gt; SOURCE_CODE = Arrays.asList(CHILDREN_SOURCE_CODE_NAME, PARENT_SOURCE_CODE_NAME);</span><br><span class="line"></span><br><span class="line"><span class="keyword">static</span> &#123;</span><br><span class="line">    SOURCE_CODE.stream().map(path -&gt; <span class="keyword">new</span> File(path))</span><br><span class="line">        <span class="comment">// 路径转文件对象</span></span><br><span class="line">        .filter(f -&gt; !f.isDirectory())</span><br><span class="line">        <span class="comment">// 文件遍历</span></span><br><span class="line">        .forEach(f -&gt; &#123;</span><br><span class="line">        <span class="comment">// 拷贝后源代码</span></span><br><span class="line">        File targetFile = copySourceFile(f);</span><br><span class="line">        <span class="comment">// 编译源代码</span></span><br><span class="line">        compileSourceFile(targetFile);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>拷贝单一源文件到自定义类加载器的<strong>类加载目录</strong>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">static</span> File <span class="title">copySourceFile</span><span class="params">(File f)</span> </span>&#123;</span><br><span class="line">    BufferedReader reader = <span class="keyword">null</span>;</span><br><span class="line">    BufferedWriter writer = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        reader = <span class="keyword">new</span> BufferedReader(<span class="keyword">new</span> FileReader(f));</span><br><span class="line">        <span class="comment">// package ...;</span></span><br><span class="line">        String firstLine = reader.readLine();</span><br><span class="line"></span><br><span class="line">        StringTokenizer tokenizer = <span class="keyword">new</span> StringTokenizer(firstLine, <span class="string">" "</span>);</span><br><span class="line">        String packageName = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">while</span> (tokenizer.hasMoreElements()) &#123;</span><br><span class="line">            String e = tokenizer.nextToken();</span><br><span class="line">            <span class="keyword">if</span> (e.contains(<span class="string">"package"</span>)) &#123;</span><br><span class="line">                <span class="keyword">continue</span>;</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                packageName = e.trim().substring(<span class="number">0</span>, e.trim().length() - <span class="number">1</span>);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="comment">// package -&gt; path</span></span><br><span class="line">        String packagePath = packageName.replace(<span class="string">"."</span>, <span class="string">"//"</span>);</span><br><span class="line">        <span class="comment">// java file path</span></span><br><span class="line">        String targetFileLocation = TARGET_CODE_LOCALTION + <span class="string">"//"</span> + packagePath + <span class="string">"//"</span>;</span><br><span class="line"></span><br><span class="line">        String sourceFilePath = f.getPath();</span><br><span class="line">        String fileName = sourceFilePath.substring(sourceFilePath.lastIndexOf(<span class="string">"\\"</span>) + <span class="number">1</span>);</span><br><span class="line"></span><br><span class="line">        File targetFile = <span class="keyword">new</span> File(targetFileLocation, fileName);</span><br><span class="line">        File targetFileLocationDir = <span class="keyword">new</span> File(targetFileLocation);</span><br><span class="line">        <span class="keyword">if</span> (!targetFileLocationDir.exists()) &#123;</span><br><span class="line">            targetFileLocationDir.mkdirs();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// writer</span></span><br><span class="line">        writer = <span class="keyword">new</span> BufferedWriter(<span class="keyword">new</span> FileWriter(targetFile));</span><br><span class="line">        <span class="comment">// 写入第一行</span></span><br><span class="line">        writer.write(firstLine);</span><br><span class="line">        writer.newLine();</span><br><span class="line">        writer.newLine();</span><br><span class="line"></span><br><span class="line">        String input = <span class="string">""</span>;</span><br><span class="line">        <span class="keyword">while</span> ((input = reader.readLine()) != <span class="keyword">null</span>) &#123;</span><br><span class="line">        writer.write(input);</span><br><span class="line">            writer.newLine();</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">return</span> targetFile;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (FileNotFoundException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            reader.close();</span><br><span class="line">            writer.close();</span><br><span class="line">        &#125; <span class="keyword">catch</span> (IOException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>对拷贝后的<code>.java</code>源文件执行手动编译，在同级目录下生成<code>.class</code>文件。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">protected</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">compileSourceFile</span><span class="params">(File f)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        JavaCompiler javaCompiler = ToolProvider.getSystemJavaCompiler();</span><br><span class="line">        StandardJavaFileManager standardFileManager = javaCompiler.getStandardFileManager(<span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>);</span><br><span class="line">        Iterable&lt;? extends JavaFileObject&gt; javaFileObjects = standardFileManager.getJavaFileObjects(f);</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 执行编译任务</span></span><br><span class="line">        CompilationTask task = javaCompiler.getTask(<span class="keyword">null</span>, standardFileManager, <span class="keyword">null</span>, <span class="keyword">null</span>, <span class="keyword">null</span>, javaFileObjects);</span><br><span class="line">        task.call();</span><br><span class="line">        standardFileManager.close();</span><br><span class="line"></span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>通过<strong>自定义类加载器</strong>加载<code>Children</code>的<code>java.lang.Class&lt;?&gt;</code>对象，然后用反射机制创建<code>Children</code>的实例对象。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">test</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="comment">// 创建自定义类加载器</span></span><br><span class="line">    CustomClassLoader classLoader = <span class="keyword">new</span> CustomClassLoader(TARGET_CODE_LOCALTION); <span class="comment">// E://myclassloader//classpath</span></span><br><span class="line">    <span class="comment">// 动态加载class文件到内存中（无连接）</span></span><br><span class="line">    Class&lt;?&gt; c = classLoader.loadClass(<span class="string">"org.ostenant.jdk8.learning.examples.classloader.custom.Children"</span>);</span><br><span class="line">    <span class="comment">// 通过反射拿到所有的方法</span></span><br><span class="line">    Method[] declaredMethods = c.getDeclaredMethods();</span><br><span class="line">    <span class="keyword">for</span> (Method method : declaredMethods) &#123;</span><br><span class="line">        <span class="keyword">if</span> (<span class="string">"say"</span>.equals(method.getName())) &#123;</span><br><span class="line">            <span class="comment">// 通过反射拿到children对象</span></span><br><span class="line">            Object children = c.newInstance();</span><br><span class="line">            <span class="comment">// 调用children的say()方法</span></span><br><span class="line">            method.invoke(children);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<h4 id="测试编写的类加载器"><a href="#测试编写的类加载器" class="headerlink" title="测试编写的类加载器"></a>测试编写的类加载器</h4><h4 id="一-测试场景一"><a href="#一-测试场景一" class="headerlink" title="(一). 测试场景一"></a>(一). 测试场景一</h4><ol>
+<li><strong>保留</strong><code>static</code>代码块，把目标类<code>Children.java</code>和<code>Parent.java</code><strong>拷贝</strong>到类加载的目录，然后进行手动<strong>编译</strong>。</li>
+<li><strong>保留</strong>测试项目目录中的目标类<code>Children.java</code>和<code>Parent.java</code>。<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_With_Parent_Children_In_Project.png" alt=""></li>
+</ol>
+<p>测试结果输出：<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/Class_Loader_Situation_1_Result.png" alt=""></p>
+<p>测试结果分析：</p>
+<blockquote>
+<p>我们成功创建了<code>Children</code>对象，并通过反射调用了它的<code>say()</code>方法。<br>然而查看控制台日志，可以发现类加载使用的仍然是<code>AppClassLoader</code>，<code>CustomClassLoader</code>并没有生效。</p>
+</blockquote>
+<p>查看<code>CustomClassLoader</code>的类加载目录：<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_Target_Folder_Class.png" alt=""></p>
+<blockquote>
+<p>类目录下有我们<strong>拷贝</strong>并<strong>编译</strong>的<code>Parent</code>和<code>Chidren</code>文件。</p>
+</blockquote>
+<p>分析原因：</p>
+<blockquote>
+<p>由于项目空间中的<code>Parent.java</code>和<code>Children.java</code>，在拷贝后并没有移除。导致<code>AppClassLoader</code>优先在其<code>Classpath</code>下面<strong>找到</strong>并成功<strong>加载</strong>了目标类。</p>
+</blockquote>
+<h4 id="二-测试场景二"><a href="#二-测试场景二" class="headerlink" title="(二). 测试场景二"></a>(二). 测试场景二</h4><ol>
+<li><strong>注释掉</strong><code>static</code>代码块（类目录下有已编译的目标类<code>.class</code>文件）。</li>
+<li><strong>移除</strong>测试项目目录中的目标类<code>Children.java</code>和<code>Parent.java</code>。<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_Without_Parent_Children_In_Project.png" alt=""></li>
+</ol>
+<p>测试结果输出：<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/ClassLoader_Situation_2_Console.png" alt=""><br>测试结果分析：</p>
+<blockquote>
+<p>我们成功通过<strong>自定义类加载器</strong>加载了目标类。创建了<code>Children</code>对象，并通过反射调用了它的<code>say()</code>方法。</p>
+</blockquote>
+<p>至此，我们自己的一个简单的类加载器就完成了！</p>
+<h1 id="参考书籍"><a href="#参考书籍" class="headerlink" title="参考书籍"></a>参考书籍</h1><p>周志明，深入理解Java虚拟机：JVM高级特性与最佳实践，机械工业出版社</p>
+<hr>
+<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="https://ostenant.coding.me/2017/05/10/JVM系列(五) - JVM类加载机制详解/" data-id="cjgx4eio2000g684ultezbxrz" class="article-share-link" data-share="baidu" data-title="JVM系列(五) - JVM类加载机制详解">分享到</a>
+      
+
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JDK/">JDK</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
+
+    </footer>
+	
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/06/02/一天一个设计模式(一) - 总体概述/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          一天一个设计模式(一) - 总体概述
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/05/02/JVM系列(四) - JVM GC回收算法/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">JVM系列(四) - JVM GC回收算法</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+
+
+
+</section>
+      
+      <aside id="sidebar">
+  
+    
+<div class="widget-wrap">
+  <h3 class="widget-title">关于我</h3>
+  <ul class="widget about-me">
+    
+    <li><img class="author" title="About me" src="/img/favicon.png" /></li>
+    
+    
+    <li>ostenant@163.com</li>
+    
+    <li>一枚热爱生活，追逐自由的小技术！</li>
+    
+  </ul>
+</div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ECMAScript基础系列/">ECMAScript基础系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECMAScript/">ECMAScript</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/Docker/" style="font-size: 13.33px;">Docker</a> <a href="/tags/ECMAScript/" style="font-size: 11.67px;">ECMAScript</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/RPC/" style="font-size: 18.33px;">RPC</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/SOFA-RPC/" style="font-size: 10px;">SOFA-RPC</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/04/29/蚂蚁金服RPC框架SOFA-RPC(一) - 初体验/">蚂蚁金服RPC框架SOFA-RPC(一) - 初体验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/28/分布式理论(四) - 3PC协议/">分布式理论(四) - 3PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/25/分布式理论(三) - 2PC协议/">分布式理论(三) - 2PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/24/分布式理论(二) - BASE理论/">分布式理论(二) - BASE理论</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/23/分布式理论(一) - CAP定理/">分布式理论(一) - CAP定理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+          </li>
+        
+          <li>
+            <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+          </li>
+        
+          <li>
+            <a href="http://ifeve.com" target="_blank">并发编程网</a>
+          </li>
+        
+          <li>
+            <a href="https://juejin.im" target="_blank">掘金</a>
+          </li>
+        
+          <li>
+            <a href="http://www.jianshu.com" target="_blank">简书</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com" target="_blank">Github</a>
+          </li>
+        
+          <li>
+            <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+          </li>
+        
+          <li>
+            <a href="http://www.infoq.com" target="_blank">Infoq</a>
+          </li>
+        
+          <li>
+            <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+          </li>
+        
+          <li>
+            <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Chen Madison<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">主页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="https://github.com/ostenant" class="mobile-nav-link">Github</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!--
+
+-->
+
+
+
+   
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+                processEscapes: true
+                    
+}
+  
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+                  
+}
+    
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i=0; i < all.length; i += 1) {
+                            all[i].SourceElement().parentNode.className += ' has-jax';
+                                    
+            }
+                
+        });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.5.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<script src="/js/script.js"></script>
+
+
+</div>
+</body>
+</html>

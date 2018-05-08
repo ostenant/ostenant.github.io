@@ -1,0 +1,589 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  
+  <title>JVM系列(一) - JVM总体概述 | Coding | Madison&#39;s Blog</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  
+    <meta name="baidu-site-verification" content="0aFfZiB4tV" />
+  
+  
+  <meta name="description" content="前言JVM是Java Virtual Machine(Java虚拟机)的缩写，JVM是一种用于计算设备的规范，它是一个虚构的计算机，是通过在实际的计算机上仿真模拟各种计算机功能来实现的。">
+<meta name="keywords" content="JVM,Java">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM系列(一) - JVM总体概述">
+<meta property="og:url" content="https://ostenant.coding.me/2017/04/22/JVM系列(一) - JVM总体概述/index.html">
+<meta property="og:site_name" content="Coding | Madison&#39;s Blog">
+<meta property="og:description" content="前言JVM是Java Virtual Machine(Java虚拟机)的缩写，JVM是一种用于计算设备的规范，它是一个虚构的计算机，是通过在实际的计算机上仿真模拟各种计算机功能来实现的。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/jvm-log.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/java-tutorial.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/jdk.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/jre.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/jvm.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/classloader.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/loadclass.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/java-compiler-and-jit-compiler.png">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-05-08T02:49:46.089Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JVM系列(一) - JVM总体概述">
+<meta name="twitter:description" content="前言JVM是Java Virtual Machine(Java虚拟机)的缩写，JVM是一种用于计算设备的规范，它是一个虚构的计算机，是通过在实际的计算机上仿真模拟各种计算机功能来实现的。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/jvm-log.png">
+  
+    <link rel="alternative" href="/atom.xml" title="Coding | Madison&#39;s Blog" type="application/atom+xml">
+  
+  
+    <link rel="icon" href="/img/favicon.png">
+  
+  <link rel="stylesheet" href="/css/style.css">
+  <!--[if lt IE 9]><script src="//cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7/html5shiv.min.js"></script><![endif]-->
+  
+ 
+</head>
+<body>
+<div id="container">
+  <div id="wrap">
+    <header id="header">
+  <div id="banner"></div>
+  <div id="header-outer" class="outer">
+    <div id="header-title" class="inner">
+      <h1 id="logo-wrap">
+        <a href="/" id="logo">Coding | Madison&#39;s Blog</a>
+      </h1>
+      
+        <h2 id="subtitle-wrap">
+          <a href="/" id="subtitle">上善若水任方猿</a>
+        </h2>
+      
+    </div>
+    <div id="header-inner" class="inner">
+      <nav id="main-nav">
+        <a id="main-nav-toggle" class="nav-icon"></a>
+        
+          <a class="main-nav-link" href="/">主页</a>
+        
+          <a class="main-nav-link" href="/archives">归档</a>
+        
+          <a class="main-nav-link" href="https://github.com/ostenant">Github</a>
+        
+          <a class="main-nav-link" href="/about">关于</a>
+        
+      </nav>
+      <nav id="sub-nav">
+        
+          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
+        
+        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
+      </nav>
+      <div id="search-form-wrap">
+        <form action="//www.baidu.com/baidu" method="get" accept-charset="utf-8" class="search-form">
+          <input type="search" name="word" maxlength="20" class="search-form-input" placeholder="Search">
+          <input type="submit" value="" class="search-form-submit">
+          <input name=tn type=hidden value="bds">
+          <input name=cl type=hidden value="3">
+          <input name=ct type=hidden value="2097152">
+          <input type="hidden" name="si" value="ostenant.coding.me">
+        </form>
+      </div>
+    </div>
+  </div>
+</header>
+    <div class="outer">
+      <section id="main"><article id="post-JVM系列(一) - JVM总体概述" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2017/04/22/JVM系列(一) - JVM总体概述/" class="article-date">
+  <time datetime="2017-04-22T06:55:00.000Z" itemprop="datePublished">2017-04-22</time>
+</a>
+    
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a>
+  </div>
+
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      JVM系列(一) - JVM总体概述
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>JVM</code>是<code>Java Virtual Machine</code>(Java虚拟机)的缩写，<code>JVM</code>是一种用于计算设备的<strong>规范</strong>，它是一个<strong>虚构</strong>的计算机，是通过在实际的计算机上仿真模拟各种计算机功能来实现的。</p>
+<a id="more"></a>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/jvm-log.png" alt=""></p>
+<p><strong>JVM屏蔽了与具体操作系统平台相关的信息</strong>，使<code>Java</code>程序只需生成在<code>Java</code>虚拟机上<strong>一次编译，多次运行，具有跨平台性</strong>。<code>JVM</code>在执行字节码时，实际上最终还是把<strong>字节码</strong>解释成具体平台上的<strong>机器指令</strong>执行。</p>
+<p><code>Java</code>虚拟机包括一套<strong>字节码指令集</strong>、一组<strong>寄存器</strong>、一个<strong>栈</strong>、一个<strong>垃圾回收堆</strong>和一个<strong>存储方法区</strong>。</p>
+<p>本文将简述以下内容:</p>
+<ul>
+<li><strong><a href="">JVM是什么？</a></strong></li>
+<li><strong><a href="">JVM能干什么？</a></strong></li>
+<li><strong><a href="">JVM生命周期？</a></strong></li>
+<li><strong><a href="">JVM组成架构？</a></strong></li>
+</ul>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><hr>
+<h2 id="JVM是什么"><a href="#JVM是什么" class="headerlink" title="JVM是什么"></a>JVM是什么</h2><h3 id="JDK、JRE和JVM对比"><a href="#JDK、JRE和JVM对比" class="headerlink" title="JDK、JRE和JVM对比"></a>JDK、JRE和JVM对比</h3><p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/java-tutorial.png" alt=""></p>
+<p><code>JVM</code>，<code>JRE</code>，<code>JDK</code> 都是 <code>java</code> 语言的支柱，他们分工协作。但不同的是 <code>Jdk</code> 和 <code>JRE</code> 是真实存在的，而 <code>JVM</code> 是一个抽象的概念，并不真实存在。</p>
+<h4 id="JDK"><a href="#JDK" class="headerlink" title="JDK"></a>JDK</h4><p><code>JDK</code>(Java Development Kit) 是 <code>Java</code> 语言的软件开发工具包（<code>SDK</code>）。<code>JDK</code> 物理存在，是 <code>programming tools</code>、<code>JRE</code> 和 <code>JVM</code> 的一个集合。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/jdk.png" alt=""></p>
+<h4 id="JRE"><a href="#JRE" class="headerlink" title="JRE"></a>JRE</h4><p><code>JRE</code>（Java Runtime Environment）<code>Java</code> 运行时环境，<code>JRE</code> 是物理存在的，主要由<code>Java API</code> 和 <code>JVM</code> 组成，提供了用于执行 <code>java</code> 应用程序<strong>最低</strong>要求的环境。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/jre.png" alt=""></p>
+<h4 id="JVM"><a href="#JVM" class="headerlink" title="JVM"></a>JVM</h4><p><code>JVM</code>是一种用于计算设备的<strong>规范</strong>，它是一个<strong>虚构</strong>的计算机的软件实现，简单的说，<code>JVM</code>是运行<code>byte code</code>字节码程序的一个容器。</p>
+<h3 id="JVM的特点"><a href="#JVM的特点" class="headerlink" title="JVM的特点"></a>JVM的特点</h3><ul>
+<li><p><strong>基于堆栈`的虚拟机</strong> ：最流行的计算机体系结构，如英特尔<code>X86</code>架构和<code>ARM</code>架构上运行基于<strong>寄存器</strong> 。比如，安卓的<code>Davilk</code>虚拟机就是基于<strong>寄存器</strong>结构 但是，<code>JVM</code>是基于栈结构的。</p>
+</li>
+<li><p><strong>符号引用</strong> ：除了<strong>基本类型</strong>以外的数据 <strong>（类和接口）</strong> 都是通过<strong>符号</strong>来引用，而不是通过显式地使用<strong>内存地址</strong>来引用。</p>
+</li>
+<li><p><strong>垃圾收集</strong> ：一个类的实例是由用户程序<strong>创建</strong>和垃圾回收<strong>自动销毁</strong>。</p>
+</li>
+<li><p><strong>网络字节顺序</strong> ：<code>Java class</code>文件用网络字节码顺序来进行存储，保证了小端的<code>Intel x86</code>架构和大端的<code>RISC</code>系列的架构之间的无关性。</p>
+</li>
+</ul>
+<h3 id="JVM字节码"><a href="#JVM字节码" class="headerlink" title="JVM字节码"></a>JVM字节码</h3><p><code>JVM</code>使用Java字节码的方式，作为<code>Java</code> <strong>用户语言</strong> 和 <strong>机器语言</strong> 之间的中间语言。实现一个<strong>通用的</strong>、 <strong>机器无关</strong> 的执行平台。</p>
+<h2 id="JVM能干什么"><a href="#JVM能干什么" class="headerlink" title="JVM能干什么"></a>JVM能干什么</h2><p>基于安全方面考虑，<code>JVM</code> 要求在 <code>class</code> 文件中使用强制性的语法和约束，但任意一门语言都可以转换为被 <code>JVM</code> 接受的有效的 <code>class</code> 文件。作为一个通用的、机器无关的执行平台，任何其他语言的实现者都可将 <code>JVM</code> 当作他的语言产品交付媒介。</p>
+<p><code>JVM</code> 中执行过程如下：</p>
+<ul>
+<li><strong>加载代码</strong></li>
+<li><strong>验证代码</strong></li>
+<li><strong>执行代码</strong></li>
+<li><strong>提供运行环境</strong></li>
+</ul>
+<h2 id="JVM生命周期"><a href="#JVM生命周期" class="headerlink" title="JVM生命周期"></a><code>JVM</code>生命周期</h2><ul>
+<li><strong>启动</strong>：任何一个拥有<code>main</code>方法的<code>class</code>都可以作为<code>JVM</code>实例运行的起点。</li>
+<li><p><strong>运行</strong>：<code>main</code>函数为起点，程序中的其他线程均有它启动，包括<code>daemon</code>守护线程和<code>non-daemon</code>普通线程。<code>daemon</code>是<code>JVM</code>自己使用的线程比如<code>GC</code>线程，<code>main</code>方法的初始线程是<code>non-daemon</code>。</p>
+</li>
+<li><p><strong>消亡</strong>：所有线程终止时，<code>JVM</code>实例结束生命。</p>
+</li>
+</ul>
+<h2 id="JVM组成架构"><a href="#JVM组成架构" class="headerlink" title="JVM组成架构"></a><code>JVM</code>组成架构</h2><p><code>JAVA</code> 代码执行过程如下：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/jvm.png" alt=""></p>
+<h3 id="1-类加载器（Class-Loader）"><a href="#1-类加载器（Class-Loader）" class="headerlink" title="1. 类加载器（Class Loader）"></a>1. 类加载器（Class Loader）</h3><p><strong>类加载器</strong> 负责加载程序中的类型（类和接口），并赋予唯一的名字予以标识。</p>
+<p><code>JDK</code> 默认提供的三种 <code>ClassLoader</code>如下：<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/classloader.png" alt=""></p>
+<h4 id="类加载器的关系"><a href="#类加载器的关系" class="headerlink" title="类加载器的关系"></a>类加载器的关系</h4><ol>
+<li><p><code>Bootstrap Classloader</code> 是在<code>Java</code>虚拟机启动后初始化的。</p>
+</li>
+<li><p><code>Bootstrap Classloader</code> 负责加载 <code>ExtClassLoader</code>，并且将 <code>ExtClassLoader</code>的父加载器设置为 <code>Bootstrap Classloader</code></p>
+</li>
+<li><p><code>Bootstrap Classloader</code> 加载完 <code>ExtClassLoader</code> 后，就会加载 <code>AppClassLoader</code>，并且将 <code>AppClassLoader</code> 的父加载器指定为 <code>ExtClassLoader</code>。</p>
+</li>
+</ol>
+<h4 id="类加载器的作用"><a href="#类加载器的作用" class="headerlink" title="类加载器的作用"></a>类加载器的作用</h4><table>
+<thead>
+<tr>
+<th style="text-align:right">Class Loader</th>
+<th style="text-align:left">实现</th>
+<th style="text-align:left">负责加载</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right">Bootstrap Loader</td>
+<td style="text-align:left">C++</td>
+<td style="text-align:left"><code>%JAVA_HOME%/jre/lib</code>, <code>%JAVA_HOME%/jre/classes</code>以及-Xbootclasspath参数指定的路径以及中的类</td>
+</tr>
+<tr>
+<td style="text-align:right">Extension ClassLoader</td>
+<td style="text-align:left">Java</td>
+<td style="text-align:left"><code>%JAVA_HOME%/jre/lib/ext</code>，路径下的所有<code>classes</code>目录以及<code>java.ext.dirs</code>系统变量指定的路径中类库</td>
+</tr>
+<tr>
+<td style="text-align:right">Application ClassLoader</td>
+<td style="text-align:left">Java</td>
+<td style="text-align:left"><code>Classpath</code>所指定的位置的类或者是<code>jar</code>文档，它也是<code>Java</code>程序默认的类加载器</td>
+</tr>
+</tbody>
+</table>
+<h4 id="双亲委托机制"><a href="#双亲委托机制" class="headerlink" title="双亲委托机制"></a>双亲委托机制</h4><p><code>Java</code>中<code>ClassLoader</code>的加载采用了<strong>双亲委托机制</strong>，采用<strong>双亲委托机制</strong>加载类的时候采用如下的几个步骤：</p>
+<ol>
+<li><p>当前<code>ClassLoader</code>首先从自己已经加载的类中查询是否此类已经加载，如果已经加载则直接返回原来已经加载的类。</p>
+</li>
+<li><p>当前<code>ClassLoader</code>的缓存中没有找到被加载的类的时候，委托父类加载器去加载，父类加载器采用同样的策略，首先查看自己的缓存，然后委托父类的父类去加载，一直到<code>Bootstrap ClassLoader</code>。</p>
+</li>
+<li><p>当所有的父类加载器都没有加载的时候，再由当前的类加载器加载，并将其放入它自己的缓存中，以便下次有加载请求的时候直接返回。</p>
+</li>
+</ol>
+<blockquote>
+<p><strong>小结</strong> ：双亲委托机制的核心思想分为两个步骤。其一，自底向上检查类是否已经加载；其二，自顶向下尝试加载类。</p>
+</blockquote>
+<h4 id="ClassLoader隔离问题"><a href="#ClassLoader隔离问题" class="headerlink" title="ClassLoader隔离问题"></a><code>ClassLoader</code>隔离问题</h4><p>每个<strong>类装载器</strong>都有一个自己的<strong>命名空间</strong>用来保存已装载的类。当一个类装载器装载一个类时，它会通过保存在命名空间里的<strong>类全局限定名</strong>(<code>Fully Qualified Class Name</code>)进行搜索来检测这个类是否已经被加载了。</p>
+<p><code>JVM</code> 及 <code>Dalvik</code> 对类唯一的识别是 <code>ClassLoader id</code> + <code>PackageName</code> + <code>ClassName</code>，所以一个运行程序中是有可能存在两个包名和类名完全一致的类的。并且如果这两个”类”不是由一个 <code>ClassLoader</code> 加载，是无法将一个类的示例<strong>强转</strong>为另外一个类的，这就是 <code>ClassLoader</code> 隔离。</p>
+<p><strong>双亲委托</strong> 是 <code>ClassLoader</code>类一致问题的一种解决方案，也是 <code>Android</code> 差价化开发和热修复的基础。</p>
+<h4 id="类装载器特点"><a href="#类装载器特点" class="headerlink" title="类装载器特点"></a>类装载器特点</h4><p><code>Java</code>提供了<strong>动态加载</strong>特性。在运行时的第一次引用到一个<code>class</code>的时候会对它进行<strong>装载(Loading)</strong> 、<strong> 链接(Linking)</strong> 和 <strong> 初始化(Initialization) </strong> ，而不是在编译时进行。不同的JVM的实现不同，本文所描述的内容均只限于<code>Hotspot JVM</code>。</p>
+<p><code>JVM</code>的类装载器负责动态装载，<code>Java</code>的类装载器有如下几个特点：</p>
+<ul>
+<li><p><strong>层级结构</strong>：Java里的类装载器被组织成了有父子关系的层级结构。Bootstrap类装载器是所有装载器的父亲。</p>
+</li>
+<li><p><strong>代理模式</strong>： 基于层级结构，类的代理可以在装载器之间进行代理。当装载器装载一个类时，首先会检查它在父装载器中是否进行了装载。如果上层装载器已经装载了这个类，这个类会被直接使用。反之，类装载器会请求装载这个类</p>
+</li>
+<li><p><strong>可见性限制</strong>：一个子装载器可以查找父装载器中的类，但是一个父装载器不能查找子装载器里的类。</p>
+</li>
+<li><p><strong>不允许卸载</strong>：类装载器可以装载一个类但是不可以卸载它，不过可以删除当前的类装载器，然后创建一个新的类装载器装载。</p>
+</li>
+</ul>
+<h4 id="类装载器过程"><a href="#类装载器过程" class="headerlink" title="类装载器过程"></a>类装载器过程</h4><ul>
+<li><p><strong>加载（Loading）</strong></p>
+<p>  首先，根据<strong>类的全限定名</strong>找到代表这个类的<code>Class</code>文件，然后读取到一个<strong>字节数组</strong>中。接着，这些字节会被解析检验它们是否代表一个<code>Class</code><strong>对象</strong> 并包含正确的<code>major</code>、<code>minor</code>版本信息。<strong>直接父类</strong> 的类和接口也会被加载进来。这些操作一旦完成，<strong>类或者接口对象</strong> 就从二进制表示中创建出来了。</p>
+</li>
+<li><p><strong>链接（Linking）</strong></p>
+<p>  链接是检验类或接口并准备类型和父类接口的过程。链接过程包含三步：<strong>校验（Verifying）</strong>、<strong>准备（Preparing）</strong>、<strong>部分解析（Optionally resolving）</strong>。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/loadclass.png" alt=""></p>
+<ul>
+<li><p><strong>验证</strong></p>
+<p>这是类装载中最复杂的过程，并且花费的时间也是最长的。任务是确保导入类型的<strong>准确性</strong>，验证阶段做的检查，运行时不需要再做。虽然减慢加了载速度，但是避免了多次检查。</p>
+</li>
+<li><p><strong>准备</strong></p>
+<p>准备过程通常分配一个结构用来<strong>存储类信息</strong>，这个结构中包含了类中定义的<strong>成员变量</strong>，<strong>方法</strong> 和<strong>接口信息</strong>等。</p>
+</li>
+<li><p><strong>解析</strong></p>
+<p>解析是可选阶段，把这个类的<strong>常量池</strong>中的所有的<strong>符号引用</strong>改变成<strong>直接引用</strong>。如果不执行，符号解析要等到字节码指令使用这个引用时才会进行。</p>
+</li>
+</ul>
+</li>
+<li><p><strong>初始化（Initialization）</strong></p>
+<p>把类中的变量初始化成合适的值。执行<strong>静态初始化程序</strong>，把<strong>静态变量</strong>初始化成指定的值。</p>
+</li>
+</ul>
+<blockquote>
+<p>   <code>JVM</code>规范定义了上面的几个任务，不过它允许具体执行的时候能够有些灵活的变动。</p>
+</blockquote>
+<h3 id="2-执行引擎（Execution-Engine）"><a href="#2-执行引擎（Execution-Engine）" class="headerlink" title="2. 执行引擎（Execution Engine）"></a>2. 执行引擎（Execution Engine）</h3><p>通过<strong>类装载器</strong>装载的，被分配到<code>JVM</code>的<strong>运行时数据区</strong>的字节码会被<strong>执行引擎</strong>执行。</p>
+<p><strong>执行引擎</strong> 以<strong>指令</strong>为单位读取 <code>Java</code> 字节码。它就像一个 <code>CPU</code> 一样，一条一条地执行<strong>机器指令</strong>。每个字节码指令都由一个1字节的<strong>操作码</strong>和附加的<strong>操作数</strong>组成。<strong>执行引擎</strong> 取得一个<strong>操作码</strong>，然后根据<strong>操作数</strong>来执行任务，完成后就继续执行下一条<strong>操作码</strong>。</p>
+<p>不过 <code>Java</code> 字节码是用一种人类可以读懂的语言编写的，而不是用机器可以直接执行的语言。因此，<strong>执行引擎</strong> 必须把<strong>字节码</strong>转换成可以直接被 <code>JVM</code> 执行的语言。</p>
+<p><strong>字节码</strong> 可以通过以下两种方式转换成<strong>机器语言</strong>：</p>
+<ul>
+<li><p><strong>解释器</strong></p>
+<p><strong>解释器</strong> 一条一条地读取<strong>字节码</strong>，<strong>解释</strong> 并且 <strong>执行</strong> 字节码指令。因为它一条一条地解释和执行指令，所以它可以<strong>很快地解释</strong>字节码，但是<strong>执行起来会比较慢</strong>。这是解释执行的语言的一个缺点。字节码这种“语言”基本来说是解释执行的。</p>
+</li>
+<li><p><strong>即时（Just-In-Time)编译器</strong></p>
+<p><strong>即时编译器</strong> 被引入用来弥补解释器的缺点。<strong>执行引擎</strong> 首先按照 <strong>解释执行</strong> 的方式来执行，然后在合适的时候，<strong>即时编译器</strong> 把 <strong>整段字节码</strong> 编译成 <strong>本地代码</strong>。然后，执行引擎就没有必要再去解释执行方法了，它可以直接通过本地代码去执行它。执行本地代码比一条一条进行解释执行的速度快很多。编译后的代码可以执行的很快，因为本地代码是保存在缓存里的。</p>
+</li>
+</ul>
+<p><code>Java</code> 字节码是<strong>解释执行</strong>的，但是没有直接在 <code>JVM</code> 宿主执行<strong>原生代码</strong>快。为了提高性能，<code>Oracle Hotspot</code> 虚拟机会找到执行最频繁的字节码片段并把它们编译成原生机器码。编译出的<strong>原生机器码</strong>被存储在<strong>非堆内存</strong>的代码缓存中。</p>
+<p>通过这种方法<code>（JIT）</code>，<code>Hotspot</code> 虚拟机将权衡下面两种时间消耗：将字节码编译成本地代码需要的额外时间和解释执行字节码消耗更多的时间。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/java-compiler-and-jit-compiler.png" alt=""></p>
+<p>这里插入一下 Android 5.0 以后用的 ART 虚拟机使用的是 AOT 机制。</p>
+<blockquote>
+<p><code>Dalvik</code> 是依靠一个 <code>Just-In-Time (JIT)</code>编译器去解释字节码。开发者编译后的应用代码需要通过一个解释器在用户的设备上运行，这一机制并不高效，但让应用能更容易在不同硬件和架构上运行。<code>ART</code> 则完全改变了这套做法，<strong>在应用安装时就预编译字节码到机器语言</strong>，这一机制叫<code>Ahead-Of-Time (AOT）</code>编译。在移除解释代码这一过程后，应用程序执行将更有效率，启动更快。</p>
+</blockquote>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>周志明，深入理解Java虚拟机：JVM高级特性与最佳实践，机械工业出版社</p>
+<hr>
+<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+      
+    </div>
+    <footer class="article-footer">
+      
+        <a data-url="https://ostenant.coding.me/2017/04/22/JVM系列(一) - JVM总体概述/" data-id="cjgx4eioa000x684uuwlcksw7" class="article-share-link" data-share="baidu" data-title="JVM系列(一) - JVM总体概述">分享到</a>
+      
+
+      
+
+      
+  <ul class="article-tag-list"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/JVM/">JVM</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Java/">Java</a></li></ul>
+
+    </footer>
+	
+  
+    
+<nav id="article-nav">
+  
+    <a href="/2017/04/25/JVM系列(二) - JVM内存区域和内存溢出异常详解/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">下一篇</strong>
+      <div class="article-nav-title">
+        
+          JVM系列(二) - JVM内存区域和内存溢出异常详解
+        
+      </div>
+    </a>
+  
+  
+    <a href="/2017/04/21/ECMAScript 6入门篇(二) - 变量的解构赋值/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">上一篇</strong>
+      <div class="article-nav-title">ECMAScript 6入门篇(二) - 变量的解构赋值</div>
+    </a>
+  
+</nav>
+
+  
+</article>
+
+
+
+
+
+
+
+
+</section>
+      
+      <aside id="sidebar">
+  
+    
+<div class="widget-wrap">
+  <h3 class="widget-title">关于我</h3>
+  <ul class="widget about-me">
+    
+    <li><img class="author" title="About me" src="/img/favicon.png" /></li>
+    
+    
+    <li>ostenant@163.com</li>
+    
+    <li>一枚热爱生活，追逐自由的小技术！</li>
+    
+  </ul>
+</div>
+
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">分类</h3>
+    <div class="widget">
+      <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/ECMAScript基础系列/">ECMAScript基础系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">1</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签</h3>
+    <div class="widget">
+      <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ECMAScript/">ECMAScript</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">标签云</h3>
+    <div class="widget tagcloud">
+      <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/Docker/" style="font-size: 13.33px;">Docker</a> <a href="/tags/ECMAScript/" style="font-size: 11.67px;">ECMAScript</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Java/" style="font-size: 20px;">Java</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/RPC/" style="font-size: 18.33px;">RPC</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/SOFA-RPC/" style="font-size: 10px;">SOFA-RPC</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">归档</h3>
+    <div class="widget">
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+    </div>
+  </div>
+
+  
+    
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">近期文章</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="/2018/04/29/蚂蚁金服RPC框架SOFA-RPC(一) - 初体验/">蚂蚁金服RPC框架SOFA-RPC(一) - 初体验</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/28/分布式理论(四) - 3PC协议/">分布式理论(四) - 3PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/25/分布式理论(三) - 2PC协议/">分布式理论(三) - 2PC协议</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/24/分布式理论(二) - BASE理论/">分布式理论(二) - BASE理论</a>
+          </li>
+        
+          <li>
+            <a href="/2018/04/23/分布式理论(一) - CAP定理/">分布式理论(一) - CAP定理</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+    
+  <div class="widget-wrap">
+    <h3 class="widget-title">友情链接</h3>
+    <div class="widget">
+      <ul>
+        
+          <li>
+            <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+          </li>
+        
+          <li>
+            <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+          </li>
+        
+          <li>
+            <a href="http://ifeve.com" target="_blank">并发编程网</a>
+          </li>
+        
+          <li>
+            <a href="https://juejin.im" target="_blank">掘金</a>
+          </li>
+        
+          <li>
+            <a href="http://www.jianshu.com" target="_blank">简书</a>
+          </li>
+        
+          <li>
+            <a href="https://github.com" target="_blank">Github</a>
+          </li>
+        
+          <li>
+            <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+          </li>
+        
+          <li>
+            <a href="http://www.infoq.com" target="_blank">Infoq</a>
+          </li>
+        
+          <li>
+            <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+          </li>
+        
+          <li>
+            <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+          </li>
+        
+      </ul>
+    </div>
+  </div>
+
+  
+</aside>
+      
+    </div>
+    <footer id="footer">
+  
+  <div class="outer">
+    <div id="footer-info" class="inner">
+      &copy; 2018 Chen Madison<br>
+      Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
+      .
+      Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
+    </div>
+  </div>
+</footer>
+  </div>
+  <nav id="mobile-nav">
+  
+    <a href="/" class="mobile-nav-link">主页</a>
+  
+    <a href="/archives" class="mobile-nav-link">归档</a>
+  
+    <a href="https://github.com/ostenant" class="mobile-nav-link">Github</a>
+  
+    <a href="/about" class="mobile-nav-link">关于</a>
+  
+</nav>
+  <!-- totop start -->
+<div id="totop">
+<a title="返回顶部"><img src="/img/scrollup.png"/></a>
+</div>
+
+<!-- totop end -->
+
+<!--
+
+-->
+
+
+
+   
+
+<!-- 百度分享 start -->
+
+<div id="article-share-box" class="article-share-box">
+  <div id="bdshare" class="bdsharebuttonbox article-share-links">
+    <a class="article-share-weibo" data-cmd="tsina" title="分享到新浪微博"></a>
+    <a class="article-share-weixin" data-cmd="weixin" title="分享到微信"></a>
+    <a class="article-share-qq" data-cmd="sqq" title="分享到QQ"></a>
+    <a class="article-share-renren" data-cmd="renren" title="分享到人人网"></a>
+    <a class="article-share-more" data-cmd="more" title="更多"></a>
+  </div>
+</div>
+<script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+                processEscapes: true
+                    
+}
+  
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+                  
+}
+    
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i=0; i < all.length; i += 1) {
+                            all[i].SourceElement().parentNode.className += ' has-jax';
+                                    
+            }
+                
+        });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.5.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<script src="/js/script.js"></script>
+
+
+</div>
+</body>
+</html>
