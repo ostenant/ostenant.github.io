@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>JVM系列(四) - JVM GC回收算法 | Coding | Madison&#39;s Blog</title>
+  <title>JVM系列(四) - JVM GC回收算法 | Coding | Harrison&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
     <meta name="baidu-site-verification" content="0aFfZiB4tV" />
@@ -15,7 +15,7 @@
 <meta property="og:type" content="article">
 <meta property="og:title" content="JVM系列(四) - JVM GC回收算法">
 <meta property="og:url" content="https://ostenant.coding.me/2017/05/02/JVM系列(四) - JVM GC回收算法/index.html">
-<meta property="og:site_name" content="Coding | Madison&#39;s Blog">
+<meta property="og:site_name" content="Coding | Harrison&#39;s Blog">
 <meta property="og:description" content="前言第二篇介绍了Java内存运行时区域，其中程序计数器、虚拟机栈、本地方法栈 三个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的内存分配和回收都具备确定性。在这几个区域内不需要过多考虑回收的问题，因为方法结束或线程结束时，内存自然就跟随着回收了。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/jpg/JVM_GC_Roots.png">
@@ -28,7 +28,7 @@
 <meta name="twitter:description" content="前言第二篇介绍了Java内存运行时区域，其中程序计数器、虚拟机栈、本地方法栈 三个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的内存分配和回收都具备确定性。在这几个区域内不需要过多考虑回收的问题，因为方法结束或线程结束时，内存自然就跟随着回收了。">
 <meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/image/jpg/JVM_GC_Roots.png">
   
-    <link rel="alternative" href="/atom.xml" title="Coding | Madison&#39;s Blog" type="application/atom+xml">
+    <link rel="alternative" href="/atom.xml" title="Coding | Harrison&#39;s Blog" type="application/atom+xml">
   
   
     <link rel="icon" href="/img/favicon.png">
@@ -46,7 +46,7 @@
   <div id="header-outer" class="outer">
     <div id="header-title" class="inner">
       <h1 id="logo-wrap">
-        <a href="/" id="logo">Coding | Madison&#39;s Blog</a>
+        <a href="/" id="logo">Coding | Harrison&#39;s Blog</a>
       </h1>
       
         <h2 id="subtitle-wrap">
@@ -204,7 +204,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="https://ostenant.coding.me/2017/05/02/JVM系列(四) - JVM GC回收算法/" data-id="cjgx4nsfa000bet4us0ezvler" class="article-share-link" data-share="baidu" data-title="JVM系列(四) - JVM GC回收算法">分享到</a>
+        <a data-url="https://ostenant.coding.me/2017/05/02/JVM系列(四) - JVM GC回收算法/" data-id="cjgx6td7a000hv44utb3vri27" class="article-share-link" data-share="baidu" data-title="JVM系列(四) - JVM GC回收算法">分享到</a>
       
 
       
@@ -393,7 +393,7 @@
   
   <div class="outer">
     <div id="footer-info" class="inner">
-      &copy; 2018 Chen Madison<br>
+      &copy; 2018 Chen Harrison<br>
       Powered by <a href="//hexo.io/" target="_blank">Hexo</a>
       .
       Theme by <a href="https://github.com/xiangming/landscape-plus" target="_blank">Landscape-plus</a>
