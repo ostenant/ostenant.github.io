@@ -20,7 +20,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/SOFA.JPG">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/sofa-bolt-invoke-way.png">
-<meta property="og:updated_time" content="2018-05-10T02:31:30.591Z">
+<meta property="og:updated_time" content="2018-05-10T06:11:48.381Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)">
 <meta name="twitter:description" content="前言上篇文章简单地介绍了 SOFA-Boot 的功能特性，对 Readiness 健康检查的配置举例说明。重点介绍了如何在 SOFA-Boot 中引入 SOFA-RPC 中间件，给出了基于 bolt、rest 和 dubbo 等不同协议通道的服务发布与消费的全流程。">
@@ -183,12 +183,96 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">HelloCallbackService helloCallbackServiceReference = (HelloCallbackService) applicationContext</span><br><span class="line">            .getBean(<span class="string">"helloCallbackServiceReference"</span>);</span><br><span class="line">helloCallbackServiceReference.sayCallback(<span class="string">"callback"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    Thread.sleep(<span class="number">3000</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>sayCallback() 的返回值不应该直接获取。在客户端注册的回调类中，返回值会以参数的形式传入正确的方法，以回调的形式完成后续逻辑处理。</p>
 <h4 id="适用场景-3"><a href="#适用场景-3" class="headerlink" title="适用场景"></a>适用场景</h4><p>Callback 方式适用于异步非阻塞编程模式。客户端程序所在线程发起调用后，继续执行后续操作，不需要主动去获取返回值。服务端程序处理完成，将返回值传回一个异步线程池，由子线程通过回调函数进行返回值处理。很大情况的减少了网络 IO 阻塞，解决了单线程的瓶颈，实现了异步编程。</p>
-<h2 id="2-泛化调用"><a href="#2-泛化调用" class="headerlink" title="2. 泛化调用"></a>2. 泛化调用</h2><h2 id="3-过滤器配置"><a href="#3-过滤器配置" class="headerlink" title="3. 过滤器配置"></a>3. 过滤器配置</h2><h2 id="4-自定义参数"><a href="#4-自定义参数" class="headerlink" title="4. 自定义参数"></a>4. 自定义参数</h2><h2 id="5-自定义线程池"><a href="#5-自定义线程池" class="headerlink" title="5. 自定义线程池"></a>5. 自定义线程池</h2><h2 id="6-预热权重"><a href="#6-预热权重" class="headerlink" title="6. 预热权重"></a>6. 预热权重</h2><h2 id="7-自动故障剔除"><a href="#7-自动故障剔除" class="headerlink" title="7. 自动故障剔除"></a>7. 自动故障剔除</h2><h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1>
+<h2 id="2-泛化调用"><a href="#2-泛化调用" class="headerlink" title="2. 泛化调用"></a>2. 泛化调用</h2><p>泛化调用方式能够在客户端不依赖服务端的接口情况下发起调用，目前支持 bolt 协议。由于不知道服务端的接口，因此需要通过字符串的方式将服务端的接口，调用的方法，参数及结果类进行描述。</p>
+<h4 id="配置说明-4"><a href="#配置说明-4" class="headerlink" title="配置说明"></a>配置说明</h4><p><strong>泛化参数类</strong></p>
+<p>SampleGenericParamModel.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SampleGenericParamModel</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>泛化返回类</strong></p>
+<p>SampleGenericResultModel.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SampleGenericResultModel</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> String name;</span><br><span class="line">    <span class="keyword">private</span> String value;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.name = name;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">getValue</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> value;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setValue</span><span class="params">(String value)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.value = value;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>服务接口和实现类</strong></p>
+<p>SampleGenericService.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">SampleGenericService</span> </span>&#123;</span><br><span class="line">    <span class="function">SampleGenericResultModel <span class="title">sayGeneric</span><span class="params">(SampleGenericParamModel sampleGenericParamModel)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>SampleGenericParamModel：作为 sayGeneric() 的输入参数类型，有一个 <code>name</code> 成员变量，作为真正的方法入参。</p>
+</li>
+<li><p>SampleGenericResultModel：作为 sayGeneric() 的返回结果类型，声明了 <code>name</code> 和 <code>value</code> 两个成员变量，作为真实的返回值。 </p>
+</li>
+</ul>
+<p>SampleGenericServiceImpl.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SampleGenericServiceImpl</span> <span class="keyword">implements</span> <span class="title">SampleGenericService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SampleGenericResultModel <span class="title">sayGeneric</span><span class="params">(SampleGenericParamModel sampleGenericParamModel)</span> </span>&#123;</span><br><span class="line">        String name = sampleGenericParamModel.getName();</span><br><span class="line">        SampleGenericResultModel resultModel = <span class="keyword">new</span> SampleGenericResultModel();</span><br><span class="line">        resultModel.setName(name);</span><br><span class="line">        resultModel.setValue(<span class="string">"sample generic value"</span>);</span><br><span class="line">        <span class="keyword">return</span> resultModel;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>服务端启动入口</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=<span class="string">"sampleGenericServiceImpl"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.ostenant.sofa.rpc.example.generic.SampleGenericServiceImpl"</span>/&gt;</span><br><span class="line">&lt;sofa:service ref=<span class="string">"sampleGenericServiceImpl"</span> <span class="class"><span class="keyword">interface</span></span>=<span class="string">"com.ostenant.sofa.rpc.example.generic.SampleGenericService"</span>&gt;</span><br><span class="line">    &lt;sofa:binding.bolt/&gt;</span><br><span class="line">&lt;/sofa:service&gt;</span><br></pre></td></tr></table></figure>
+<p><strong>客户端启动入口</strong></p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;sofa:reference id=<span class="string">"sampleGenericServiceReference"</span> <span class="class"><span class="keyword">interface</span></span>=<span class="string">"com.alipay.sofa.rpc.api.GenericService"</span>&gt;</span><br><span class="line">    &lt;sofa:binding.bolt&gt;</span><br><span class="line">        &lt;sofa:global-attrs generic-<span class="class"><span class="keyword">interface</span></span>=<span class="string">"com.ostenant.sofa.rpc.example.generic.SampleGenericService"</span>/&gt;</span><br><span class="line">    &lt;/sofa:binding.bolt&gt;</span><br><span class="line">&lt;/sofa:reference&gt;</span><br></pre></td></tr></table></figure>
+<p>在泛化调用过程中，客户端配置有两点需要注意：</p>
+<ul>
+<li><code>sofa:reference</code> 指向的服务接口需要声明为 SOFA-RPC 提供的泛化接口 <code>com.alipay.sofa.rpc.api.GenericService</code>。</li>
+<li><code>sofa:global-attrs</code> 需要声明属性 <code>generic-interface</code>，value 为真实的服务接口名称。</li>
+</ul>
+<p><strong>服务端启动入口</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(FutureServerApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
+<p><strong>客户端启动入口</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(InvokeClientApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
+<p><strong>客户端发起调用</strong></p>
+<ul>
+<li>获取服务的泛化引用</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">GenericService sampleGenericServiceReference = (GenericService) applicationContext</span><br><span class="line">    .getBean(<span class="string">"sampleGenericServiceReference"</span>);</span><br></pre></td></tr></table></figure>
+<ul>
+<li>准备方法参数 </li>
+</ul>
+<p>由于客户端没有调用服务的参数类，因此通过 <code>com.alipay.hessian.generic.model.GenericObjectGenericObject</code> 进行描述。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 准备方法参数</span></span><br><span class="line">GenericObject genericParam = <span class="keyword">new</span> GenericObject(</span><br><span class="line">    <span class="string">"com.ostenant.sofa.rpc.example.generic.SampleGenericParamModel"</span>);</span><br><span class="line">genericParam.putField(<span class="string">"name"</span>, <span class="string">"Harrison"</span>);</span><br></pre></td></tr></table></figure>
+<p><code>GenericObject</code> 持有一个 <code>Map&lt;String, Object&gt;</code> 类型的变量，你能够通过 <code>GenericObject</code> 提供的 <code>putField()</code> 方法，将参数类的属性和值放到这个 <code>Map</code> 中，以此来描述参数类。</p>
+<ul>
+<li>发起泛化调用</li>
+</ul>
+<p>通过 <code>GenericService</code> 的 <code>$genericInvoke(arg1, agr2, arg3)</code> 方法可以发起服务的泛化调用，各个参数含义如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">含义</th>
+<th style="text-align:left">参数可选</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">arg1</td>
+<td style="text-align:left">目标方法名称</td>
+<td style="text-align:left">必填</td>
+</tr>
+<tr>
+<td style="text-align:left">arg2</td>
+<td style="text-align:left">参数类型的数组，要求严格遵循先后次序</td>
+<td style="text-align:left">必填</td>
+</tr>
+<tr>
+<td style="text-align:left">arg3</td>
+<td style="text-align:left">参数值的数组，要求与参数类型数组保持一致</td>
+<td style="text-align:left">必填</td>
+</tr>
+<tr>
+<td style="text-align:left">arg4</td>
+<td style="text-align:left">返回值的Class类型</td>
+<td style="text-align:left">可选</td>
+</tr>
+</tbody>
+</table>
+<p>方式一：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">GenericObject genericResult = (GenericObject) sampleGenericServiceReference.$genericInvoke(</span><br><span class="line">    <span class="comment">// 目标方法名称</span></span><br><span class="line">    <span class="string">"sayGeneric"</span>,</span><br><span class="line">    <span class="comment">// 参数类型名称</span></span><br><span class="line">    <span class="keyword">new</span> String[] &#123; <span class="string">"com.ostenant.sofa.rpc.example.generic.SampleGenericParamModel"</span> &#125;,</span><br><span class="line">    <span class="comment">// 参数的值</span></span><br><span class="line">    <span class="keyword">new</span> Object[] &#123; genericParam &#125;);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 验证返回结果</span></span><br><span class="line">System.out.println(<span class="string">"Type: "</span> + genericResult.getType());</span><br><span class="line">System.out.println(<span class="string">"Name: "</span> + genericResult.getField(<span class="string">"name"</span>));</span><br><span class="line">System.out.println(<span class="string">"Value: "</span> + genericResult.getField(<span class="string">"value"</span>));</span><br><span class="line">s</span><br></pre></td></tr></table></figure>
+<p>方式二：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">SampleGenericResultModel sampleGenericResult = sampleGenericServiceReference.$genericInvoke(</span><br><span class="line">    <span class="comment">// 目标方法名称</span></span><br><span class="line">    <span class="string">"sayGeneric"</span>,</span><br><span class="line">    <span class="comment">// 参数类型名称</span></span><br><span class="line">    <span class="keyword">new</span> String[] &#123; <span class="string">"com.ostenant.sofa.rpc.example.generic.SampleGenericParamModel"</span> &#125;,</span><br><span class="line">    <span class="comment">// 参数的值</span></span><br><span class="line">    <span class="keyword">new</span> Object[] &#123; genericParam &#125;,</span><br><span class="line">    <span class="comment">// 返回值的Class类型</span></span><br><span class="line">    SampleGenericResultModel.class);</span><br><span class="line"></span><br><span class="line"><span class="comment">// 验证返回结果</span></span><br><span class="line">System.out.println(<span class="string">"Type: "</span> + sampleGenericResult.getClass().getName());</span><br><span class="line">System.out.println(<span class="string">"Name: "</span> + sampleGenericResult.getName());</span><br><span class="line">System.out.println(<span class="string">"Value: "</span> + sampleGenericResult.getValue());</span><br></pre></td></tr></table></figure>
+<p><strong>查看控制台输出</strong></p>
+<p>两种方式输出如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Type: com.ostenant.sofa.rpc.example.generic.SampleGenericResultModel</span><br><span class="line">Name: Harrison</span><br><span class="line">Value: sample generic value</span><br></pre></td></tr></table></figure>
+<h2 id="3-过滤器配置"><a href="#3-过滤器配置" class="headerlink" title="3. 过滤器配置"></a>3. 过滤器配置</h2><h2 id="4-自定义参数"><a href="#4-自定义参数" class="headerlink" title="4. 自定义参数"></a>4. 自定义参数</h2><h2 id="5-自定义线程池"><a href="#5-自定义线程池" class="headerlink" title="5. 自定义线程池"></a>5. 自定义线程池</h2><h2 id="6-预热权重"><a href="#6-预热权重" class="headerlink" title="6. 预热权重"></a>6. 预热权重</h2><h2 id="7-自动故障剔除"><a href="#7-自动故障剔除" class="headerlink" title="7. 自动故障剔除"></a>7. 自动故障剔除</h2><h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1>
       
     </div>
     <footer class="article-footer">
       
-        <a data-url="https://ostenant.coding.me/2018/05/09/蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)/" data-id="cjgzx3k7y002xzk4uf9w5qrk2" class="article-share-link" data-share="baidu" data-title="蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)">分享到</a>
+        <a data-url="https://ostenant.coding.me/2018/05/09/蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)/" data-id="cjh04y7rk002yle4u8bsnfli4" class="article-share-link" data-share="baidu" data-title="蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)">分享到</a>
       
 
       
