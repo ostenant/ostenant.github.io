@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇) | Coding | Harrison&#39;s Blog</title>
+  <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇) | Coding | Harrison&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
     <meta name="baidu-site-verification" content="0aFfZiB4tV" />
@@ -13,16 +13,17 @@
   <meta name="description" content="前言上篇文章简单地介绍了 SOFA-Boot 的功能特性，对 Readiness 健康检查的配置举例说明。重点介绍了如何在 SOFA-Boot 中引入 SOFA-RPC 中间件，给出了基于 bolt、rest 和 dubbo 等不同协议通道的服务发布与消费的全流程。">
 <meta name="keywords" content="RPC,SOFA-Boot,SOFA_RPC">
 <meta property="og:type" content="article">
-<meta property="og:title" content="蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)">
-<meta property="og:url" content="https://ostenant.coding.me/2018/05/09/蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)/index.html">
+<meta property="og:title" content="蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)">
+<meta property="og:url" content="https://ostenant.coding.me/2018/05/09/蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)/index.html">
 <meta property="og:site_name" content="Coding | Harrison&#39;s Blog">
 <meta property="og:description" content="前言上篇文章简单地介绍了 SOFA-Boot 的功能特性，对 Readiness 健康检查的配置举例说明。重点介绍了如何在 SOFA-Boot 中引入 SOFA-RPC 中间件，给出了基于 bolt、rest 和 dubbo 等不同协议通道的服务发布与消费的全流程。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/SOFA.JPG">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/sofa-bolt-invoke-way.png">
-<meta property="og:updated_time" content="2018-05-10T06:13:35.828Z">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-05-10T07:36:51.543Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)">
+<meta name="twitter:title" content="蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)">
 <meta name="twitter:description" content="前言上篇文章简单地介绍了 SOFA-Boot 的功能特性，对 Readiness 健康检查的配置举例说明。重点介绍了如何在 SOFA-Boot 中引入 SOFA-RPC 中间件，给出了基于 bolt、rest 和 dubbo 等不同协议通道的服务发布与消费的全流程。">
 <meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/SOFA.JPG">
   
@@ -85,9 +86,9 @@
   </div>
 </header>
     <div class="outer">
-      <section id="main"><article id="post-蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)" class="article article-type-post" itemscope itemprop="blogPost">
+      <section id="main"><article id="post-蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
-    <a href="/2018/05/09/蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)/" class="article-date">
+    <a href="/2018/05/09/蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)/" class="article-date">
   <time datetime="2018-05-09T07:08:00.000Z" itemprop="datePublished">2018-05-09</time>
 </a>
     
@@ -103,7 +104,7 @@
         
   
     <h1 class="article-title" itemprop="name">
-      蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)
+      蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)
     </h1>
   
 
@@ -115,7 +116,7 @@
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>上篇文章简单地介绍了 SOFA-Boot 的功能特性，对 Readiness 健康检查的配置举例说明。重点介绍了如何在 SOFA-Boot 中引入 SOFA-RPC 中间件，给出了基于 bolt、rest 和 dubbo 等不同协议通道的服务发布与消费的全流程。</p>
 <a id="more"></a>
 <p><img src="http://ols3fdyll.bkt.clouddn.com/SOFA.JPG" alt=""></p>
-<p>本文将进一步介绍 SOFA-RPC 中间件提供的丰富而强大的功能，包括单向调用、同步调用、Future调用、回调，泛化调用，过滤器配置，自定义参数，自定义线程池，预热权重和自动故障剔除等。</p>
+<p>本文将进一步介绍 SOFA-RPC 中间件提供的丰富而强大的功能，包括单向调用、同步调用、Future调用、回调，泛化调用，过滤器配置等。</p>
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="1-调用方式"><a href="#1-调用方式" class="headerlink" title="1. 调用方式"></a>1. 调用方式</h2><p>SOFA-RPC 提供单向调用、同步调用、异步调用和回调四种调用机制。为了区分四者的不同之处，这里给出 SOFA 官方提供的原理图。</p>
 <p><img src="http://ols3fdyll.bkt.clouddn.com/sofa-bolt-invoke-way.png" alt=""></p>
 <p>下面给出详细阐述和配置说明：</p>
@@ -124,8 +125,18 @@
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">sofa:reference</span> <span class="attr">id</span>=<span class="string">"helloOneWayServiceReference"</span> <span class="attr">interface</span>=<span class="string">"com.ostenant.sofa.rpc.example.invoke.HelloOneWayService"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sofa:binding.bolt</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">sofa:global-attrs</span> <span class="attr">type</span>=<span class="string">"oneway"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">sofa:binding.bolt</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">sofa:reference</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <h4 id="适用场景"><a href="#适用场景" class="headerlink" title="适用场景"></a>适用场景</h4><p>单向调用不保证成功，而且发起方无法知道调用结果。因此通常用于可以重试，或者定时通知类的场景，调用过程是有可能因为网络问题，机器故障等原因，导致请求失败。业务场景需要能接受这样的异常场景，才可以使用。</p>
 <h3 id="1-2-同步方式"><a href="#1-2-同步方式" class="headerlink" title="1.2. 同步方式"></a>1.2. 同步方式</h3><p>当前线程发起调用后，需要在指定的超时时间内，等到响应结果，才能完成本次调用。如果超时时间内没有得到结果，那么会抛出超时异常。</p>
-<h4 id="配置说明-1"><a href="#配置说明-1" class="headerlink" title="配置说明"></a>配置说明</h4><p>SOFA-RPC 缺省采用的就是同步调用，可以省略 <code>sofa:global-attrs</code> 配置项。</p>
+<h4 id="配置说明-1"><a href="#配置说明-1" class="headerlink" title="配置说明"></a>配置说明</h4><p><strong>服务接口与实现类</strong></p>
+<p>SOFA-RPC 缺省采用的就是同步调用，可以省略 <code>sofa:global-attrs</code> 配置项。</p>
+<p><strong>服务端发布配置</strong></p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"helloSyncServiceImpl"</span> <span class="attr">class</span>=<span class="string">"com.ostenant.sofa.rpc.example.invoke.HelloSyncServiceImpl"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">sofa:service</span> <span class="attr">ref</span>=<span class="string">"helloSyncServiceImpl"</span> <span class="attr">interface</span>=<span class="string">"com.ostenant.sofa.rpc.example.invoke.HelloSyncService"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sofa:binding.bolt</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">sofa:service</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><strong>客户端引用配置</strong></p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">sofa:reference</span> <span class="attr">id</span>=<span class="string">"helloSyncServiceReference"</span> <span class="attr">interface</span>=<span class="string">"com.ostenant.sofa.rpc.example.invoke.HelloSyncService"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sofa:binding.bolt</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">sofa:reference</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><strong>服务端启动入口</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(SyncServerApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
+<p><strong>客户端启动入口</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(SyncClientApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
+<p><strong>客户端调用</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">HelloSyncService helloSyncServiceReference = (HelloSyncService) applicationContext.getBean(<span class="string">"helloSyncServiceReference"</span>);</span><br><span class="line">System.out.println(helloSyncServiceReference.saySync(<span class="string">"sync"</span>));</span><br></pre></td></tr></table></figure>
 <h4 id="适用场景-1"><a href="#适用场景-1" class="headerlink" title="适用场景"></a>适用场景</h4><p>同步调用是最常用的方式。注意要根据对端的处理能力，合理设置超时时间。</p>
 <h3 id="1-3-Future方式"><a href="#1-3-Future方式" class="headerlink" title="1.3. Future方式"></a>1.3. Future方式</h3><p>Future 方式下，客户端发起调用后不会等待服务端的结果，继续执行后面的业务逻辑。服务端返回的结果会被 SOFA-RPC 缓存，当客户端需要结果的时候，需要主动获取。目前支持 bolt 协议。</p>
 <h4 id="配置说明-2"><a href="#配置说明-2" class="headerlink" title="配置说明"></a>配置说明</h4><p><strong>服务接口和实现类</strong></p>
@@ -142,7 +153,7 @@
 <p><strong>服务端启动入口</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(FutureServerApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
 <p><strong>客户端启动入口</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(InvokeClientApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(FutureClientApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
 <p>客户端获取返回结果有两种方式：</p>
 <ul>
 <li>其一，通过 <code>SofaResponseFuture</code> 直接获取结果。第一个参数是获取结果的超时时间，第二个参数表示是否清除线程上下文中的结果。</li>
@@ -176,9 +187,9 @@
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"callbackImpl"</span> <span class="attr">class</span>=<span class="string">"com.ostenant.sofa.rpc.example.invoke.CallbackImpl"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">sofa:reference</span> <span class="attr">id</span>=<span class="string">"helloCallbackServiceReference"</span></span></span><br><span class="line"><span class="tag">                <span class="attr">interface</span>=<span class="string">"com.ostenant.sofa.rpc.example.invoke.HelloCallbackService"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sofa:binding.bolt</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">sofa:global-attrs</span> <span class="attr">type</span>=<span class="string">"callback"</span> <span class="attr">callback-ref</span>=<span class="string">"callbackImpl"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">sofa:binding.bolt</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">sofa:reference</span>&gt;</span></span><br></pre></td></tr></table></figure>
 <p>这样使用该服务引用发起调用时，就是使用的回调方式了。在结果返回时，由 SOFA-RPC 自动调用该回调类的相应方法。</p>
 <p><strong>服务端启动入口</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(FutureServerApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(CallbackServerApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
 <p><strong>客户端启动入口</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(InvokeClientApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(CallbackClientApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
 <p><strong>客户端发起调用</strong></p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">HelloCallbackService helloCallbackServiceReference = (HelloCallbackService) applicationContext</span><br><span class="line">            .getBean(<span class="string">"helloCallbackServiceReference"</span>);</span><br><span class="line">helloCallbackServiceReference.sayCallback(<span class="string">"callback"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    Thread.sleep(<span class="number">3000</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <p>sayCallback() 的返回值不应该直接获取。在客户端注册的回调类中，返回值会以参数的形式传入正确的方法，以回调的形式完成后续逻辑处理。</p>
@@ -201,9 +212,9 @@
 </ul>
 <p>SampleGenericServiceImpl.java</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SampleGenericServiceImpl</span> <span class="keyword">implements</span> <span class="title">SampleGenericService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SampleGenericResultModel <span class="title">sayGeneric</span><span class="params">(SampleGenericParamModel sampleGenericParamModel)</span> </span>&#123;</span><br><span class="line">        String name = sampleGenericParamModel.getName();</span><br><span class="line">        SampleGenericResultModel resultModel = <span class="keyword">new</span> SampleGenericResultModel();</span><br><span class="line">        resultModel.setName(name);</span><br><span class="line">        resultModel.setValue(<span class="string">"sample generic value"</span>);</span><br><span class="line">        <span class="keyword">return</span> resultModel;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-<p><strong>服务端启动入口</strong></p>
+<p><strong>服务端发布配置</strong></p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id=<span class="string">"sampleGenericServiceImpl"</span> <span class="class"><span class="keyword">class</span></span>=<span class="string">"com.ostenant.sofa.rpc.example.generic.SampleGenericServiceImpl"</span>/&gt;</span><br><span class="line">&lt;sofa:service ref=<span class="string">"sampleGenericServiceImpl"</span> <span class="class"><span class="keyword">interface</span></span>=<span class="string">"com.ostenant.sofa.rpc.example.generic.SampleGenericService"</span>&gt;</span><br><span class="line">    &lt;sofa:binding.bolt/&gt;</span><br><span class="line">&lt;/sofa:service&gt;</span><br></pre></td></tr></table></figure>
-<p><strong>客户端启动入口</strong></p>
+<p><strong>客户端引用配置</strong></p>
 <figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;sofa:reference id=<span class="string">"sampleGenericServiceReference"</span> <span class="class"><span class="keyword">interface</span></span>=<span class="string">"com.alipay.sofa.rpc.api.GenericService"</span>&gt;</span><br><span class="line">    &lt;sofa:binding.bolt&gt;</span><br><span class="line">        &lt;sofa:global-attrs generic-<span class="class"><span class="keyword">interface</span></span>=<span class="string">"com.ostenant.sofa.rpc.example.generic.SampleGenericService"</span>/&gt;</span><br><span class="line">    &lt;/sofa:binding.bolt&gt;</span><br><span class="line">&lt;/sofa:reference&gt;</span><br></pre></td></tr></table></figure>
 <p>在泛化调用过程中，客户端配置有两点需要注意：</p>
 <ul>
@@ -211,9 +222,9 @@
 <li><code>sofa:global-attrs</code> 需要声明属性 <code>generic-interface</code>，value 为真实的服务接口名称。</li>
 </ul>
 <p><strong>服务端启动入口</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(FutureServerApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(SampleGenericServerApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
 <p><strong>客户端启动入口</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(InvokeClientApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(SampleGenericClientApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
 <p><strong>客户端发起调用</strong></p>
 <ul>
 <li>获取服务的泛化引用</li>
@@ -267,12 +278,55 @@
 <p><strong>查看控制台输出</strong></p>
 <p>两种方式输出如下：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Type: com.ostenant.sofa.rpc.example.generic.SampleGenericResultModel</span><br><span class="line">Name: Harrison</span><br><span class="line">Value: sample generic value</span><br></pre></td></tr></table></figure>
-<h2 id="3-过滤器配置"><a href="#3-过滤器配置" class="headerlink" title="3. 过滤器配置"></a>3. 过滤器配置</h2><h2 id="4-自定义参数"><a href="#4-自定义参数" class="headerlink" title="4. 自定义参数"></a>4. 自定义参数</h2><h2 id="5-自定义线程池"><a href="#5-自定义线程池" class="headerlink" title="5. 自定义线程池"></a>5. 自定义线程池</h2><h2 id="6-预热权重"><a href="#6-预热权重" class="headerlink" title="6. 预热权重"></a>6. 预热权重</h2><h2 id="7-自动故障剔除"><a href="#7-自动故障剔除" class="headerlink" title="7. 自动故障剔除"></a>7. 自动故障剔除</h2><h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1>
+<h2 id="3-过滤器配置"><a href="#3-过滤器配置" class="headerlink" title="3. 过滤器配置"></a>3. 过滤器配置</h2><p>SOFA-RPC 通过过滤器 Filter 来实现对请求和响应的拦截处理。用户可以自定义 Filter 实现拦截扩展，目前支持 bolt 协议。开发人员通过继承 <code>com.alipay.sofa.rpc.filter.Filter</code> 实现过滤器的自定义。</p>
+<h4 id="配置说明-5"><a href="#配置说明-5" class="headerlink" title="配置说明"></a>配置说明</h4><p><strong>服务接口与实现类</strong></p>
+<p>FilterService.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">FilterService</span> </span>&#123;</span><br><span class="line">    <span class="function">String <span class="title">sayFilter</span><span class="params">(String filter)</span></span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>FilterServiceImpl.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FilterServiceImpl</span> <span class="keyword">implements</span> <span class="title">FilterService</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">sayFilter</span><span class="params">(String filter)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> filters;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>服务端过滤器</strong></p>
+<p>在 Filter 实现类中，<code>invoke()</code> 方法实现具体的拦截逻辑，通过 <code>FilterInvoker.invoke(SofaRequest)</code> 触发服务的调用，在该方法前后可以实现具体的拦截处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SampleServerFilter</span> <span class="keyword">extends</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SofaResponse <span class="title">invoke</span><span class="params">(FilterInvoker invoker, SofaRequest request)</span> <span class="keyword">throws</span> SofaRpcException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"SampleFilter before server process"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> invoker.invoke(request);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"SampleFilter after server process"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>服务端发布配置</strong></p>
+<p>服务端需要配置服务实现类、过滤器，然后在 <code>sofa:service</code> 的 <code>sofa:global-attrs</code> 标签配置 <code>filter</code> 属性，实现两者的绑定。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"sampleFilter"</span> <span class="attr">class</span>=<span class="string">"com.ostenant.sofa.rpc.example.filter.SampleServerFilter"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"filterService"</span> <span class="attr">class</span>=<span class="string">"com.ostenant.sofa.rpc.example.filter.FilterServiceImpl"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">sofa:service</span> <span class="attr">ref</span>=<span class="string">"filterService"</span> <span class="attr">interface</span>=<span class="string">"com.ostenant.sofa.rpc.example.filter.FilterService"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sofa:binding.bolt</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">sofa:global-attrs</span> <span class="attr">filter</span>=<span class="string">"sampleFilter"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">sofa:binding.bolt</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">sofa:service</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><strong>客户端过滤器</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SampleClientFilter</span> <span class="keyword">extends</span> <span class="title">Filter</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> SofaResponse <span class="title">invoke</span><span class="params">(FilterInvoker invoker, SofaRequest request)</span> <span class="keyword">throws</span> SofaRpcException </span>&#123;</span><br><span class="line">        System.out.println(<span class="string">"SampleFilter before client invoke"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">return</span> invoker.invoke(request);</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"SampleFilter after client invoke"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><strong>客户端引用配置</strong></p>
+<p>同样的，客户端过滤器需要在 <code>sofa:reference</code> 的 <code>sofa:global-attrs</code> 标签中配置 <code>filter</code> 属性，实现客户端引用类的调用拦截。</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">bean</span> <span class="attr">id</span>=<span class="string">"sampleFilter"</span> <span class="attr">class</span>=<span class="string">"com.alipay.sofa.rpc.samples.filter.SampleClientFilter"</span>/&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">sofa:reference</span> <span class="attr">id</span>=<span class="string">"filterServiceReference"</span> <span class="attr">interface</span>=<span class="string">"com.ostenant.sofa.rpc.example.filter.FilterService"</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">sofa:binding.bolt</span>&gt;</span></span><br><span class="line">        <span class="tag">&lt;<span class="name">sofa:global-attrs</span> <span class="attr">filter</span>=<span class="string">"sampleFilter"</span>/&gt;</span></span><br><span class="line">    <span class="tag">&lt;/<span class="name">sofa:binding.bolt</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">sofa:reference</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p><strong>服务端启动类</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(FilterServerApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
+<p><strong>客户端启动类</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SpringApplication springApplication = <span class="keyword">new</span> SpringApplication(FilterClientApplication.class);</span><br><span class="line">ApplicationContext applicationContext = springApplication.run(args);</span><br></pre></td></tr></table></figure>
+<p><strong>客户端调用</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">FilterService filterServiceReference = (FilterService) applicationContext.getBean(<span class="string">"filterServiceReference"</span>);</span><br><span class="line"><span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="comment">// sleep 5s, 便于观察过滤器效果</span></span><br><span class="line">    Thread.sleep(<span class="number">5000</span>);</span><br><span class="line">&#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">    e.printStackTrace();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">String result = filterServiceReference.sayFilter(<span class="string">"filter"</span>);</span><br><span class="line">System.out.println(<span class="string">"Invoke result: "</span> + result);</span><br></pre></td></tr></table></figure>
+<p><strong>查看拦截输出</strong></p>
+<ul>
+<li>服务端打印输出</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">SampleFilter before server process</span><br><span class="line">SampleFilter after server process</span><br></pre></td></tr></table></figure>
+<ul>
+<li>客户端打印输出</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">SampleFilter before client invoke</span><br><span class="line">SampleFilter after client invoke</span><br><span class="line">Invoke result: filter</span><br></pre></td></tr></table></figure>
+<p>过滤器配置生效，总结过滤器拦截先后次序如下：</p>
+<ol>
+<li>客户端发起调用 -&gt; 客户端前置拦截 -&gt; 服务端前置拦截          </li>
+<li>服务端方法执行</li>
+<li>服务端后置拦截 -&gt; 客户端后置拦截 -&gt; 客户端接收返回值</li>
+</ol>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本文介绍了 SOFA-RPC 的集中调用方式，包括单向调用、同步调用、Future调用、回调，引入了 SOFA-RPC 独有的泛化调用机制，同时对过滤器的配置进行了简单介绍。</p>
+<hr>
+<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
       
     </div>
     <footer class="article-footer">
       
-        <a data-url="https://ostenant.coding.me/2018/05/09/蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)/" data-id="cjh0505tp002yo54uko7uyps0" class="article-share-link" data-share="baidu" data-title="蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)">分享到</a>
+        <a data-url="https://ostenant.coding.me/2018/05/09/蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)/" data-id="cjh07zjg1002ygb4usr3jkpi0" class="article-share-link" data-share="baidu" data-title="蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)">分享到</a>
       
 
       
@@ -370,7 +424,7 @@
       <ul>
         
           <li>
-            <a href="/2018/05/09/蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)/">蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)</a>
+            <a href="/2018/05/09/蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)/">蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)</a>
           </li>
         
           <li>
