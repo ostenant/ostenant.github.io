@@ -18,6 +18,7 @@
 <meta property="og:site_name" content="Coding | Harrison&#39;s Blog">
 <meta property="og:description" content="前言上文引入了 反应式编程模型 相关概念，对 Spring Reactor 的核心 API 进行了简单归纳。本文会对 Spring 5 WebFlux 进行相关介绍，包括引入 Servlet 3.1 +，各个功能组件 Router Functions、WebFlux 和 Reactive Streams 等，以及如何在 Spring Boot 2.0 中分别以 全局功能路由 和 MVC">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Sprng_Boot_2.0_Log.png">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/WebFlux_01_00.png">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Flux_Workflow.png">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Mono_Workflow.png">
@@ -25,11 +26,11 @@
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Controller_Result_001.png">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Router_Result_000.png">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-05-27T10:18:37.978Z">
+<meta property="og:updated_time" content="2018-05-27T10:31:53.194Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Spring Boot 2.0 Reactive编程系列(一) - WebFlux初体验">
 <meta name="twitter:description" content="前言上文引入了 反应式编程模型 相关概念，对 Spring Reactor 的核心 API 进行了简单归纳。本文会对 Spring 5 WebFlux 进行相关介绍，包括引入 Servlet 3.1 +，各个功能组件 Router Functions、WebFlux 和 Reactive Streams 等，以及如何在 Spring Boot 2.0 中分别以 全局功能路由 和 MVC">
-<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/WebFlux_01_00.png">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/Sprng_Boot_2.0_Log.png">
   
     <link rel="alternative" href="/atom.xml" title="Coding | Harrison&#39;s Blog" type="application/atom+xml">
   
@@ -119,6 +120,7 @@
         <hr>
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>上文引入了 <strong>反应式编程模型</strong> 相关概念，对 <code>Spring Reactor</code> 的核心 <code>API</code> 进行了简单归纳。本文会对 <code>Spring 5 WebFlux</code> 进行相关介绍，包括引入 <code>Servlet 3.1 +</code>，各个功能组件 <code>Router Functions</code>、<code>WebFlux</code> 和 <code>Reactive Streams</code> 等，以及如何在 <code>Spring Boot 2.0</code> 中分别以 <strong>全局功能路由</strong> 和 <code>MVC</code> <strong>控制器</strong> 的方式配置 <code>HTTP</code> 请求处理。</p>
 <a id="more"></a>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Sprng_Boot_2.0_Log.png" alt=""></p>
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="Spring-5-WebFlux介绍"><a href="#Spring-5-WebFlux介绍" class="headerlink" title="Spring 5 WebFlux介绍"></a>Spring 5 WebFlux介绍</h2><p>关于 <code>Spring 5</code> 的 <code>WebFlux</code> 响应式编程，下图是传统 <code>Spring Web MVC</code> 结构以及<code>Spring 5</code> 中新增加的基于 <code>Reactive Streams</code> 的 <code>Spring WebFlux</code> 框架。可以使用 <code>webFlux</code> 模块来构建 <strong>异步的</strong>、<strong>非堵塞的</strong>、<strong>事件驱动</strong> 的服务，其在 <strong>伸缩性方面</strong> 表现非常好。</p>
 <p><img src="http://ols3fdyll.bkt.clouddn.com/WebFlux_01_00.png" alt=""></p>
 <p>如图所示，<code>WebFlux</code> 模块从上到下依次是 <code>Router Functions</code>、<code>WebFlux</code>、<code>Reactive Streams</code> 三个新组件。</p>
@@ -244,7 +246,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="https://ostenant.coding.me/2018/05/27/Spring Boot 2.0 Reactive编程系列(一) - WebFlux初体验/" data-id="cjhoo9blo001jjx4urlzqqd3a" class="article-share-link" data-share="baidu" data-title="Spring Boot 2.0 Reactive编程系列(一) - WebFlux初体验">分享到</a>
+        <a data-url="https://ostenant.coding.me/2018/05/27/Spring Boot 2.0 Reactive编程系列(一) - WebFlux初体验/" data-id="cjhooqhin001kn54u363saui6" class="article-share-link" data-share="baidu" data-title="Spring Boot 2.0 Reactive编程系列(一) - WebFlux初体验">分享到</a>
       
 
       
