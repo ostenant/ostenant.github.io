@@ -11,7 +11,7 @@
   
   
   <meta name="description" content="前言上文介绍了 SOFARPC 的简单使用。在生产环境中，通常会将 SOFARPC 整合到 SpringBoot 中。蚂蚁金服提供了 SOFABoot 框架，SOFABoot 是蚂蚁金服开源的基于 Spring Boot 的研发框架，它在 Spring Boot 的基础上，提供了诸如 Readiness Check，类隔离，日志空间隔离等等能力。">
-<meta name="keywords" content="RPC,SOFA-Boot,SOFA-RPC">
+<meta name="keywords" content="RPC,SOFA-RPC,SOFA-Boot">
 <meta property="og:type" content="article">
 <meta property="og:title" content="蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)">
 <meta property="og:url" content="https://ostenant.coding.me/2018/05/08/蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)/index.html">
@@ -208,7 +208,7 @@
     </div>
     <footer class="article-footer">
       
-        <a data-url="https://ostenant.coding.me/2018/05/08/蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)/" data-id="cjhsh9wiw0040ti4ukqwcbqtp" class="article-share-link" data-share="baidu" data-title="蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)">分享到</a>
+        <a data-url="https://ostenant.coding.me/2018/05/08/蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)/" data-id="cjhshfih4003evp4uhsebw067" class="article-share-link" data-share="baidu" data-title="蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)">分享到</a>
       
 
       
@@ -301,7 +301,7 @@
   <div class="widget-wrap">
     <h3 class="widget-title">归档</h3>
     <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">10</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">9</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
     </div>
   </div>
 
@@ -313,10 +313,6 @@
     <h3 class="widget-title">近期文章</h3>
     <div class="widget">
       <ul>
-        
-          <li>
-            <a href="/2018/05/28/深度剖析HTTP1.0, HTTP1.1, SPDY, HTTP2.0的区别/">(no title)</a>
-          </li>
         
           <li>
             <a href="/2018/05/27/实战Spring Boot 2.0 Reactive编程系列(一) - WebFlux初体验/">实战Spring Boot 2.0 Reactive编程系列(一) - WebFlux初体验</a>
@@ -332,6 +328,10 @@
         
           <li>
             <a href="/2018/05/21/Android异步框架RxJava 1.x系列(二) - 事件及事件序列转换原理/">Android异步框架RxJava 1.x系列(二) - 事件及事件序列转换原理</a>
+          </li>
+        
+          <li>
+            <a href="/2018/05/20/Android异步框架RxJava 1.x系列(一) - 观察者模式及实现/">Android异步框架RxJava 1.x系列(一) - 观察者模式及实现</a>
           </li>
         
       </ul>
