@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   
-  <title>Category: Java虚拟机系列 | Coding | Harrison&#39;s Blog</title>
+  <title>Category: JAVA虚拟机系列 | Coding | Harrison&#39;s Blog</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   
     <meta name="baidu-site-verification" content="0aFfZiB4tV" />
@@ -13,7 +13,7 @@
   <meta name="description" content="上善若水任方猿">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Coding | Harrison&#39;s Blog">
-<meta property="og:url" content="https://ostenant.coding.me/categories/Java虚拟机系列/index.html">
+<meta property="og:url" content="https://ostenant.coding.me/categories/JAVA虚拟机系列/index.html">
 <meta property="og:site_name" content="Coding | Harrison&#39;s Blog">
 <meta property="og:description" content="上善若水任方猿">
 <meta property="og:locale" content="zh-CN">
@@ -96,70 +96,13 @@
     <article class="archive-article archive-type-post">
   <div class="archive-article-inner">
     <header class="archive-article-header">
-      <a href="/2017/05/10/JVM系列(五) - JVM类加载机制详解/" class="archive-article-date">
-  <time datetime="2017-05-10T03:17:00.000Z" itemprop="datePublished">05-10</time>
+      <a href="/2017/04/28/JVM系列(三) - JVM对象探秘/" class="archive-article-date">
+  <time datetime="2017-04-28T03:22:00.000Z" itemprop="datePublished">04-28</time>
 </a>
       
   
     <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/05/10/JVM系列(五) - JVM类加载机制详解/">JVM系列(五) - JVM类加载机制详解</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/05/02/JVM系列(四) - JVM GC回收算法/" class="archive-article-date">
-  <time datetime="2017-05-02T10:09:00.000Z" itemprop="datePublished">05-02</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/05/02/JVM系列(四) - JVM GC回收算法/">JVM系列(四) - JVM GC回收算法</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/04/25/JVM系列(二) - JVM内存区域和内存溢出异常详解/" class="archive-article-date">
-  <time datetime="2017-04-25T09:57:00.000Z" itemprop="datePublished">04-25</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/04/25/JVM系列(二) - JVM内存区域和内存溢出异常详解/">JVM系列(二) - JVM内存区域和内存溢出异常详解</a>
-    </h1>
-  
-
-    </header>
-  </div>
-</article>
-  
-    
-    
-    <article class="archive-article archive-type-post">
-  <div class="archive-article-inner">
-    <header class="archive-article-header">
-      <a href="/2017/04/22/JVM系列(一) - JVM总体概述/" class="archive-article-date">
-  <time datetime="2017-04-22T06:55:00.000Z" itemprop="datePublished">04-22</time>
-</a>
-      
-  
-    <h1 itemprop="name">
-      <a class="archive-article-title" href="/2017/04/22/JVM系列(一) - JVM总体概述/">JVM系列(一) - JVM总体概述</a>
+      <a class="archive-article-title" href="/2017/04/28/JVM系列(三) - JVM对象探秘/">JVM系列(三) - JVM对象探秘</a>
     </h1>
   
 
@@ -237,7 +180,7 @@
       <ul>
         
           <li>
-            <a href="/2018/05/31/单元测试利器Mockito/">单元测试利器Mockito</a>
+            <a href="/2018/05/31/单元测试利器Mockito/">单元测试利器Mockito框架</a>
           </li>
         
           <li>
@@ -365,6 +308,75 @@
   </div>
 </div>
 <script>
+  function SetShareData(cmd, config) {
+    if (shareDataTitle && shareDataUrl) {
+      config.bdText = shareDataTitle;
+      config.bdUrl = shareDataUrl;
+    }
+    return config;
+  }
+  window._bd_share_config={
+    "common":{onBeforeClick: SetShareData},
+    "share":{"bdCustomStyle":"/css/bdshare.css"}
+  };
+  with(document)0[(getElementsByTagName('head')[0]||body).appendChild(createElement('script')).src='//bdimg.share.baidu.com/static/api/js/share.js?cdnversion='+~(-new Date()/36e5)];
+</script>
+
+<!-- 百度分享 end -->
+
+<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+
+  <link rel="stylesheet" href="/fancybox/jquery.fancybox.css">
+  <script src="/fancybox/jquery.fancybox.pack.js"></script>
+
+
+
+<! -- mathjax config similar to math.stackexchange -->
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+                processEscapes: true
+                    
+}
+  
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Config({
+tex2jax: {
+            skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+                  
+}
+    
+        });
+</script>
+
+<script type="text/x-mathjax-config">
+MathJax.Hub.Queue(function() {
+            var all = MathJax.Hub.getAllJax(), i;
+            for(i=0; i < all.length; i += 1) {
+                            all[i].SourceElement().parentNode.className += ' has-jax';
+                                    
+            }
+                
+        });
+</script>
+
+<script type="text/javascript" src="//cdn.bootcss.com/mathjax/2.5.3/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+</script>
+
+
+<script src="/js/script.js"></script>
+
+
+</div>
+</body>
+</html>
+cript>
   function SetShareData(cmd, config) {
     if (shareDataTitle && shareDataUrl) {
       config.bdText = shareDataTitle;
