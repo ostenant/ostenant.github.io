@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Coding | Harrison&#39;s Blog</title>
+  <title>Harrison&#39;s Blog</title>
   
   <subtitle>上善若水任方猿</subtitle>
   <link href="/atom.xml" rel="self"/>
@@ -10,7 +10,7 @@
   <id>https://ostenant.coding.me/</id>
   
   <author>
-    <name>Chen Harrison</name>
+    <name>Harrison</name>
     
   </author>
   

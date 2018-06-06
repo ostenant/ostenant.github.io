@@ -3,24 +3,26 @@
 <head>
     <meta charset="utf-8">
     
-    <title>Coding | Harrison&#39;s Blog</title>
+    <title>Harrison&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="上善若水任方猿">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Coding | Harrison&#39;s Blog">
+<meta property="og:title" content="Harrison&#39;s Blog">
 <meta property="og:url" content="https://ostenant.coding.me/page/3/index.html">
-<meta property="og:site_name" content="Coding | Harrison&#39;s Blog">
+<meta property="og:site_name" content="Harrison&#39;s Blog">
 <meta property="og:description" content="上善若水任方猿">
 <meta property="og:locale" content="zh-CN">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Coding | Harrison&#39;s Blog">
+<meta name="twitter:title" content="Harrison&#39;s Blog">
 <meta name="twitter:description" content="上善若水任方猿">
     
 
     
-        <link rel="alternate" href="/" title="Coding | Harrison&#39;s Blog" type="application/atom+xml" />
+        <link rel="alternate" href="/" title="Harrison&#39;s Blog" type="application/atom+xml" />
     
 
+    
+        <link rel="icon" href="/css/images/favicon.png" />
     
 
     <link rel="stylesheet" href="/libs/font-awesome5/css/fontawesome.min.css">
@@ -53,7 +55,7 @@
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">Coding | Harrison&#39;s Blog</span>
+                <span class="site-title">Harrison&#39;s Blog</span>
             </a>
             <nav id="main-nav">
                 
@@ -153,9 +155,9 @@
         <div class="base-info profile-block">
             <img id="avatar" src="/css/images/avatar.jpeg" />
             <h2 id="name">陈林 | Harrison</h2>
-            <h3 id="title">年轻无为，卖马为生。</h3>
+            <h3 id="title">年轻无为，卖码为生。</h3>
             <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>成都, 中国</span>
-            <a id="follow" target="_blank" href="https://github.com/ppoffice/">关注我</a>
+            <a id="follow" target="_blank" href="undefined">关注我</a>
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
@@ -198,6 +200,12 @@
                     </td>
                     
                     <td>
+                        <a href="/" target="_blank" title="linkedin" class=tooltip>
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
                         <a href="/" target="_blank" title="rss" class=tooltip>
                             <i class="fab fa-rss"></i>
                         </a>
@@ -212,7 +220,7 @@
 
             
             <section id="main">
-    <article id="post-蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-Spring Cloud整合Thrift RPC(二) - 应用案例" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -220,7 +228,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2018/05/08/蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)/">蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)</a>
+            <a class="article-title" href="/2018/01/24/Spring Cloud整合Thrift RPC(二) - 应用案例/">Spring Cloud整合Thrift RPC(二) - 应用案例</a>
         </h1>
     
 
@@ -229,8 +237,8 @@
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2018/05/08/蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)/">
-            <time datetime="2018-05-08T13:23:00.000Z" itemprop="datePublished">2018-05-08</time>
+        <a href="/2018/01/24/Spring Cloud整合Thrift RPC(二) - 应用案例/">
+            <time datetime="2018-01-24T02:21:00.000Z" itemprop="datePublished">2018-01-24</time>
         </a>
     </div>
 
@@ -244,7 +252,7 @@
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/RPC/">RPC</a>, <a class="tag-link" href="/tags/SOFA-Boot/">SOFA-Boot</a>, <a class="tag-link" href="/tags/SOFA-RPC/">SOFA-RPC</a>
+        <a class="tag-link" href="/tags/RPC/">RPC</a>, <a class="tag-link" href="/tags/Spring-Cloud/">Spring Cloud</a>, <a class="tag-link" href="/tags/Thrift/">Thrift</a>
     </div>
 
                     </div>
@@ -255,9 +263,9 @@
         <div class="article-entry" itemprop="articleBody">
         
             <p><hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>上文介绍了 SOFARPC 的简单使用。在生产环境中，通常会将 SOFARPC 整合到 SpringBoot 中。蚂蚁金服提供了 SOFABoot 框架，SOFABoot 是蚂蚁金服开源的基于 Spring Boot 的研发框架，它在 Spring Boot 的基础上，提供了诸如 Readiness Check，类隔离，日志空间隔离等等能力。</p></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>上一篇简单的阐述了 <code>spring-cloud-thrift-starter</code> 这个插件的配置和使用，并引入了一个<code>calculator</code>的项目。本文将基于一个银行存款、取款的业务场景，给出一套<code>thrift</code>在生产环境的应用案例。</p></p>
             <p class="article-more-link">
-                <a href="/2018/05/08/蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)/#more">查看更多</a>
+                <a href="/2018/01/24/Spring Cloud整合Thrift RPC(二) - 应用案例/#more">查看更多</a>
             </p>
         
         </div>
@@ -266,73 +274,60 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
 
-    <a data-url="https://ostenant.coding.me/2018/05/08/蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)/" data-id="cji2pk7f7003mun4uy7kd8fj7" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+</div>
 
             
     
@@ -344,7 +339,7 @@
 
 
 
-    <article id="post-蚂蚁金服RPC框架SOFA-RPC - 初体验" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-Spring Cloud整合Thrift RPC(一) - 使用指南" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -352,7 +347,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2018/04/29/蚂蚁金服RPC框架SOFA-RPC - 初体验/">蚂蚁金服RPC框架SOFA-RPC - 初体验</a>
+            <a class="article-title" href="/2018/01/18/Spring Cloud整合Thrift RPC(一) - 使用指南/">Spring Cloud整合Thrift RPC(一) - 使用指南</a>
         </h1>
     
 
@@ -361,8 +356,8 @@
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2018/04/29/蚂蚁金服RPC框架SOFA-RPC - 初体验/">
-            <time datetime="2018-04-29T09:59:00.000Z" itemprop="datePublished">2018-04-29</time>
+        <a href="/2018/01/18/Spring Cloud整合Thrift RPC(一) - 使用指南/">
+            <time datetime="2018-01-18T07:07:00.000Z" itemprop="datePublished">2018-01-18</time>
         </a>
     </div>
 
@@ -376,7 +371,7 @@
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/RPC/">RPC</a>, <a class="tag-link" href="/tags/SOFA-RPC/">SOFA-RPC</a>
+        <a class="tag-link" href="/tags/RPC/">RPC</a>, <a class="tag-link" href="/tags/Spring-Cloud/">Spring Cloud</a>, <a class="tag-link" href="/tags/Thrift/">Thrift</a>
     </div>
 
                     </div>
@@ -387,9 +382,9 @@
         <div class="article-entry" itemprop="articleBody">
         
             <p><hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>SOFARPC 最早源于阿里内部的 HSF，是近期蚂蚁金服开源的一个高可扩展性、高性能、生产级的 Java RPC 框架。SOFA-RPC 在蚂蚁金服已经历了十多年的发展，致力于简化应用之间的 RPC 调用。为应用提供方便透明、稳定高效的点对点远程服务调用方案。</p></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>前面几篇博客，着重对<code>Apache Thrift</code>的使用和原理做了介绍。在微服架构流行的今天，自然而然就会想到<code>Spring Boot</code>和<code>Spring Cloud</code>作为<strong>微服务</strong>的基础框架。然而，<code>Spring Cloud</code>从诞生以来，就基于<code>HTTP</code>协议的<strong>轻量级</strong><code>Restful API</code>作为服务之间的通信方式。</p></p>
             <p class="article-more-link">
-                <a href="/2018/04/29/蚂蚁金服RPC框架SOFA-RPC - 初体验/#more">查看更多</a>
+                <a href="/2018/01/18/Spring Cloud整合Thrift RPC(一) - 使用指南/#more">查看更多</a>
             </p>
         
         </div>
@@ -398,73 +393,60 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
 
-    <a data-url="https://ostenant.coding.me/2018/04/29/蚂蚁金服RPC框架SOFA-RPC - 初体验/" data-id="cji2pk7f4003fun4uxhohmxo5" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+</div>
 
             
     
@@ -476,7 +458,7 @@
 
 
 
-    <article id="post-分布式理论(四) - 3PC协议" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-阿里云CentOS 7上安装配置Docker" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -484,7 +466,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2018/04/28/分布式理论(四) - 3PC协议/">分布式理论(四) - 3PC协议</a>
+            <a class="article-title" href="/2018/01/18/阿里云CentOS 7上安装配置Docker/">阿里云CentOS 7上安装配置Docker</a>
         </h1>
     
 
@@ -493,8 +475,8 @@
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2018/04/28/分布式理论(四) - 3PC协议/">
-            <time datetime="2018-04-28T13:26:00.000Z" itemprop="datePublished">2018-04-28</time>
+        <a href="/2018/01/18/阿里云CentOS 7上安装配置Docker/">
+            <time datetime="2018-01-18T01:44:00.000Z" itemprop="datePublished">2018-01-18</time>
         </a>
     </div>
 
@@ -502,13 +484,13 @@
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/分布式系列/">分布式系列</a>
+        <a class="article-category-link" href="/categories/Docker学习系列/">Docker学习系列</a>
     </div>
 
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/3PC/">3PC</a>, <a class="tag-link" href="/tags/分布式/">分布式</a>
+        <a class="tag-link" href="/tags/CentOS/">CentOS</a>, <a class="tag-link" href="/tags/Docker/">Docker</a>
     </div>
 
                     </div>
@@ -519,9 +501,9 @@
         <div class="article-entry" itemprop="articleBody">
         
             <p><hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>由于二阶段提交存在着诸如同步阻塞、单点问题、脑裂等缺陷。所以，研究者们在二阶段提交的基础上做了改进，提出了三阶段提交。</p></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Docker</code>是一个开源工具，它可以让创建和管理<code>Linux</code>容器变得简单。<strong>容器</strong>就像是<strong>轻量级</strong>的<strong>虚拟机</strong>，并且可以以<strong>毫秒级</strong>的速度来启动或停止。<code>Docker</code>帮助系统管理员和程序员<strong>在容器中开发应用程序</strong>，并且可以扩展到成千上万的节点。</p></p>
             <p class="article-more-link">
-                <a href="/2018/04/28/分布式理论(四) - 3PC协议/#more">查看更多</a>
+                <a href="/2018/01/18/阿里云CentOS 7上安装配置Docker/#more">查看更多</a>
             </p>
         
         </div>
@@ -530,73 +512,60 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
 
-    <a data-url="https://ostenant.coding.me/2018/04/28/分布式理论(四) - 3PC协议/" data-id="cji2pk7ev002wun4urcus69ly" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+</div>
 
             
     
@@ -608,7 +577,7 @@
 
 
 
-    <article id="post-分布式理论(三) - 2PC协议" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-Apache Thrift系列详解(三) - 序列化机制" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -616,7 +585,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2018/04/25/分布式理论(三) - 2PC协议/">分布式理论(三) - 2PC协议</a>
+            <a class="article-title" href="/2018/01/16/Apache Thrift系列详解(三) - 序列化机制/">Apache Thrift系列详解(三) - 序列化机制</a>
         </h1>
     
 
@@ -625,8 +594,8 @@
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2018/04/25/分布式理论(三) - 2PC协议/">
-            <time datetime="2018-04-25T14:22:00.000Z" itemprop="datePublished">2018-04-25</time>
+        <a href="/2018/01/16/Apache Thrift系列详解(三) - 序列化机制/">
+            <time datetime="2018-01-16T07:37:00.000Z" itemprop="datePublished">2018-01-16</time>
         </a>
     </div>
 
@@ -634,13 +603,13 @@
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/分布式系列/">分布式系列</a>
+        <a class="article-category-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a>
     </div>
 
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/2PC/">2PC</a>, <a class="tag-link" href="/tags/分布式/">分布式</a>
+        <a class="tag-link" href="/tags/Apache/">Apache</a>, <a class="tag-link" href="/tags/RPC/">RPC</a>, <a class="tag-link" href="/tags/Thrift/">Thrift</a>
     </div>
 
                     </div>
@@ -651,9 +620,9 @@
         <div class="article-entry" itemprop="articleBody">
         
             <p><hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>由于BASE理论需要在一致性和可用性方面做出权衡，因此涌现了很多关于一致性的算法和协议。其中比较著名的有二阶提交协议（2 Phase Commitment Protocol），三阶提交协议（3 Phase Commitment Protocol）和Paxos算法。</p></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Thrift</code>支持<strong>二进制</strong>，<strong>压缩格式</strong>，以及<code>json</code>格式数据的<strong>序列化</strong>和<strong>反序列化</strong>。开发人员可以更加灵活的选择协议的具体形式。协议是可<strong>自由扩展</strong>的，新版本的协议，完全<strong>兼容</strong>老的版本！</p></p>
             <p class="article-more-link">
-                <a href="/2018/04/25/分布式理论(三) - 2PC协议/#more">查看更多</a>
+                <a href="/2018/01/16/Apache Thrift系列详解(三) - 序列化机制/#more">查看更多</a>
             </p>
         
         </div>
@@ -662,73 +631,60 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
 
-    <a data-url="https://ostenant.coding.me/2018/04/25/分布式理论(三) - 2PC协议/" data-id="cji2pk7eq002kun4uiilaq0xe" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+</div>
 
             
     
@@ -740,7 +696,7 @@
 
 
 
-    <article id="post-分布式理论(二) - BASE理论" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-Apache Thrift系列详解(二) - 网络服务模型" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -748,7 +704,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2018/04/24/分布式理论(二) - BASE理论/">分布式理论(二) - BASE理论</a>
+            <a class="article-title" href="/2018/01/11/Apache Thrift系列详解(二) - 网络服务模型/">Apache Thrift系列详解(二) - 网络服务模型</a>
         </h1>
     
 
@@ -757,8 +713,8 @@
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2018/04/24/分布式理论(二) - BASE理论/">
-            <time datetime="2018-04-24T12:41:00.000Z" itemprop="datePublished">2018-04-24</time>
+        <a href="/2018/01/11/Apache Thrift系列详解(二) - 网络服务模型/">
+            <time datetime="2018-01-11T09:36:00.000Z" itemprop="datePublished">2018-01-11</time>
         </a>
     </div>
 
@@ -766,13 +722,13 @@
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/分布式系列/">分布式系列</a>
+        <a class="article-category-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a>
     </div>
 
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/BASE/">BASE</a>, <a class="tag-link" href="/tags/分布式/">分布式</a>
+        <a class="tag-link" href="/tags/Apache/">Apache</a>, <a class="tag-link" href="/tags/RPC/">RPC</a>, <a class="tag-link" href="/tags/Thrift/">Thrift</a>
     </div>
 
                     </div>
@@ -783,9 +739,9 @@
         <div class="article-entry" itemprop="articleBody">
         
             <p><hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>BASE理论是由eBay架构师提出的。BASE是对CAP中一致性和可用性权衡的结果，其来源于对大规模互联网分布式系统实践的总结，是基于CAP定律逐步演化而来。其核心思想是即使无法做到强一致性，但每个应用都可以根据自身业务特点，才用适当的方式来使系统打到最终一致性。</p></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Thrift</code>提供的<strong>网络服务模型</strong>：<strong>单线程</strong>、<strong>多线程</strong>、<strong>事件驱动</strong>，从另一个角度划分为：<strong>阻塞服务模型</strong>、<strong>非阻塞服务模型</strong>。</p></p>
             <p class="article-more-link">
-                <a href="/2018/04/24/分布式理论(二) - BASE理论/#more">查看更多</a>
+                <a href="/2018/01/11/Apache Thrift系列详解(二) - 网络服务模型/#more">查看更多</a>
             </p>
         
         </div>
@@ -794,73 +750,60 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
 
-    <a data-url="https://ostenant.coding.me/2018/04/24/分布式理论(二) - BASE理论/" data-id="cji2pk7er002lun4ujgeewvie" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+</div>
 
             
     
@@ -872,7 +815,7 @@
 
 
 
-    <article id="post-分布式理论(一) - CAP定理" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-Apache Thrift系列详解(一) - 概述与入门" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -880,7 +823,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2018/04/23/分布式理论(一) - CAP定理/">分布式理论(一) - CAP定理</a>
+            <a class="article-title" href="/2018/01/08/Apache Thrift系列详解(一) - 概述与入门/">Apache Thrift系列详解(一) - 概述与入门</a>
         </h1>
     
 
@@ -889,8 +832,8 @@
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2018/04/23/分布式理论(一) - CAP定理/">
-            <time datetime="2018-04-23T12:33:00.000Z" itemprop="datePublished">2018-04-23</time>
+        <a href="/2018/01/08/Apache Thrift系列详解(一) - 概述与入门/">
+            <time datetime="2018-01-08T02:14:00.000Z" itemprop="datePublished">2018-01-08</time>
         </a>
     </div>
 
@@ -898,13 +841,13 @@
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/分布式系列/">分布式系列</a>
+        <a class="article-category-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a>
     </div>
 
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/CAP/">CAP</a>, <a class="tag-link" href="/tags/分布式/">分布式</a>
+        <a class="tag-link" href="/tags/Apache/">Apache</a>, <a class="tag-link" href="/tags/RPC/">RPC</a>, <a class="tag-link" href="/tags/Thrift/">Thrift</a>
     </div>
 
                     </div>
@@ -915,9 +858,9 @@
         <div class="article-entry" itemprop="articleBody">
         
             <p><hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>CAP原则又称CAP定理，指的是在一个分布式系统中，Consistency（一致性）、 Availability（可用性）、Partition tolerance（分区容错性）这三个基本需求，最多只能同时满足其中的2个。</p></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Thrift</code>是一个<strong>轻量级</strong>、<strong>跨语言</strong>的<strong>远程服务调用</strong>框架，最初由<code>Facebook</code>开发，后面进入<code>Apache</code>开源项目。它通过自身的<code>IDL</code><strong>中间语言</strong>, 并借助<strong>代码生成引擎</strong>生成各种主流语言的<code>RPC</code><strong>服务端</strong>/<strong>客户端</strong>模板代码。</p></p>
             <p class="article-more-link">
-                <a href="/2018/04/23/分布式理论(一) - CAP定理/#more">查看更多</a>
+                <a href="/2018/01/08/Apache Thrift系列详解(一) - 概述与入门/#more">查看更多</a>
             </p>
         
         </div>
@@ -926,73 +869,538 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
 </div>
 
-    <a data-url="https://ostenant.coding.me/2018/04/23/分布式理论(一) - CAP定理/" data-id="cji2pk7eo002gun4uv23el0v2" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
+            
+    
 
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
+        </footer>
+    </div>
+    
+</article>
 
-            if ($('#' + id).length) {
-                box = $('#' + id);
 
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
 
-              box = $(html);
+    <article id="post-深入浅出OAuth 2.0授权机制" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2018/01/04/深入浅出OAuth 2.0授权机制/">深入浅出OAuth 2.0授权机制</a>
+        </h1>
+    
 
-              $('body').append(box);
-            }
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2018/01/04/深入浅出OAuth 2.0授权机制/">
+            <time datetime="2018-01-04T13:10:00.000Z" itemprop="datePublished">2018-01-04</time>
+        </a>
+    </div>
 
-            $('.article-share-box.on').hide();
 
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/认证与授权系列/">认证与授权系列</a>
+    </div>
 
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/OAuth-2-0/">OAuth 2.0</a>
+    </div>
 
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            <p><hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>举个简单的例子。新浪微博是你的家，有时候你会想让一些人(第三方应用)去你的家里帮你办点事情，或者取点东西。你可以直接复制一把钥匙(用户名和密码)给他们，但这里存在几个问题：</p></p>
+            <p class="article-more-link">
+                <a href="/2018/01/04/深入浅出OAuth 2.0授权机制/#more">查看更多</a>
+            </p>
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-Java NIO系列(四) - Selector" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/12/31/Java NIO系列(四) - Selector/">Java NIO系列(四) - Selector</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2017/12/31/Java NIO系列(四) - Selector/">
+            <time datetime="2017-12-31T04:16:00.000Z" itemprop="datePublished">2017-12-31</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/NIO/">NIO</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            <p><hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Selector</code> 是 <code>Java NIO</code> 中的一个组件，用于检查<strong>一个</strong>或<strong>多个</strong>通道 <code>Channel</code> 的状态是否处于<strong>可读</strong>、<strong>可写</strong>状态。如此可以实现<strong>单线程</strong>管理<strong>多个通道</strong>，也就是可以管理多个<strong>网络连接</strong>。</p></p>
+            <p class="article-more-link">
+                <a href="/2017/12/31/Java NIO系列(四) - Selector/#more">查看更多</a>
+            </p>
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-Java NIO系列(三) - Channel" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/12/27/Java NIO系列(三) - Channel/">Java NIO系列(三) - Channel</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2017/12/27/Java NIO系列(三) - Channel/">
+            <time datetime="2017-12-27T07:22:00.000Z" itemprop="datePublished">2017-12-27</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/NIO/">NIO</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            <p><hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>上文讲到<code>Java NIO</code>一些基本概念。在标准的<code>IO</code>中，都是基于<strong>字节流/字符流</strong>进行数据操作的，而在<code>NIO</code>中则是是基于<code>Channel</code>和<code>Buffer</code>进行操作，其中的<code>Channel</code>的虽然模拟了<strong>流</strong>的概念，实则大不相同。</p>
+<p>本文将详细阐述<code>NIO</code>中的<strong>通道</strong><code>Channel</code>的概念和具体的用法。</p></p>
+            <p class="article-more-link">
+                <a href="/2017/12/27/Java NIO系列(三) - Channel/#more">查看更多</a>
+            </p>
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-Java NIO系列(二) - Buffer" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/12/26/Java NIO系列(二) - Buffer/">Java NIO系列(二) - Buffer</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2017/12/26/Java NIO系列(二) - Buffer/">
+            <time datetime="2017-12-26T13:41:00.000Z" itemprop="datePublished">2017-12-26</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/NIO/">NIO</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            <p><hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在<code>Java NIO</code>中，<strong>缓冲区</strong>用来<strong>临时</strong>存储数据，可以理解为是<code>I/O</code>操作中数据暂存的中转站。<strong>缓冲区</strong>直接为<strong>通道</strong>(<code>Channel</code>)服务，数据是从<strong>通道</strong>读入<strong>缓冲区</strong>，从<strong>缓冲区</strong>写入到<strong>通道</strong>中的。</p>
+<p><strong>缓冲区</strong>本质上是一块可以<strong>写入数据</strong>，然后可以从中<strong>读取数据</strong>的内存。这块内存被包装成<code>NIO Buffer</code>对象，并提供了一组方法，用来方便的访问<strong>这块内存</strong>。</p></p>
+            <p class="article-more-link">
+                <a href="/2017/12/26/Java NIO系列(二) - Buffer/#more">查看更多</a>
+            </p>
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
 
             
     
@@ -1005,7 +1413,7 @@
 
 
     <nav id="page-nav">
-        <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
+        <a class="extend prev" rel="prev" href="/page/2/">&laquo; 上一页</a><a class="page-number" href="/">1</a><a class="page-number" href="/page/2/">2</a><span class="page-number current">3</span><a class="page-number" href="/page/4/">4</a><a class="page-number" href="/page/5/">5</a><a class="extend next" rel="next" href="/page/4/">下一页 &raquo;</a>
     </nav>
 </section>
             
@@ -1178,7 +1586,7 @@
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2018 Chen Harrison<br>
+            &copy; 2018 Harrison<br>
             Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
         </div>
     </div>

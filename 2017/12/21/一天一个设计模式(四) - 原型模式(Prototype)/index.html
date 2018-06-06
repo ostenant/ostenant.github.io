@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8">
     
-    <title>一天一个设计模式(四) - 原型模式(Prototype) | Coding | Harrison&#39;s Blog</title>
+    <title>一天一个设计模式(四) - 原型模式(Prototype) | Harrison&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="前言原型模式属于对象的创建模式。通过给出一个原型对象来指明所有创建的对象的类型，然后用这个原型对象提供的复制办法创建出更多同类型的对象。">
 <meta name="keywords" content="Prototype">
 <meta property="og:type" content="article">
 <meta property="og:title" content="一天一个设计模式(四) - 原型模式(Prototype)">
 <meta property="og:url" content="https://ostenant.coding.me/2017/12/21/一天一个设计模式(四) - 原型模式(Prototype)/index.html">
-<meta property="og:site_name" content="Coding | Harrison&#39;s Blog">
+<meta property="og:site_name" content="Harrison&#39;s Blog">
 <meta property="og:description" content="前言原型模式属于对象的创建模式。通过给出一个原型对象来指明所有创建的对象的类型，然后用这个原型对象提供的复制办法创建出更多同类型的对象。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Java_Design_Pattern_Protype_Simple.png">
@@ -26,9 +26,11 @@
     
 
     
-        <link rel="alternate" href="/" title="Coding | Harrison&#39;s Blog" type="application/atom+xml" />
+        <link rel="alternate" href="/" title="Harrison&#39;s Blog" type="application/atom+xml" />
     
 
+    
+        <link rel="icon" href="/css/images/favicon.png" />
     
 
     <link rel="stylesheet" href="/libs/font-awesome5/css/fontawesome.min.css">
@@ -61,7 +63,7 @@
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">Coding | Harrison&#39;s Blog</span>
+                <span class="site-title">Harrison&#39;s Blog</span>
             </a>
             <nav id="main-nav">
                 
@@ -161,9 +163,9 @@
         <div class="base-info profile-block">
             <img id="avatar" src="/css/images/avatar.jpeg" />
             <h2 id="name">陈林 | Harrison</h2>
-            <h3 id="title">年轻无为，卖马为生。</h3>
+            <h3 id="title">年轻无为，卖码为生。</h3>
             <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>成都, 中国</span>
-            <a id="follow" target="_blank" href="https://github.com/ppoffice/">关注我</a>
+            <a id="follow" target="_blank" href="undefined">关注我</a>
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
@@ -202,6 +204,12 @@
                     <td>
                         <a href="/" target="_blank" title="dribbble" class=tooltip>
                             <i class="fab fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="linkedin" class=tooltip>
+                            <i class="fab fa-linkedin"></i>
                         </a>
                     </td>
                     
@@ -316,73 +324,60 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
 
-    <a data-url="https://ostenant.coding.me/2017/12/21/一天一个设计模式(四) - 原型模式(Prototype)/" data-id="cji2pk7el0028un4uo0aiswzn" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+</div>
 
             
     
@@ -589,7 +584,7 @@
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2018 Chen Harrison<br>
+            &copy; 2018 Harrison<br>
             Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
         </div>
     </div>

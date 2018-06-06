@@ -3,24 +3,26 @@
 <head>
     <meta charset="utf-8">
     
-    <title>Coding | Harrison&#39;s Blog</title>
+    <title>Harrison&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="上善若水任方猿">
 <meta property="og:type" content="website">
-<meta property="og:title" content="Coding | Harrison&#39;s Blog">
+<meta property="og:title" content="Harrison&#39;s Blog">
 <meta property="og:url" content="https://ostenant.coding.me/page/5/index.html">
-<meta property="og:site_name" content="Coding | Harrison&#39;s Blog">
+<meta property="og:site_name" content="Harrison&#39;s Blog">
 <meta property="og:description" content="上善若水任方猿">
 <meta property="og:locale" content="zh-CN">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Coding | Harrison&#39;s Blog">
+<meta name="twitter:title" content="Harrison&#39;s Blog">
 <meta name="twitter:description" content="上善若水任方猿">
     
 
     
-        <link rel="alternate" href="/" title="Coding | Harrison&#39;s Blog" type="application/atom+xml" />
+        <link rel="alternate" href="/" title="Harrison&#39;s Blog" type="application/atom+xml" />
     
 
+    
+        <link rel="icon" href="/css/images/favicon.png" />
     
 
     <link rel="stylesheet" href="/libs/font-awesome5/css/fontawesome.min.css">
@@ -53,7 +55,7 @@
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">Coding | Harrison&#39;s Blog</span>
+                <span class="site-title">Harrison&#39;s Blog</span>
             </a>
             <nav id="main-nav">
                 
@@ -153,9 +155,9 @@
         <div class="base-info profile-block">
             <img id="avatar" src="/css/images/avatar.jpeg" />
             <h2 id="name">陈林 | Harrison</h2>
-            <h3 id="title">年轻无为，卖马为生。</h3>
+            <h3 id="title">年轻无为，卖码为生。</h3>
             <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>成都, 中国</span>
-            <a id="follow" target="_blank" href="https://github.com/ppoffice/">关注我</a>
+            <a id="follow" target="_blank" href="undefined">关注我</a>
         </div>
         <div class="article-info profile-block">
             <div class="article-info-block">
@@ -198,6 +200,12 @@
                     </td>
                     
                     <td>
+                        <a href="/" target="_blank" title="linkedin" class=tooltip>
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
                         <a href="/" target="_blank" title="rss" class=tooltip>
                             <i class="fab fa-rss"></i>
                         </a>
@@ -212,7 +220,7 @@
 
             
             <section id="main">
-    <article id="post-Apache Thrift系列详解(二) - 网络服务模型" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-JVM系列(四) - JVM GC回收算法" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -220,7 +228,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2018/01/11/Apache Thrift系列详解(二) - 网络服务模型/">Apache Thrift系列详解(二) - 网络服务模型</a>
+            <a class="article-title" href="/2017/05/02/JVM系列(四) - JVM GC回收算法/">JVM系列(四) - JVM GC回收算法</a>
         </h1>
     
 
@@ -229,8 +237,8 @@
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2018/01/11/Apache Thrift系列详解(二) - 网络服务模型/">
-            <time datetime="2018-01-11T09:36:00.000Z" itemprop="datePublished">2018-01-11</time>
+        <a href="/2017/05/02/JVM系列(四) - JVM GC回收算法/">
+            <time datetime="2017-05-02T10:09:00.000Z" itemprop="datePublished">2017-05-02</time>
         </a>
     </div>
 
@@ -238,13 +246,13 @@
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a>
+        <a class="article-category-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a>
     </div>
 
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/Apache/">Apache</a>, <a class="tag-link" href="/tags/RPC/">RPC</a>, <a class="tag-link" href="/tags/Thrift/">Thrift</a>
+        <a class="tag-link" href="/tags/JVM/">JVM</a>, <a class="tag-link" href="/tags/Java/">Java</a>
     </div>
 
                     </div>
@@ -255,9 +263,9 @@
         <div class="article-entry" itemprop="articleBody">
         
             <p><hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Thrift</code>提供的<strong>网络服务模型</strong>：<strong>单线程</strong>、<strong>多线程</strong>、<strong>事件驱动</strong>，从另一个角度划分为：<strong>阻塞服务模型</strong>、<strong>非阻塞服务模型</strong>。</p></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>第二篇介绍了<code>Java</code>内存运行时区域，其中<strong>程序计数器</strong>、<strong>虚拟机栈</strong>、<strong>本地方法栈</strong> 三个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的<strong>内存分配和回收</strong>都具备<strong>确定性</strong>。在这几个区域内不需要过多考虑回收的问题，<strong>因为方法结束或线程结束时，内存自然就跟随着回收了</strong>。</p></p>
             <p class="article-more-link">
-                <a href="/2018/01/11/Apache Thrift系列详解(二) - 网络服务模型/#more">查看更多</a>
+                <a href="/2017/05/02/JVM系列(四) - JVM GC回收算法/#more">查看更多</a>
             </p>
         
         </div>
@@ -266,73 +274,60 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
 
-    <a data-url="https://ostenant.coding.me/2018/01/11/Apache Thrift系列详解(二) - 网络服务模型/" data-id="cji2pk7do000bun4upwfvh0g6" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+</div>
 
             
     
@@ -344,7 +339,7 @@
 
 
 
-    <article id="post-Apache Thrift系列详解(一) - 概述与入门" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-JVM系列(三) - JVM对象探秘" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -352,7 +347,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2018/01/08/Apache Thrift系列详解(一) - 概述与入门/">Apache Thrift系列详解(一) - 概述与入门</a>
+            <a class="article-title" href="/2017/04/28/JVM系列(三) - JVM对象探秘/">JVM系列(三) - JVM对象探秘</a>
         </h1>
     
 
@@ -361,8 +356,8 @@
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2018/01/08/Apache Thrift系列详解(一) - 概述与入门/">
-            <time datetime="2018-01-08T02:14:00.000Z" itemprop="datePublished">2018-01-08</time>
+        <a href="/2017/04/28/JVM系列(三) - JVM对象探秘/">
+            <time datetime="2017-04-28T03:22:00.000Z" itemprop="datePublished">2017-04-28</time>
         </a>
     </div>
 
@@ -370,13 +365,13 @@
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a>
+        <a class="article-category-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a>
     </div>
 
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/Apache/">Apache</a>, <a class="tag-link" href="/tags/RPC/">RPC</a>, <a class="tag-link" href="/tags/Thrift/">Thrift</a>
+        <a class="tag-link" href="/tags/JVM/">JVM</a>, <a class="tag-link" href="/tags/Java/">Java</a>
     </div>
 
                     </div>
@@ -387,9 +382,9 @@
         <div class="article-entry" itemprop="articleBody">
         
             <p><hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Thrift</code>是一个<strong>轻量级</strong>、<strong>跨语言</strong>的<strong>远程服务调用</strong>框架，最初由<code>Facebook</code>开发，后面进入<code>Apache</code>开源项目。它通过自身的<code>IDL</code><strong>中间语言</strong>, 并借助<strong>代码生成引擎</strong>生成各种主流语言的<code>RPC</code><strong>服务端</strong>/<strong>客户端</strong>模板代码。</p></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对于 <code>JVM</code> 运行时区域有了一定了解以后，本文将更进一步介绍虚拟机内存中的数据的细节信息。以<code>JVM</code>虚拟机(<code>Hotspot</code>)的内存区域<code>Java</code>堆为例，探讨<code>Java</code>堆是如何<strong>创建对象</strong>、如何<strong>布局对象</strong>以及如何<strong>访问对象</strong>的。</p></p>
             <p class="article-more-link">
-                <a href="/2018/01/08/Apache Thrift系列详解(一) - 概述与入门/#more">查看更多</a>
+                <a href="/2017/04/28/JVM系列(三) - JVM对象探秘/#more">查看更多</a>
             </p>
         
         </div>
@@ -398,73 +393,60 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
 
-    <a data-url="https://ostenant.coding.me/2018/01/08/Apache Thrift系列详解(一) - 概述与入门/" data-id="cji2pk7dj0006un4uuj2l5lo9" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+</div>
 
             
     
@@ -476,7 +458,7 @@
 
 
 
-    <article id="post-深入浅出OAuth 2.0授权机制" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-JVM系列(二) - JVM内存区域和内存溢出异常详解" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -484,7 +466,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2018/01/04/深入浅出OAuth 2.0授权机制/">深入浅出OAuth 2.0授权机制</a>
+            <a class="article-title" href="/2017/04/25/JVM系列(二) - JVM内存区域和内存溢出异常详解/">JVM系列(二) - JVM内存区域和内存溢出异常详解</a>
         </h1>
     
 
@@ -493,8 +475,8 @@
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2018/01/04/深入浅出OAuth 2.0授权机制/">
-            <time datetime="2018-01-04T13:10:00.000Z" itemprop="datePublished">2018-01-04</time>
+        <a href="/2017/04/25/JVM系列(二) - JVM内存区域和内存溢出异常详解/">
+            <time datetime="2017-04-25T09:57:00.000Z" itemprop="datePublished">2017-04-25</time>
         </a>
     </div>
 
@@ -502,13 +484,13 @@
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/认证与授权系列/">认证与授权系列</a>
+        <a class="article-category-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a>
     </div>
 
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/OAuth-2-0/">OAuth 2.0</a>
+        <a class="tag-link" href="/tags/JVM/">JVM</a>, <a class="tag-link" href="/tags/Java/">Java</a>
     </div>
 
                     </div>
@@ -519,9 +501,10 @@
         <div class="article-entry" itemprop="articleBody">
         
             <p><hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>举个简单的例子。新浪微博是你的家，有时候你会想让一些人(第三方应用)去你的家里帮你办点事情，或者取点东西。你可以直接复制一把钥匙(用户名和密码)给他们，但这里存在几个问题：</p></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>JVM</code>内存区域包括<strong>PC计数器</strong>、<strong>Java虚拟机栈</strong>、<strong>本地方法栈</strong>、<strong>堆</strong>、<strong>方法区</strong>、<strong>运行时常量池</strong>和<strong>直接内存</strong>。</p>
+<p>本文主要介绍各个内存区域的作用和特性，同时分别阐述各个区域发生内存溢出的可能性和异常类型。</p></p>
             <p class="article-more-link">
-                <a href="/2018/01/04/深入浅出OAuth 2.0授权机制/#more">查看更多</a>
+                <a href="/2017/04/25/JVM系列(二) - JVM内存区域和内存溢出异常详解/#more">查看更多</a>
             </p>
         
         </div>
@@ -530,73 +513,60 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
 
-    <a data-url="https://ostenant.coding.me/2018/01/04/深入浅出OAuth 2.0授权机制/" data-id="cji2pk7f5003iun4u1wfnr0w8" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+</div>
 
             
     
@@ -608,7 +578,7 @@
 
 
 
-    <article id="post-Java NIO系列(四) - Selector" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-JVM系列(一) - JVM总体概述" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -616,7 +586,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2017/12/31/Java NIO系列(四) - Selector/">Java NIO系列(四) - Selector</a>
+            <a class="article-title" href="/2017/04/22/JVM系列(一) - JVM总体概述/">JVM系列(一) - JVM总体概述</a>
         </h1>
     
 
@@ -625,8 +595,8 @@
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2017/12/31/Java NIO系列(四) - Selector/">
-            <time datetime="2017-12-31T04:16:00.000Z" itemprop="datePublished">2017-12-31</time>
+        <a href="/2017/04/22/JVM系列(一) - JVM总体概述/">
+            <time datetime="2017-04-22T06:55:00.000Z" itemprop="datePublished">2017-04-22</time>
         </a>
     </div>
 
@@ -634,13 +604,13 @@
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a>
+        <a class="article-category-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a>
     </div>
 
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/NIO/">NIO</a>
+        <a class="tag-link" href="/tags/JVM/">JVM</a>, <a class="tag-link" href="/tags/Java/">Java</a>
     </div>
 
                     </div>
@@ -650,10 +620,9 @@
         
         <div class="article-entry" itemprop="articleBody">
         
-            <p><hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Selector</code> 是 <code>Java NIO</code> 中的一个组件，用于检查<strong>一个</strong>或<strong>多个</strong>通道 <code>Channel</code> 的状态是否处于<strong>可读</strong>、<strong>可写</strong>状态。如此可以实现<strong>单线程</strong>管理<strong>多个通道</strong>，也就是可以管理多个<strong>网络连接</strong>。</p></p>
+            <p><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>JVM</code>是<code>Java Virtual Machine</code>(Java虚拟机)的缩写，<code>JVM</code>是一种用于计算设备的<strong>规范</strong>，它是一个<strong>虚构</strong>的计算机，是通过在实际的计算机上仿真模拟各种计算机功能来实现的。</p></p>
             <p class="article-more-link">
-                <a href="/2017/12/31/Java NIO系列(四) - Selector/#more">查看更多</a>
+                <a href="/2017/04/22/JVM系列(一) - JVM总体概述/#more">查看更多</a>
             </p>
         
         </div>
@@ -662,73 +631,60 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
 
-    <a data-url="https://ostenant.coding.me/2017/12/31/Java NIO系列(四) - Selector/" data-id="cji2pk7e8001fun4usheku5cn" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+</div>
 
             
     
@@ -740,7 +696,7 @@
 
 
 
-    <article id="post-Java NIO系列(三) - Channel" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-ECMAScript 6入门篇(二) - 变量的解构赋值" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -748,7 +704,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2017/12/27/Java NIO系列(三) - Channel/">Java NIO系列(三) - Channel</a>
+            <a class="article-title" href="/2017/04/21/ECMAScript 6入门篇(二) - 变量的解构赋值/">ECMAScript 6入门篇(二) - 变量的解构赋值</a>
         </h1>
     
 
@@ -757,8 +713,8 @@
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2017/12/27/Java NIO系列(三) - Channel/">
-            <time datetime="2017-12-27T07:22:00.000Z" itemprop="datePublished">2017-12-27</time>
+        <a href="/2017/04/21/ECMAScript 6入门篇(二) - 变量的解构赋值/">
+            <time datetime="2017-04-21T14:27:00.000Z" itemprop="datePublished">2017-04-21</time>
         </a>
     </div>
 
@@ -766,13 +722,13 @@
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a>
+        <a class="article-category-link" href="/categories/ECMAScript基础系列/">ECMAScript基础系列</a>
     </div>
 
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/NIO/">NIO</a>
+        <a class="tag-link" href="/tags/ECMAScript/">ECMAScript</a>
     </div>
 
                     </div>
@@ -783,10 +739,9 @@
         <div class="article-entry" itemprop="articleBody">
         
             <p><hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>上文讲到<code>Java NIO</code>一些基本概念。在标准的<code>IO</code>中，都是基于<strong>字节流/字符流</strong>进行数据操作的，而在<code>NIO</code>中则是是基于<code>Channel</code>和<code>Buffer</code>进行操作，其中的<code>Channel</code>的虽然模拟了<strong>流</strong>的概念，实则大不相同。</p>
-<p>本文将详细阐述<code>NIO</code>中的<strong>通道</strong><code>Channel</code>的概念和具体的用法。</p></p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>ES6允许按照一定的模式，对数组和对象进行值提取，然后将值赋给变量，这叫做变量的解构（Destructuring）。值得一提的是，解构只能用于数组或对象，原始数据类型的值可以转换为相应的对象。</p></p>
             <p class="article-more-link">
-                <a href="/2017/12/27/Java NIO系列(三) - Channel/#more">查看更多</a>
+                <a href="/2017/04/21/ECMAScript 6入门篇(二) - 变量的解构赋值/#more">查看更多</a>
             </p>
         
         </div>
@@ -795,73 +750,60 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
 
-    <a data-url="https://ostenant.coding.me/2017/12/27/Java NIO系列(三) - Channel/" data-id="cji2pk7e60019un4un6lrui3v" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
-
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
-
-            if ($('#' + id).length) {
-                box = $('#' + id);
-
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
-
-              box = $(html);
-
-              $('body').append(box);
-            }
-
-            $('.article-share-box.on').hide();
-
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
-
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
-
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+</div>
 
             
     
@@ -873,7 +815,7 @@
 
 
 
-    <article id="post-Java NIO系列(二) - Buffer" class="article article-type-post" itemscope itemprop="blogPost">
+    <article id="post-ECMAScript 6入门篇(一) - var, let, const命令" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -881,7 +823,7 @@
                 
     
         <h1 itemprop="name">
-            <a class="article-title" href="/2017/12/26/Java NIO系列(二) - Buffer/">Java NIO系列(二) - Buffer</a>
+            <a class="article-title" href="/2017/04/14/ECMAScript 6入门篇(一) - var, let, const命令/">ECMAScript 6入门篇(一) - var, let, const命令</a>
         </h1>
     
 
@@ -890,8 +832,8 @@
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2017/12/26/Java NIO系列(二) - Buffer/">
-            <time datetime="2017-12-26T13:41:00.000Z" itemprop="datePublished">2017-12-26</time>
+        <a href="/2017/04/14/ECMAScript 6入门篇(一) - var, let, const命令/">
+            <time datetime="2017-04-14T07:45:00.000Z" itemprop="datePublished">2017-04-14</time>
         </a>
     </div>
 
@@ -899,13 +841,13 @@
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a>
+        <a class="article-category-link" href="/categories/ECMAScript基础系列/">ECMAScript基础系列</a>
     </div>
 
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/NIO/">NIO</a>
+        <a class="tag-link" href="/tags/ECMAScript/">ECMAScript</a>
     </div>
 
                     </div>
@@ -916,10 +858,9 @@
         <div class="article-entry" itemprop="articleBody">
         
             <p><hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在<code>Java NIO</code>中，<strong>缓冲区</strong>用来<strong>临时</strong>存储数据，可以理解为是<code>I/O</code>操作中数据暂存的中转站。<strong>缓冲区</strong>直接为<strong>通道</strong>(<code>Channel</code>)服务，数据是从<strong>通道</strong>读入<strong>缓冲区</strong>，从<strong>缓冲区</strong>写入到<strong>通道</strong>中的。</p>
-<p><strong>缓冲区</strong>本质上是一块可以<strong>写入数据</strong>，然后可以从中<strong>读取数据</strong>的内存。这块内存被包装成<code>NIO Buffer</code>对象，并提供了一组方法，用来方便的访问<strong>这块内存</strong>。</p></p>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p><code>let</code>和<code>const</code>都是<code>es5</code>，<code>es6</code>新版本的<code>js</code>语言规范出来的定义，在这以前定义一个变量只能用<code>var</code>。简言之，<code>let</code>和<code>const</code>都是为了弥补<code>var</code>的一些缺陷而新设计出来的。 <code>let</code>修复了<code>var</code>的作用域上的<code>bug</code>，<code>let</code>是更好的<code>var</code>。<code>var</code>的作用域是<strong>函数级别</strong>，而let是<strong>块级别</strong>（大括号括起来的内容）。</p></p>
             <p class="article-more-link">
-                <a href="/2017/12/26/Java NIO系列(二) - Buffer/#more">查看更多</a>
+                <a href="/2017/04/14/ECMAScript 6入门篇(一) - var, let, const命令/#more">查看更多</a>
             </p>
         
         </div>
@@ -928,73 +869,541 @@
 
 
 
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
 </div>
 
-    <a data-url="https://ostenant.coding.me/2017/12/26/Java NIO系列(二) - Buffer/" data-id="cji2pk7e7001bun4uu6prxeq2" class="article-share-link"><i class="fas fa-share"></i>分享到</a>
-<script>
-    (function ($) {
-        // Prevent duplicate binding
-        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
-            __SHARE_BUTTON_BINDED__ = true;
-        } else {
-            return;
-        }
-        $('body').on('click', function() {
-            $('.article-share-box.on').removeClass('on');
-        }).on('click', '.article-share-link', function(e) {
-            e.stopPropagation();
+            
+    
 
-            var $this = $(this),
-                url = $this.attr('data-url'),
-                encodedUrl = encodeURIComponent(url),
-                id = 'article-share-box-' + $this.attr('data-id'),
-                offset = $this.offset(),
-                box;
+        </footer>
+    </div>
+    
+</article>
 
-            if ($('#' + id).length) {
-                box = $('#' + id);
 
-                if (box.hasClass('on')){
-                    box.removeClass('on');
-                    return;
-                }
-            } else {
-                var html = [
-                    '<div id="' + id + '" class="article-share-box">',
-                        '<input class="article-share-input" value="' + url + '">',
-                        '<div class="article-share-links">',
-                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fab fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
-                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fab fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
-                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fab fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
-                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fab fa-google article-share-google" target="_blank" title="Google+"></a>',
-                        '</div>',
-                    '</div>'
-                ].join('');
 
-              box = $(html);
+    <article id="post-大型Web网站架构演变" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/03/24/大型Web网站架构演变/">大型Web网站架构演变</a>
+        </h1>
+    
 
-              $('body').append(box);
-            }
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2017/03/24/大型Web网站架构演变/">
+            <time datetime="2017-03-24T07:55:00.000Z" itemprop="datePublished">2017-03-24</time>
+        </a>
+    </div>
 
-            $('.article-share-box.on').hide();
 
-            box.css({
-                top: offset.top + 25,
-                left: offset.left
-            }).addClass('on');
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/架构学习系列/">架构学习系列</a>
+    </div>
 
-        }).on('click', '.article-share-box', function (e) {
-            e.stopPropagation();
-        }).on('click', '.article-share-box-input', function () {
-            $(this).select();
-        }).on('click', '.article-share-box-link', function (e) {
-            e.preventDefault();
-            e.stopPropagation();
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/Web/">Web</a>
+    </div>
 
-            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
-        });
-    })(jQuery);
-</script>
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            <p><hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>我们以Java Web为例，来搭建一个简单的电商系统，看看这个系统可以如何一步步演变。<br>该系统具备的功能：</p>
+<ul>
+<li>用户模块：用户注册和管理</li>
+<li>商品模块：商品展示和管理</li>
+<li>交易模块：创建交易和管理</li>
+</ul></p>
+            <p class="article-more-link">
+                <a href="/2017/03/24/大型Web网站架构演变/#more">查看更多</a>
+            </p>
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-HTTP协议详解" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/02/25/HTTP协议详解/">HTTP协议详解</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2017/02/25/HTTP协议详解/">
+            <time datetime="2017-02-25T14:14:00.000Z" itemprop="datePublished">2017-02-25</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/网络协议系列/">网络协议系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/HTTP/">HTTP</a>, <a class="tag-link" href="/tags/HTTPS/">HTTPS</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            <p><hr>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p><code>HTTP</code>协议(超文本传输协议HyperText Transfer Protocol)，它是基于TCP协议的应用层传输协议，简单来说就是客户端和服务端进行数据传输的一种规则。</p></p>
+            <p class="article-more-link">
+                <a href="/2017/02/25/HTTP协议详解/#more">查看更多</a>
+            </p>
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-TCP协议简介" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/02/25/TCP协议简介/">TCP协议简介</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2017/02/25/TCP协议简介/">
+            <time datetime="2017-02-25T03:59:00.000Z" itemprop="datePublished">2017-02-25</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/网络协议系列/">网络协议系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/TCP/">TCP</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            <p><hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>TCP（Transmission Control Protocol 传输控制协议）是一种面向连接的、可靠的、基于字节流的传输层通信协议。</p></p>
+            <p class="article-more-link">
+                <a href="/2017/02/25/TCP协议简介/#more">查看更多</a>
+            </p>
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+
+        </footer>
+    </div>
+    
+</article>
+
+
+
+    <article id="post-WebSocket协议入门简介" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 itemprop="name">
+            <a class="article-title" href="/2017/02/23/WebSocket协议入门简介/">WebSocket协议入门简介</a>
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2017/02/23/WebSocket协议入门简介/">
+            <time datetime="2017-02-23T07:47:00.000Z" itemprop="datePublished">2017-02-23</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/网络协议系列/">网络协议系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/WebSocket/">WebSocket</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            <p><hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>以前的网站为了实现<strong>推送</strong>功能，使用的方法都是<strong>轮询</strong>。所谓的轮询就是在特定的时间间隔（例如1秒），由浏览器向服务器发出一个 <code>Http request</code> ，然后服务器返回最新的数据给客户端浏览器，从而给出一种服务端实时推送的假象。由于 <code>Http Request</code> 的 <code>Header</code>（请求头）很长,而传输的数据可能很短就只占一点点，每次请求消耗的带宽大部分都消耗在 <code>Header</code> 上。从网上资料得知后来还有改进的轮询方法叫做 <code>Comet</code> ，使用 <code>Ajax</code> 。但这种技术虽然可达到<strong>双向通信</strong>，但依然需要发出请求，而且在 <code>Comet</code> 中，普遍采用了<strong>长轮询</strong>，这也会大量消耗服务器<strong>带宽</strong>和<strong>资源</strong>。</p></p>
+            <p class="article-more-link">
+                <a href="/2017/02/23/WebSocket协议入门简介/#more">查看更多</a>
+            </p>
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
 
             
     
@@ -1007,7 +1416,7 @@
 
 
     <nav id="page-nav">
-        <a class="extend prev" rel="prev" href="/page/4/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span><a class="page-number" href="/page/6/">6</a><a class="page-number" href="/page/7/">7</a><span class="space">&hellip;</span><a class="page-number" href="/page/9/">9</a><a class="extend next" rel="next" href="/page/6/">下一页 &raquo;</a>
+        <a class="extend prev" rel="prev" href="/page/4/">&laquo; 上一页</a><a class="page-number" href="/">1</a><span class="space">&hellip;</span><a class="page-number" href="/page/3/">3</a><a class="page-number" href="/page/4/">4</a><span class="page-number current">5</span>
     </nav>
 </section>
             
@@ -1180,7 +1589,7 @@
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2018 Chen Harrison<br>
+            &copy; 2018 Harrison<br>
             Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
         </div>
     </div>
