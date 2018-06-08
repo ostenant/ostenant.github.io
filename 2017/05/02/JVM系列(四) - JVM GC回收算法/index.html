@@ -6,7 +6,7 @@
     <title>JVM系列(四) - JVM GC回收算法 | Harrison&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="前言第二篇介绍了Java内存运行时区域，其中程序计数器、虚拟机栈、本地方法栈 三个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的内存分配和回收都具备确定性。在这几个区域内不需要过多考虑回收的问题，因为方法结束或线程结束时，内存自然就跟随着回收了。">
-<meta name="keywords" content="JVM,Java">
+<meta name="keywords" content="Java,JVM">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JVM系列(四) - JVM GC回收算法">
 <meta property="og:url" content="https://ostenant.coding.me/2017/05/02/JVM系列(四) - JVM GC回收算法/index.html">
@@ -433,6 +433,8 @@ ga('send', 'pageview');
 
             
     
+        <a href="https://ostenant.coding.me/2017/05/02/JVM系列(四) - JVM GC回收算法/#comments" class="article-comment-link">评论</a>
+    
 
         </footer>
     </div>
@@ -463,6 +465,10 @@ ga('send', 'pageview');
 
 
     
+    
+        <section id="comments">
+    <div id="lv-container" data-id="city" data-uid=MTAyMC8zNzE2NC8xMzY5OA==></div>
+</section>
     
 
 </section>
@@ -632,6 +638,27 @@ ga('send', 'pageview');
     </div>
 </footer>
         
+    
+    
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+     (function(d, s) {
+         var j, e = d.getElementsByTagName(s)[0];
+
+         if (typeof LivereTower === 'function') { return; }
+
+         j = d.createElement(s);
+         j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+         j.async = true;
+
+         e.parentNode.insertBefore(j, e);
+     })(document, 'script');
+    </script>
+  <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+  <!-- City版安装代码已完成 -->
+
+
+
 
 
     

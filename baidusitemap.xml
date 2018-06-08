@@ -341,6 +341,26 @@
 
     
   <url>
+    <loc>https://ostenant.coding.me/2018/01/04/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAOAuth%202.0%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6/</loc>
+    <lastmod>2018-05-08T02:49:46.097Z</lastmod>
+    <data>
+        <display>
+        <title>深入浅出OAuth 2.0授权机制</title>
+        <pubTime>2018-01-04T13:10:00.000Z</pubTime>
+        
+        <tag>OAuth 2.0</tag>
+         
+         
+           
+             
+              <breadCrumb title="认证与授权系列" url="https://ostenant.coding.me/categories/%E8%AE%A4%E8%AF%81%E4%B8%8E%E6%8E%88%E6%9D%83%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://ostenant.coding.me/2018/01/18/%E9%98%BF%E9%87%8C%E4%BA%91CentOS%207%E4%B8%8A%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AEDocker/</loc>
     <lastmod>2018-05-08T02:49:46.097Z</lastmod>
     <data>
@@ -356,26 +376,6 @@
            
              
               <breadCrumb title="Docker学习系列" url="https://ostenant.coding.me/categories/Docker%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://ostenant.coding.me/2018/01/04/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAOAuth%202.0%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6/</loc>
-    <lastmod>2018-05-08T02:49:46.097Z</lastmod>
-    <data>
-        <display>
-        <title>深入浅出OAuth 2.0授权机制</title>
-        <pubTime>2018-01-04T13:10:00.000Z</pubTime>
-        
-        <tag>OAuth 2.0</tag>
-         
-         
-           
-             
-              <breadCrumb title="认证与授权系列" url="https://ostenant.coding.me/categories/%E8%AE%A4%E8%AF%81%E4%B8%8E%E6%8E%88%E6%9D%83%E7%B3%BB%E5%88%97/"/>
           
         </display>
     </data>
@@ -475,28 +475,6 @@
 
     
   <url>
-    <loc>https://ostenant.coding.me/2018/04/28/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA(%E5%9B%9B)%20-%203PC%E5%8D%8F%E8%AE%AE/</loc>
-    <lastmod>2018-05-08T02:49:46.095Z</lastmod>
-    <data>
-        <display>
-        <title>分布式理论(四) - 3PC协议</title>
-        <pubTime>2018-04-28T13:26:00.000Z</pubTime>
-        
-        <tag>分布式</tag>
-         
-        <tag>3PC</tag>
-         
-         
-           
-             
-              <breadCrumb title="分布式系列" url="https://ostenant.coding.me/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://ostenant.coding.me/2018/04/25/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA(%E4%B8%89)%20-%202PC%E5%8D%8F%E8%AE%AE/</loc>
     <lastmod>2018-05-08T02:49:46.095Z</lastmod>
     <data>
@@ -519,16 +497,16 @@
 
     
   <url>
-    <loc>https://ostenant.coding.me/2018/04/23/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA(%E4%B8%80)%20-%20CAP%E5%AE%9A%E7%90%86/</loc>
-    <lastmod>2018-05-08T02:49:46.094Z</lastmod>
+    <loc>https://ostenant.coding.me/2018/04/28/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA(%E5%9B%9B)%20-%203PC%E5%8D%8F%E8%AE%AE/</loc>
+    <lastmod>2018-05-08T02:49:46.095Z</lastmod>
     <data>
         <display>
-        <title>分布式理论(一) - CAP定理</title>
-        <pubTime>2018-04-23T12:33:00.000Z</pubTime>
+        <title>分布式理论(四) - 3PC协议</title>
+        <pubTime>2018-04-28T13:26:00.000Z</pubTime>
         
         <tag>分布式</tag>
          
-        <tag>CAP</tag>
+        <tag>3PC</tag>
          
          
            
@@ -561,14 +539,36 @@
 
     
   <url>
-    <loc>https://ostenant.coding.me/2017/12/19/%E4%B8%80%E5%A4%A9%E4%B8%80%E4%B8%AA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F(%E4%B8%89)%20-%20Builder%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F/</loc>
+    <loc>https://ostenant.coding.me/2018/04/23/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA(%E4%B8%80)%20-%20CAP%E5%AE%9A%E7%90%86/</loc>
+    <lastmod>2018-05-08T02:49:46.094Z</lastmod>
+    <data>
+        <display>
+        <title>分布式理论(一) - CAP定理</title>
+        <pubTime>2018-04-23T12:33:00.000Z</pubTime>
+        
+        <tag>分布式</tag>
+         
+        <tag>CAP</tag>
+         
+         
+           
+             
+              <breadCrumb title="分布式系列" url="https://ostenant.coding.me/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/06/03/%E4%B8%80%E5%A4%A9%E4%B8%80%E4%B8%AA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F(%E4%BA%8C)%20-%20%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F(Singleton)/</loc>
     <lastmod>2018-05-08T02:49:46.093Z</lastmod>
     <data>
         <display>
-        <title>一天一个设计模式(三) - 建造者模式(Builder)</title>
-        <pubTime>2017-12-19T09:20:00.000Z</pubTime>
+        <title>一天一个设计模式(二) -单例模式(Singleton)</title>
+        <pubTime>2017-06-03T07:37:00.000Z</pubTime>
         
-        <tag>Builder</tag>
+        <tag>Singleton</tag>
          
          
            
@@ -601,26 +601,6 @@
 
     
   <url>
-    <loc>https://ostenant.coding.me/2017/06/03/%E4%B8%80%E5%A4%A9%E4%B8%80%E4%B8%AA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F(%E4%BA%8C)%20-%20%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F(Singleton)/</loc>
-    <lastmod>2018-05-08T02:49:46.093Z</lastmod>
-    <data>
-        <display>
-        <title>一天一个设计模式(二) -单例模式(Singleton)</title>
-        <pubTime>2017-06-03T07:37:00.000Z</pubTime>
-        
-        <tag>Singleton</tag>
-         
-         
-           
-             
-              <breadCrumb title="JAVA设计模式系列" url="https://ostenant.coding.me/categories/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://ostenant.coding.me/2017/06/02/%E4%B8%80%E5%A4%A9%E4%B8%80%E4%B8%AA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F(%E4%B8%80)%20-%20%E6%80%BB%E4%BD%93%E6%A6%82%E8%BF%B0/</loc>
     <lastmod>2018-05-08T02:49:46.093Z</lastmod>
     <data>
@@ -639,43 +619,19 @@
 
     
   <url>
-    <loc>https://ostenant.coding.me/2018/01/24/Spring%20Cloud%E6%95%B4%E5%90%88Thrift%20RPC(%E4%BA%8C)%20-%20%E5%BA%94%E7%94%A8%E6%A1%88%E4%BE%8B/</loc>
-    <lastmod>2018-05-08T02:49:46.092Z</lastmod>
+    <loc>https://ostenant.coding.me/2017/12/19/%E4%B8%80%E5%A4%A9%E4%B8%80%E4%B8%AA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F(%E4%B8%89)%20-%20Builder%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F/</loc>
+    <lastmod>2018-05-08T02:49:46.093Z</lastmod>
     <data>
         <display>
-        <title>Spring Cloud整合Thrift RPC(二) - 应用案例</title>
-        <pubTime>2018-01-24T02:21:00.000Z</pubTime>
+        <title>一天一个设计模式(三) - 建造者模式(Builder)</title>
+        <pubTime>2017-12-19T09:20:00.000Z</pubTime>
         
-        <tag>Thrift</tag>
-         
-        <tag>RPC</tag>
-         
-        <tag>Spring Cloud</tag>
+        <tag>Builder</tag>
          
          
            
              
-              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://ostenant.coding.me/2017/12/31/Java%20NIO%E7%B3%BB%E5%88%97(%E5%9B%9B)%20-%20Selector/</loc>
-    <lastmod>2018-05-08T02:49:46.092Z</lastmod>
-    <data>
-        <display>
-        <title>Java NIO系列(四) - Selector</title>
-        <pubTime>2017-12-31T04:16:00.000Z</pubTime>
-        
-        <tag>NIO</tag>
-         
-         
-           
-             
-              <breadCrumb title="Java编程进阶系列" url="https://ostenant.coding.me/categories/Java%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6%E7%B3%BB%E5%88%97/"/>
+              <breadCrumb title="JAVA设计模式系列" url="https://ostenant.coding.me/categories/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
           
         </display>
     </data>
@@ -727,6 +683,50 @@
 
     
   <url>
+    <loc>https://ostenant.coding.me/2017/12/31/Java%20NIO%E7%B3%BB%E5%88%97(%E5%9B%9B)%20-%20Selector/</loc>
+    <lastmod>2018-05-08T02:49:46.092Z</lastmod>
+    <data>
+        <display>
+        <title>Java NIO系列(四) - Selector</title>
+        <pubTime>2017-12-31T04:16:00.000Z</pubTime>
+        
+        <tag>NIO</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java编程进阶系列" url="https://ostenant.coding.me/categories/Java%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/01/24/Spring%20Cloud%E6%95%B4%E5%90%88Thrift%20RPC(%E4%BA%8C)%20-%20%E5%BA%94%E7%94%A8%E6%A1%88%E4%BE%8B/</loc>
+    <lastmod>2018-05-08T02:49:46.092Z</lastmod>
+    <data>
+        <display>
+        <title>Spring Cloud整合Thrift RPC(二) - 应用案例</title>
+        <pubTime>2018-01-24T02:21:00.000Z</pubTime>
+        
+        <tag>Thrift</tag>
+         
+        <tag>RPC</tag>
+         
+        <tag>Spring Cloud</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://ostenant.coding.me/2017/12/18/Java%E5%9F%BA%E7%A1%80%E7%AF%87%20-%20%E5%BC%BA%E5%BC%95%E7%94%A8%E3%80%81%E5%BC%B1%E5%BC%95%E7%94%A8%E3%80%81%E8%BD%AF%E5%BC%95%E7%94%A8%E5%92%8C%E8%99%9A%E5%BC%95%E7%94%A8/</loc>
     <lastmod>2018-05-08T02:49:46.092Z</lastmod>
     <data>
@@ -749,6 +749,26 @@
 
     
   <url>
+    <loc>https://ostenant.coding.me/2017/12/27/Java%20NIO%E7%B3%BB%E5%88%97(%E4%B8%89)%20-%20Channel/</loc>
+    <lastmod>2018-05-08T02:49:46.091Z</lastmod>
+    <data>
+        <display>
+        <title>Java NIO系列(三) - Channel</title>
+        <pubTime>2017-12-27T07:22:00.000Z</pubTime>
+        
+        <tag>NIO</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java编程进阶系列" url="https://ostenant.coding.me/categories/Java%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://ostenant.coding.me/2017/12/19/Java%20NIO%E7%B3%BB%E5%88%97(%E4%B8%80)%20-%20%E6%A6%82%E8%BF%B0/</loc>
     <lastmod>2018-05-08T02:49:46.091Z</lastmod>
     <data>
@@ -764,26 +784,6 @@
            
              
               <breadCrumb title="JAVA编程进阶系列" url="https://ostenant.coding.me/categories/JAVA%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://ostenant.coding.me/2017/12/27/Java%20NIO%E7%B3%BB%E5%88%97(%E4%B8%89)%20-%20Channel/</loc>
-    <lastmod>2018-05-08T02:49:46.091Z</lastmod>
-    <data>
-        <display>
-        <title>Java NIO系列(三) - Channel</title>
-        <pubTime>2017-12-27T07:22:00.000Z</pubTime>
-        
-        <tag>NIO</tag>
-         
-         
-           
-             
-              <breadCrumb title="Java编程进阶系列" url="https://ostenant.coding.me/categories/Java%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6%E7%B3%BB%E5%88%97/"/>
           
         </display>
     </data>
@@ -831,28 +831,6 @@
 
     
   <url>
-    <loc>https://ostenant.coding.me/2017/04/25/JVM%E7%B3%BB%E5%88%97(%E4%BA%8C)%20-%20JVM%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E5%92%8C%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E5%BC%82%E5%B8%B8%E8%AF%A6%E8%A7%A3/</loc>
-    <lastmod>2018-05-08T02:49:46.090Z</lastmod>
-    <data>
-        <display>
-        <title>JVM系列(二) - JVM内存区域和内存溢出异常详解</title>
-        <pubTime>2017-04-25T09:57:00.000Z</pubTime>
-        
-        <tag>JVM</tag>
-         
-        <tag>Java</tag>
-         
-         
-           
-             
-              <breadCrumb title="Java虚拟机系列" url="https://ostenant.coding.me/categories/Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
     <loc>https://ostenant.coding.me/2017/05/10/JVM%E7%B3%BB%E5%88%97(%E4%BA%94)%20-%20JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/</loc>
     <lastmod>2018-05-08T02:49:46.090Z</lastmod>
     <data>
@@ -882,9 +860,9 @@
         <title>JVM系列(四) - JVM GC回收算法</title>
         <pubTime>2017-05-02T10:09:00.000Z</pubTime>
         
-        <tag>JVM</tag>
-         
         <tag>Java</tag>
+         
+        <tag>JVM</tag>
          
          
            
@@ -917,6 +895,28 @@
 
     
   <url>
+    <loc>https://ostenant.coding.me/2017/04/25/JVM%E7%B3%BB%E5%88%97(%E4%BA%8C)%20-%20JVM%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E5%92%8C%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E5%BC%82%E5%B8%B8%E8%AF%A6%E8%A7%A3/</loc>
+    <lastmod>2018-05-08T02:49:46.090Z</lastmod>
+    <data>
+        <display>
+        <title>JVM系列(二) - JVM内存区域和内存溢出异常详解</title>
+        <pubTime>2017-04-25T09:57:00.000Z</pubTime>
+        
+        <tag>Java</tag>
+         
+        <tag>JVM</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java虚拟机系列" url="https://ostenant.coding.me/categories/Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://ostenant.coding.me/2017/04/28/JVM%E7%B3%BB%E5%88%97(%E4%B8%89)%20-%20JVM%E5%AF%B9%E8%B1%A1%E6%8E%A2%E7%A7%98/</loc>
     <lastmod>2018-05-08T02:49:46.089Z</lastmod>
     <data>
@@ -924,14 +924,36 @@
         <title>JVM系列(三) - JVM对象探秘</title>
         <pubTime>2017-04-28T03:22:00.000Z</pubTime>
         
-        <tag>JVM</tag>
-         
         <tag>Java</tag>
+         
+        <tag>JVM</tag>
          
          
            
              
               <breadCrumb title="JAVA虚拟机系列" url="https://ostenant.coding.me/categories/JAVA%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/04/22/JVM%E7%B3%BB%E5%88%97(%E4%B8%80)%20-%20JVM%E6%80%BB%E4%BD%93%E6%A6%82%E8%BF%B0/</loc>
+    <lastmod>2018-05-08T02:49:46.089Z</lastmod>
+    <data>
+        <display>
+        <title>JVM系列(一) - JVM总体概述</title>
+        <pubTime>2017-04-22T06:55:00.000Z</pubTime>
+        
+        <tag>Java</tag>
+         
+        <tag>JVM</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java虚拟机系列" url="https://ostenant.coding.me/categories/Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
           
         </display>
     </data>
@@ -961,21 +983,19 @@
 
     
   <url>
-    <loc>https://ostenant.coding.me/2017/04/22/JVM%E7%B3%BB%E5%88%97(%E4%B8%80)%20-%20JVM%E6%80%BB%E4%BD%93%E6%A6%82%E8%BF%B0/</loc>
-    <lastmod>2018-05-08T02:49:46.089Z</lastmod>
+    <loc>https://ostenant.coding.me/2017/04/14/ECMAScript%206%E5%85%A5%E9%97%A8%E7%AF%87(%E4%B8%80)%20-%20var,%20let,%20const%E5%91%BD%E4%BB%A4/</loc>
+    <lastmod>2018-05-08T02:49:46.088Z</lastmod>
     <data>
         <display>
-        <title>JVM系列(一) - JVM总体概述</title>
-        <pubTime>2017-04-22T06:55:00.000Z</pubTime>
+        <title>ECMAScript 6入门篇(一) - var, let, const命令</title>
+        <pubTime>2017-04-14T07:45:00.000Z</pubTime>
         
-        <tag>JVM</tag>
-         
-        <tag>Java</tag>
+        <tag>ECMAScript</tag>
          
          
            
              
-              <breadCrumb title="Java虚拟机系列" url="https://ostenant.coding.me/categories/Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
+              <breadCrumb title="ECMAScript基础系列" url="https://ostenant.coding.me/categories/ECMAScript%E5%9F%BA%E7%A1%80%E7%B3%BB%E5%88%97/"/>
           
         </display>
     </data>
@@ -1000,26 +1020,6 @@
            
              
               <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://ostenant.coding.me/2017/04/14/ECMAScript%206%E5%85%A5%E9%97%A8%E7%AF%87(%E4%B8%80)%20-%20var,%20let,%20const%E5%91%BD%E4%BB%A4/</loc>
-    <lastmod>2018-05-08T02:49:46.088Z</lastmod>
-    <data>
-        <display>
-        <title>ECMAScript 6入门篇(一) - var, let, const命令</title>
-        <pubTime>2017-04-14T07:45:00.000Z</pubTime>
-        
-        <tag>ECMAScript</tag>
-         
-         
-           
-             
-              <breadCrumb title="ECMAScript基础系列" url="https://ostenant.coding.me/categories/ECMAScript%E5%9F%BA%E7%A1%80%E7%B3%BB%E5%88%97/"/>
           
         </display>
     </data>
