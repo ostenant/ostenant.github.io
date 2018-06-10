@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="https://ostenant.coding.me/"/>
-  <updated>2018-06-10T10:35:53.463Z</updated>
+  <updated>2018-06-10T14:22:55.711Z</updated>
   <id>https://ostenant.coding.me/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>微服务的反模式和陷阱(一) - 数据驱动的迁移反模式</title>
+    <link href="https://ostenant.coding.me/2018/06/10/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%9A%84%E5%8F%8D%E6%A8%A1%E5%BC%8F%E5%92%8C%E9%99%B7%E9%98%B1(%E4%B8%80)%20-%20%E6%95%B0%E6%8D%AE%E9%A9%B1%E5%8A%A8%E7%9A%84%E8%BF%81%E7%A7%BB%E5%8F%8D%E6%A8%A1%E5%BC%8F%08/"/>
+    <id>https://ostenant.coding.me/2018/06/10/微服务的反模式和陷阱(一) - 数据驱动的迁移反模式/</id>
+    <published>2018-06-10T10:20:00.000Z</published>
+    <updated>2018-06-10T14:22:55.711Z</updated>
+    
+    <content type="html"><![CDATA[<hr><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>采用 <strong>数据驱动迁移反模式</strong> 主要发生在当你从一个 <strong>单体应用</strong> 向 <strong>微服务架构</strong> 做迁移的时候。之所以称之为反模式主要原因是，刚开始我们觉得创建微服务是一个不错的主意，<strong>服务和相应的数据</strong> 都独立成 <strong>微服务</strong>，但这可能会将你带向一个错误的道路上，导致高风险、过剩成本和额外的迁移工作。</p><a id="more"></a><h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="数据驱动的迁移反模式"><a href="#数据驱动的迁移反模式" class="headerlink" title="数据驱动的迁移反模式"></a>数据驱动的迁移反模式</h2><p>微服务会创建 <strong>大量小的</strong>、<strong>分布式的</strong>、<strong>单一用途</strong> 的服务，每个服务拥有自己的数据。这种 <strong>服务和数据耦合</strong> 支持一个 <strong>有界的上下文</strong> 和 <strong>一个无共享数据</strong> 的架构。其中，每个服务及其对应的数据是独立一块，完全独立于所有其他服务。服务只暴露了一个明确的接口（服务契约）。有界的上下文可以允许开发者以最小的依赖快速轻松地开发，测试和部署。</p><p>采用 <strong>数据驱动迁移反模式</strong> 主要发生在当你从一个 <strong>单体应用</strong> 向 <strong>微服务架构</strong> 做迁移的时候。我们之所以称之为反模式主要原因是，刚开始我们觉得创建微服务是一个不错的主意，<strong>服务和相应的数据</strong> 都独立成 <strong>微服务</strong>，但这可能会将你带向一个错误的道路上，导致高风险、过剩成本和额外的迁移工作。</p><p>单体应用迁移到微服务架构有两个主要目标：</p><ol><li><p>第一个目标是单体应用程序的 <strong>功能</strong> 分割成 <strong>小的</strong>，<strong>单一用途</strong> 的服务。</p></li><li><p>第二个目标是单体应用的 <strong>数据</strong> 迁移到每个服务自己 <strong>独占的小数据库</strong>（或独立的服务）。</p></li></ol><p>下图展示了一个典型的迁移，看起来像服务代码和相应的数据同时进行迁移。</p><p><img src="http://ols3fdyll.bkt.clouddn.com/data_driven_back_pattern.png" alt="图1-1"></p><p>上图中有三个服务是从单体应用中划分而来，并且还划分独立的三个数据库，这是一个自然演变的过程，因为在每个 <strong>服务</strong> 和 <strong>数据库</strong> 之间都使用了最为关键的 <strong>限界上下文</strong>，然而我们遇到的问题也正是基于这一过程将带领我们进入 <strong>数据迁移的反模式</strong>。</p><h3 id="1-太多的数据迁移"><a href="#1-太多的数据迁移" class="headerlink" title="1. 太多的数据迁移"></a>1. 太多的数据迁移</h3><p>这种迁移路径的主要问题是，我们很难在一次就能够划分清楚每个服务的粒度。从一个 <strong>更粗粒度</strong> 的服务开始着手，一步步的进行 <strong>细化工作</strong>，并且要多了解相关业务知识，不断的 <strong>对服务的粒度进行调整</strong>。</p><p>我们来看图 <code>1-1</code> 发现最左边的 <strong>服务粒度太粗</strong>，需要再 <strong>拆分</strong> 成二个小的服务，或者你发现左边的二个 <strong>服务粒度划分的太细</strong>，需要进行 <strong>合并</strong>。而 <strong>数据迁移</strong> 要比 <strong>源代码迁移</strong> 更复杂，更容易出错，我们最好只为数据进行一次迁移工作，因为数据迁移是一个 <strong>高风险</strong> 的工作。</p><p>我们的微服务划分也就是应用代码的迁移和数据的迁移。如图 <code>1-2</code> 所示。</p><p><img src="http://ols3fdyll.bkt.clouddn.com/data_drive_back_pattern2.png" alt="图1-2"></p><h3 id="2-功能分割优先，数据迁移最后"><a href="#2-功能分割优先，数据迁移最后" class="headerlink" title="2. 功能分割优先，数据迁移最后"></a>2. 功能分割优先，数据迁移最后</h3><p>此模式主要采用的是一种避免的手段，以 <strong>迁移服务的功能</strong> 为第一，同时也需要注意服务和数据之间的 <strong>限界上下文</strong>。我们可以通过 <strong>合并</strong> 与 <strong>拆分</strong> 的手段对服务进行调整直到满意为止，这时候就可以进行 <strong>数据迁移</strong>。</p><p>如图 <code>1-3</code> 所示，左边所有三个服务都已经进行了 <strong>迁移</strong> 和 <strong>拆分</strong>，但是所有服务仍然使用的是 <strong>同一个数据库</strong>。如果这是一个临时中间方案还可以作为一个选择，这时候我们就需要更多的了解服务如何使用，以及接受什么类型的请求数据等。</p><p><img src="http://ols3fdyll.bkt.clouddn.com/data_driven_back_pattern3.png" alt=""></p><p>在图 <code>1-3</code> 中，我们要注意最左边的服务是如何发现 <strong>粒度太粗</strong> 而 <strong>拆分</strong> 成两个服务的。服务粒度最终确定完成之后，下一步就开始 <strong>迁移数据</strong> 了，采用这种方式可以避免重复的数据迁移。</p><h2 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h2><ol><li><a href="">微服务的反模式和陷阱(一) - 数据驱动的迁移反模式</a></li><li><a href="">微服务的反模式和陷阱(二) - 超时反模式</a></li><li><a href="">微服务的反模式和陷阱(三) - 共享反模式</a></li><li><a href="">微服务的反模式和陷阱(四) - 到达报告反模式</a></li><li><a href="">微服务的反模式和陷阱(五) - 沙粒陷阱</a></li><li><a href="">微服务的反模式和陷阱(六) - 无因的开发者陷阱</a></li><li><a href="">微服务的反模式和陷阱(七) - 随大流陷阱</a></li><li><a href="">微服务的反模式和陷阱(八) - 其它架构模式</a></li><li><a href="">微服务的反模式和陷阱(九) - 静态契约陷阱</a></li><li><a href="">微服务的反模式和陷阱(十) - 通信协议使用的陷阱</a></li></ol><hr><p>欢迎关注公众号： 零壹技术栈</p><p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p><p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>]]></content>
+    
+    <summary type="html">
+    
+      &lt;hr&gt;
+&lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;采用 &lt;strong&gt;数据驱动迁移反模式&lt;/strong&gt; 主要发生在当你从一个 &lt;strong&gt;单体应用&lt;/strong&gt; 向 &lt;strong&gt;微服务架构&lt;/strong&gt; 做迁移的时候。之所以称之为反模式主要原因是，刚开始我们觉得创建微服务是一个不错的主意，&lt;strong&gt;服务和相应的数据&lt;/strong&gt; 都独立成 &lt;strong&gt;微服务&lt;/strong&gt;，但这可能会将你带向一个错误的道路上，导致高风险、过剩成本和额外的迁移工作。&lt;/p&gt;
+    
+    </summary>
+    
+      <category term="微服务系列" scheme="https://ostenant.coding.me/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%B3%BB%E5%88%97/"/>
+    
+    
+      <category term="微服务" scheme="https://ostenant.coding.me/tags/%E5%BE%AE%E6%9C%8D%E5%8A%A1/"/>
+    
+      <category term="反模式" scheme="https://ostenant.coding.me/tags/%E5%8F%8D%E6%A8%A1%E5%BC%8F/"/>
+    
+  </entry>
   
   <entry>
     <title>Docker Compose搭建MySQL主从复制集群</title>
@@ -206,11 +231,11 @@
       <category term="Spring Reactive编程系列" scheme="https://ostenant.coding.me/categories/Spring-Reactive%E7%BC%96%E7%A8%8B%E7%B3%BB%E5%88%97/"/>
     
     
-      <category term="Reactor" scheme="https://ostenant.coding.me/tags/Reactor/"/>
-    
       <category term="Reactive Streams" scheme="https://ostenant.coding.me/tags/Reactive-Streams/"/>
     
       <category term="Spring WebFlux" scheme="https://ostenant.coding.me/tags/Spring-WebFlux/"/>
+    
+      <category term="Reactor" scheme="https://ostenant.coding.me/tags/Reactor/"/>
     
   </entry>
   
@@ -495,31 +520,6 @@
       <category term="分布式" scheme="https://ostenant.coding.me/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
     
       <category term="BASE" scheme="https://ostenant.coding.me/tags/BASE/"/>
-    
-  </entry>
-  
-  <entry>
-    <title>分布式理论(一) - CAP定理</title>
-    <link href="https://ostenant.coding.me/2018/04/23/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA(%E4%B8%80)%20-%20CAP%E5%AE%9A%E7%90%86/"/>
-    <id>https://ostenant.coding.me/2018/04/23/分布式理论(一) - CAP定理/</id>
-    <published>2018-04-23T12:33:00.000Z</published>
-    <updated>2018-05-08T02:49:46.094Z</updated>
-    
-    <content type="html"><![CDATA[<hr><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>CAP原则又称CAP定理，指的是在一个分布式系统中，Consistency（一致性）、 Availability（可用性）、Partition tolerance（分区容错性）这三个基本需求，最多只能同时满足其中的2个。</p><a id="more"></a><p><img src="http://ols3fdyll.bkt.clouddn.com/CAP.png" alt=""></p><h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="1-CAP原则简介"><a href="#1-CAP原则简介" class="headerlink" title="1. CAP原则简介"></a>1. CAP原则简介</h2><table><thead><tr><th style="text-align:left">选项</th><th style="text-align:left">描述</th></tr></thead><tbody><tr><td style="text-align:left">Consistency（一致性）</td><td style="text-align:left">指数据在多个副本之间能够保持一致的特性（严格的一致性）</td></tr><tr><td style="text-align:left">Availability（可用性）</td><td style="text-align:left">指系统提供的服务必须一直处于可用的状态，每次请求都能获取到非错的响应（不保证获取的数据为最新数据）</td></tr><tr><td style="text-align:left">Partition tolerance（分区容错性）</td><td style="text-align:left">分布式系统在遇到任何网络分区故障的时候，仍然能够对外提供满足一致性和可用性的服务，除非整个网络环境都发生了故障</td></tr></tbody></table><p><strong>什么是分区？</strong></p><blockquote><p>在分布式系统中，不同的节点分布在不同的子网络中，由于一些特殊的原因，这些子节点之间出现了网络不通的状态，但他们的内部子网络是正常的。从而导致了整个系统的环境被切分成了若干个孤立的区域，这就是分区。</p></blockquote><h2 id="2-CAP原则论证"><a href="#2-CAP原则论证" class="headerlink" title="2. CAP原则论证"></a>2. CAP原则论证</h2><p>如图所示，是我们证明CAP的基本场景，网络中有两个节点N1和N2，可以简单的理解N1和N2分别是两台计算机，他们之间网络可以连通，N1中有一个应用程序A，和一个数据库V，N2也有一个应用程序B和一个数据库V。现在，A和B是分布式系统的两个部分，V是分布式系统的数据存储的两个子数据库。</p><p><img src="http://ols3fdyll.bkt.clouddn.com/CAP_prove.png" alt=""></p><ul><li>在满足一致性的时候，N1和N2中的数据是一样的，V0=V0。</li><li>在满足可用性的时候，用户不管是请求N1或者N2，都会得到立即响应。</li><li>在满足分区容错性的情况下，N1和N2有任何一方宕机，或者网络不通的时候，都不会影响N1和N2彼此之间的正常运作。</li></ul><p>如图所示，这是分布式系统正常运转的流程，用户向N1机器请求数据更新，程序A更新数据库V0为V1。分布式系统将数据进行同步操作M，将V1同步的N2中V0，使得N2中的数据V0也更新为V1，N2中的数据再响应N2的请求。</p><p><img src="http://ols3fdyll.bkt.clouddn.com/CAP_prove2.png" alt=""></p><p>根据CAP原则定义，系统的一致性、可用性和分区容错性细分如下：</p><ul><li>一致性：N1和N2的数据库V之间的数据是否完全一样。</li><li>可用性：N1和N2的对外部的请求能否做出正常的响应。</li><li>分区容错性：N1和N2之间的网络是否互通。</li></ul><p>这是正常运作的场景，也是理想的场景。作为一个分布式系统，它和单机系统的最大区别，就在于网络。现在假设一种极端情况，N1和N2之间的网络断开了，我们要支持这种网络异常。相当于要满足分区容错性，能不能同时满足一致性和可用性呢？还是说要对他们进行取舍？</p><p><img src="http://ols3fdyll.bkt.clouddn.com/CAP_prove3.png" alt=""></p><p>假设在N1和N2之间网络断开的时候，有用户向N1发送数据更新请求，那N1中的数据V0将被更新为V1。由于网络是断开的，所以分布式系统同步操作M，所以N2中的数据依旧是V0。这个时候，有用户向N2发送数据读取请求，由于数据还没有进行同步，应用程序没办法立即给用户返回最新的数据V1，怎么办呢？</p><p>这里有两种选择：</p><ul><li>第一：牺牲数据一致性，保证可用性。响应旧的数据V0给用户。</li><li>第二：牺牲可用性，保证数据一致性。阻塞等待，直到网络连接恢复，数据更新操作M完成之后，再给用户响应最新的数据V1。</li></ul><p>这个过程，证明了要满足分区容错性的分布式系统，只能在一致性和可用性两者中，选择其中一个。</p><h2 id="3-CAP原则权衡"><a href="#3-CAP原则权衡" class="headerlink" title="3. CAP原则权衡"></a>3. CAP原则权衡</h2><p>通过CAP理论，我们知道无法同时满足一致性、可用性和分区容错性这三个特性，那要舍弃哪个呢？</p><h3 id="3-1-CA-without-P"><a href="#3-1-CA-without-P" class="headerlink" title="3.1. CA without P"></a>3.1. CA without P</h3><p>如果不要求P（不允许分区），则C（强一致性）和A（可用性）是可以保证的。但其实分区不是你想不想的问题，而是始终会存在，因此CA的系统更多的是允许分区后各子系统依然保持CA。</p><h3 id="3-2-CP-without-A"><a href="#3-2-CP-without-A" class="headerlink" title="3.2. CP without A"></a>3.2. CP without A</h3><p>如果不要求A（可用），相当于每个请求都需要在Server之间强一致，而P（分区）会导致同步时间无限延长，如此CP也是可以保证的。很多传统的数据库分布式事务都属于这种模式。</p><h3 id="3-3-AP-wihtout-C"><a href="#3-3-AP-wihtout-C" class="headerlink" title="3.3. AP wihtout C"></a>3.3. AP wihtout C</h3><p>要高可用并允许分区，则需放弃一致性。一旦分区发生，节点之间可能会失去联系，为了高可用，每个节点只能用本地数据提供服务，而这样会导致全局数据的不一致性。现在众多的NoSQL都属于此类。</p><h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>对于多数大型互联网应用的场景，主机众多、部署分散。而且现在的集群规模越来越大，所以节点故障、网络故障是常态。这种应用一般要保证服务可用性达到N个9，即保证P和A，只有舍弃C（退而求其次保证最终一致性）。虽然某些地方会影响客户体验，但没达到造成用户流程的严重程度。</p><p>对于涉及到钱财这样不能有一丝让步的场景，C必须保证。网络发生故障宁可停止服务，这是保证CA，舍弃P。貌似这几年国内银行业发生了不下10起事故，但影响面不大，报到也不多，广大群众知道的少。还有一种是保证CP，舍弃A，例如网络故障时只读不写。</p><p>孰优孰劣，没有定论，只能根据场景定夺，适合的才是最好的。</p><hr><p>欢迎扫码关注公众号： 零壹技术栈</p><p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p><p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>]]></content>
-    
-    <summary type="html">
-    
-      &lt;hr&gt;
-&lt;h1 id=&quot;前言&quot;&gt;&lt;a href=&quot;#前言&quot; class=&quot;headerlink&quot; title=&quot;前言&quot;&gt;&lt;/a&gt;前言&lt;/h1&gt;&lt;p&gt;CAP原则又称CAP定理，指的是在一个分布式系统中，Consistency（一致性）、 Availability（可用性）、Partition tolerance（分区容错性）这三个基本需求，最多只能同时满足其中的2个。&lt;/p&gt;
-    
-    </summary>
-    
-      <category term="分布式系列" scheme="https://ostenant.coding.me/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
-    
-    
-      <category term="分布式" scheme="https://ostenant.coding.me/tags/%E5%88%86%E5%B8%83%E5%BC%8F/"/>
-    
-      <category term="CAP" scheme="https://ostenant.coding.me/tags/CAP/"/>
     
   </entry>
   
