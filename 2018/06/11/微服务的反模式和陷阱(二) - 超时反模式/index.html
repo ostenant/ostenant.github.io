@@ -3,24 +3,25 @@
 <head>
     <meta charset="utf-8">
     
-    <title>TCP协议简介 | Harrison&#39;s Blog</title>
+    <title>微服务的反模式和陷阱(二) - 超时反模式 | Harrison&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="前言TCP（Transmission Control Protocol 传输控制协议）是一种面向连接的、可靠的、基于字节流的传输层通信协议。">
-<meta name="keywords" content="TCP">
+    <meta name="description" content="前言分布式应用的挑战之一就是如何管理 远程服务 的 可用性 和它们的 响应。虽然服务可用性和服务响应都涉及到服务的通信，但它们是两个完全不同的东西。服务可用性 是服务消费者 连接服务 并能够 发送请求 的能力，服务响应 则关注服务的 响应时间。这里就涉及微服务中的 超时反模式。">
+<meta name="keywords" content="微服务,反模式">
 <meta property="og:type" content="article">
-<meta property="og:title" content="TCP协议简介">
-<meta property="og:url" content="https://ostenant.coding.me/2017/02/25/TCP协议简介/index.html">
+<meta property="og:title" content="微服务的反模式和陷阱(二) - 超时反模式">
+<meta property="og:url" content="https://ostenant.coding.me/2018/06/11/微服务的反模式和陷阱(二) - 超时反模式/index.html">
 <meta property="og:site_name" content="Harrison&#39;s Blog">
-<meta property="og:description" content="前言TCP（Transmission Control Protocol 传输控制协议）是一种面向连接的、可靠的、基于字节流的传输层通信协议。">
+<meta property="og:description" content="前言分布式应用的挑战之一就是如何管理 远程服务 的 可用性 和它们的 响应。虽然服务可用性和服务响应都涉及到服务的通信，但它们是两个完全不同的东西。服务可用性 是服务消费者 连接服务 并能够 发送请求 的能力，服务响应 则关注服务的 响应时间。这里就涉及微服务中的 超时反模式。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/tcp-connection-made-three-way-handshake.png">
-<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/tcp-connection-closed-four-way-handshake.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Timeout1.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Micro_Service_timeout2.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Micro_Service_timeout3.png">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-05-08T02:49:46.092Z">
+<meta property="og:updated_time" content="2018-06-11T13:31:46.758Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="TCP协议简介">
-<meta name="twitter:description" content="前言TCP（Transmission Control Protocol 传输控制协议）是一种面向连接的、可靠的、基于字节流的传输层通信协议。">
-<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/tcp-connection-made-three-way-handshake.png">
+<meta name="twitter:title" content="微服务的反模式和陷阱(二) - 超时反模式">
+<meta name="twitter:description" content="前言分布式应用的挑战之一就是如何管理 远程服务 的 可用性 和它们的 响应。虽然服务可用性和服务响应都涉及到服务的通信，但它们是两个完全不同的东西。服务可用性 是服务消费者 连接服务 并能够 发送请求 的能力，服务响应 则关注服务的 响应时间。这里就涉及微服务中的 超时反模式。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Timeout1.png">
     
 
     
@@ -238,7 +239,7 @@ ga('send', 'pageview');
 </aside>
 
             
-            <section id="main"><article id="post-TCP协议简介" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-微服务的反模式和陷阱(二) - 超时反模式" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -246,7 +247,7 @@ ga('send', 'pageview');
                 
     
         <h1 class="article-title" itemprop="name">
-            TCP协议简介
+            微服务的反模式和陷阱(二) - 超时反模式
         </h1>
     
 
@@ -255,8 +256,8 @@ ga('send', 'pageview');
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2017/02/25/TCP协议简介/">
-            <time datetime="2017-02-25T03:59:00.000Z" itemprop="datePublished">2017-02-25</time>
+        <a href="/2018/06/11/微服务的反模式和陷阱(二) - 超时反模式/">
+            <time datetime="2018-06-11T11:40:00.000Z" itemprop="datePublished">2018-06-11</time>
         </a>
     </div>
 
@@ -264,13 +265,13 @@ ga('send', 'pageview');
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/网络协议系列/">网络协议系列</a>
+        <a class="article-category-link" href="/categories/微服务系列/">微服务系列</a>
     </div>
 
                         
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/TCP/">TCP</a>
+        <a class="tag-link" href="/tags/反模式/">反模式</a>, <a class="tag-link" href="/tags/微服务/">微服务</a>
     </div>
 
                     </div>
@@ -282,41 +283,39 @@ ga('send', 'pageview');
         
             
             <hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>TCP（Transmission Control Protocol 传输控制协议）是一种面向连接的、可靠的、基于字节流的传输层通信协议。</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>分布式应用的挑战之一就是如何管理 <strong>远程服务</strong> 的 <strong>可用性</strong> 和它们的 <strong>响应</strong>。虽然服务可用性和服务响应都涉及到服务的通信，但它们是两个完全不同的东西。<strong>服务可用性</strong> 是服务消费者 <strong>连接服务</strong> 并能够 <strong>发送请求</strong> 的能力，<strong>服务响应</strong> 则关注服务的 <strong>响应时间</strong>。这里就涉及微服务中的 <strong>超时反模式</strong>。</p>
 <a id="more"></a>
-<h2 id="TCP的特性"><a href="#TCP的特性" class="headerlink" title="TCP的特性"></a>TCP的特性</h2><ul>
-<li>TCP提供一种<strong>面向连接的</strong>, <strong>可靠的</strong>字节流服务;</li>
-<li>在一个TCP连接中，仅有两方进行彼此通信。广播和多播不能用于TCP;</li>
-<li>TCP使用<strong>校验和</strong>, <strong>确认和重传机制</strong>来保证可靠传输;</li>
-<li>TCP使用累积确认</li>
-<li>TCP使用<strong>滑动窗口机制</strong>来实现流量控制，通过动态改变窗口的大小进行拥塞控制</li>
-</ul>
-<h2 id="TCP三次握手与四次挥手"><a href="#TCP三次握手与四次挥手" class="headerlink" title="TCP三次握手与四次挥手"></a>TCP三次握手与四次挥手</h2><h3 id="三次握手"><a href="#三次握手" class="headerlink" title="三次握手"></a>三次握手</h3><ul>
-<li><p>所谓<strong>三次握手</strong>(Three-way Handshake)，是指建立一个 TCP 连接时，需要客户端和服务器总共发送3个包。</p>
-<p>三次握手的目的是连接服务器指定端口，建立 TCP 连接，并同步连接双方的<strong>序列号</strong>和<strong>确认号</strong>，交换 TCP 窗口大小信息。在Socket 编程中，客户端执行 <code>connect()</code> 时。将触发三次握手。</p>
-</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">1. 第一次握手(SYN=1, seq=x);</span><br><span class="line"></span><br><span class="line">  - 客户端发送一个 TCP 的 SYN 标志位置1的包, 指明客户端打算连接的服务器的端口，以及初始序号 X, 保存在包头的序列号(Sequence Number)字段里。</span><br><span class="line"></span><br><span class="line">  - 发送完毕后，客户端进入 `SYN_SEND` 状态。</span><br><span class="line"></span><br><span class="line">2. 第二次握手(SYN=1, ACK=1, seq=y, ACKnum=x+1);</span><br><span class="line"></span><br><span class="line">  - 服务器发回确认包(ACK)应答。即 SYN 标志位和 ACK 标志位均为1。服务器端选择自己 ISN 序列号, 放到 Seq 域里, 同时将确认序号(Acknowledgement Number)设置为客户端的 ISN 加1, 即x+1。</span><br><span class="line"></span><br><span class="line">  - 发送完毕后，服务器端进入 `SYN_RCVD` 状态。</span><br><span class="line"></span><br><span class="line">3. 第三次握手(ACK=1，ACKnum=y+1)</span><br><span class="line"></span><br><span class="line">  - 客户端再次发送确认包(ACK), SYN 标志位为0, ACK 标志位为1, 并且把服务器发来 ACK 的序号字段+1, 放在确定字段中发送给对方, 并且在数据段放写ISN的+1</span><br><span class="line"></span><br><span class="line">  - 发送完毕后，客户端进入 `ESTABLISHED` 状态，当服务器端接收到这个包时，也进入 `ESTABLISHED` 状态，TCP 握手结束。</span><br></pre></td></tr></table></figure>
-<p>三次握手的过程的示意图如下：</p>
-<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/tcp-connection-made-three-way-handshake.png" alt=""></p>
-<h3 id="四次挥手"><a href="#四次挥手" class="headerlink" title="四次挥手"></a>四次挥手</h3><p>TCP的连接的拆除需要发送四个包，因此称为<strong>四次挥手</strong>(Four-way handshake)，也叫做改进的三次握手。客户端或服务器均可主动发起挥手动作，在 socket 编程中，任何一方执行 <code>close()</code> 操作即可产生挥手操作。</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">1. 第一次挥手(FIN=1, seq=x);</span><br><span class="line"></span><br><span class="line">  - 假设客户端想要关闭连接，客户端发送一个 FIN 标志位置为1的包, 表示自己已经没有数据可以发送了, 但是仍然可以接受数据。</span><br><span class="line"></span><br><span class="line">  - 发送完毕后，客户端进入 `FIN_WAIT_1` 状态。</span><br><span class="line"></span><br><span class="line">2. 第二次挥手(ACK=1, ACKnum=x+1);</span><br><span class="line"></span><br><span class="line">  - 服务器端确认客户端的 FIN 包，发送一个确认包, 表明自己接受到了客户端关闭连接的请求，但还没有准备好关闭连接。</span><br><span class="line"></span><br><span class="line">  - 发送完毕后，服务器端进入 `CLOSE_WAIT` 状态, 客户端接收到这个确认包之后，进入 `FIN_WAIT_2` 状态, 等待服务器端关闭连接。</span><br><span class="line"></span><br><span class="line">3. 第三次挥手(FIN=1, seq=y);</span><br><span class="line"></span><br><span class="line">  - 服务器端准备好关闭连接时, 向客户端发送结束连接请求, `FIN` 置为1。</span><br><span class="line"></span><br><span class="line">  - 发送完毕后, 服务器端进入 `LAST_ACK` 状态, 等待来自客户端的最后一个ACK。</span><br><span class="line"></span><br><span class="line">4. 第四次挥手(ACK=1，ACKnum=y+1)</span><br><span class="line"></span><br><span class="line">  - 客户端接收到来自服务器端的关闭请求, 发送一个确认包, 并进入 `TIME_WAIT` 状态, 等待可能出现的要求重传的 ACK 包。</span><br><span class="line"></span><br><span class="line">  - 服务器端接收到这个确认包之后, 关闭连接, 进入 `CLOSED` 状态。</span><br><span class="line"></span><br><span class="line">  - 客户端等待了某个固定时间（两个最大段生命周期, 2MSL, 2 Maximum Segment Lifetime）之后, 没有收到服务器端的 ACK, 认为服务器端已经正常关闭连接, 于是自己也关闭连接, 进入 `CLOSED` 状态。</span><br></pre></td></tr></table></figure>
-<p>四次挥手的示意图如下：</p>
-<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/tcp-connection-closed-four-way-handshake.png" alt=""></p>
-<h2 id="SYN攻击"><a href="#SYN攻击" class="headerlink" title="SYN攻击"></a>SYN攻击</h2><ul>
-<li>什么是 SYN 攻击（SYN Flood）？</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">在三次握手过程中，服务器发送 SYN-ACK 之后，收到客户端的 ACK 之前的 TCP 连接称为半连接(half-open connect)。此时服务器处于 SYN_RCVD 状态。当收到 ACK 后，服务器才能转入 ESTABLISHED 状态.</span><br><span class="line"></span><br><span class="line">SYN 攻击指的是，攻击客户端在短时间内伪造大量不存在的IP地址，向服务器不断地发送SYN包，服务器回复确认包，并等待客户的确认。由于源地址是不存在的，服务器需要不断的重发直至超时，这些伪造的SYN包将长时间占用未连接队列，正常的SYN请求被丢弃，导致目标系统运行缓慢，严重者会引起网络堵塞甚至系统瘫痪。</span><br><span class="line"></span><br><span class="line">SYN 攻击是一种典型的 DoS/DDoS 攻击。</span><br></pre></td></tr></table></figure>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="超时反模式"><a href="#超时反模式" class="headerlink" title="超时反模式"></a>超时反模式</h2><p>微服务是一种 <strong>分布式的架构</strong>，它所有的组件（也就是服务）会被部署为单独的应用程序，并通过某种 <strong>远程访问协议</strong> 进行通讯。分布式应用的挑战之一就是如何管理 <strong>远程服务</strong> 的 <strong>可用性</strong> 和它们的 <strong>响应</strong>。虽然服务可用性和服务响应都涉及到服务的通信，但它们是两个完全不同的东西。<strong>服务可用性</strong> 是服务消费者 <strong>连接服务</strong> 并能够 <strong>发送请求</strong> 的能力，<strong>服务响应</strong> 则关注服务的 <strong>响应时间</strong>。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Timeout1.png" alt="图1-1"></p>
+<p>如图 <code>1-1</code> 的所示，如果此时服务消费者 <strong>无法连接</strong> 到服务提供者的时候，通过会在毫秒级的时间里得到通知和反馈。这时候 <strong>服务消费者</strong> 可以选择是 <strong>直接返回错误信息</strong> 还是 <strong>进行重试</strong>。但是如果服务提供者接收了请求却 <strong>不进行响应</strong> 该怎么办？在这种情况下服务消费者可以选择 <strong>无限期等待</strong> 或者 <strong>设置超时时间</strong>，使用超时时间看起来是个好办法，但是它会导致 <strong>超时反模式</strong>。</p>
+<h3 id="1-使用超时"><a href="#1-使用超时" class="headerlink" title="1. 使用超时"></a>1. 使用超时</h3><p>你可能感觉非常困惑，难道设置一个超时时间不是一件好事吗？在大部分的情况下超时时间的错误设置都会带来问题。比如当你上网购物的时候，你提交了订单，服务一直在处理没有返回，你在超时的时候再提交订单，显然服务器需要更复杂的逻辑来处理重复提交订单的问题。</p>
+<p>那么超时时间设置多少合适呢？</p>
 <ul>
-<li>如何检测 SYN 攻击？</li>
+<li>第一种是基于 <strong>数据库的超时</strong> 来计算服务的超时时间。</li>
+<li>第二种是计算 <strong>负载下最长的处理时间</strong>，把它乘以 <code>2</code> 作为 <strong>超时时间</strong>。</li>
 </ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">检测 SYN 攻击非常的方便，当你在服务器上看到大量的半连接状态时，特别是源IP地址是随机的，基本上可以断定这是一次SYN攻击。在 Linux/Unix 上可以使用系统自带的 netstats 命令来检测 SYN 攻击。</span><br></pre></td></tr></table></figure>
-<ul>
-<li>如何防御 SYN 攻击？</li>
-</ul>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">SYN攻击不能完全被阻止，除非将TCP协议重新设计。我们所做的是尽可能的减轻SYN攻击的危害，常见的防御 SYN 攻击的方法有如下几种：</span><br><span class="line"></span><br><span class="line"> - 缩短超时（SYN Timeout）时间</span><br><span class="line"> - 增加最大半连接数</span><br><span class="line"> - 过滤网关防护</span><br><span class="line"> - SYN cookies技术</span><br></pre></td></tr></table></figure>
+<p>在图 <code>2-2</code> 中，通常的情况下 <strong>平均响应时间</strong> 是 <code>2</code> 秒，在 <strong>高并发</strong> 的情况下 <strong>最长时间</strong> 是 <code>5</code> 秒，因为可以使用加倍技术服务的超时时间设置为 <code>10</code> 秒。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Micro_Service_timeout2.png" alt="图1-2"></p>
+<p>图 <code>1-2</code> 的解决方案似乎看起来很完美，它使每一个服务消费者必须等待 <code>10</code> 秒，其实只是为了 <strong>判断服务没有响应</strong>。在大多数情况下，用户在等待提交按钮或放弃和关闭屏幕之前不会等待超过 <code>2</code> 到 <code>3</code> 秒。那就必须要有更好的办法来解决。</p>
+<h2 id="2-使用断路器模式"><a href="#2-使用断路器模式" class="headerlink" title="2. 使用断路器模式"></a>2. 使用断路器模式</h2><p>与上面 <strong>超时</strong> 的方法相比，使用 <strong>断路器</strong> 的方式更为稳妥。这种设计模式就像家里的电器的保险丝一样，当负载过大，或者电路发生故障或异常时，电流会不断升高，为防止升高的电流有可能损坏电路中的某些重要器件或贵重器件，烧毁电路甚至造成火灾。保险丝会在电流异常升高到一定的高度和热度的时候，自身熔断切断电流，从而起到保护电路安全运行的作用。</p>
+<p>图 <code>1-3</code> 说明了 <strong>断路器模式</strong> 是如何工作的。当服务保持响应时，断路器将关闭，允许通过请求。如果远程服务突然变得不能响应，断路器就会打开，从而阻止请求通过，直到服务再次响应。当然这并不像你家中的保险丝，<strong>断路器</strong> 本身可以 <strong>持续监测服务</strong>。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Micro_Service_timeout3.png" alt="图1-3"></p>
+<p><strong>断路器模式</strong> 相比 <strong>设置超时</strong> 的优点是，使用者可以 <strong>立即</strong> 知道服务已变得不响应，而不必等待超时，使用者将在 <strong>毫秒内</strong> 服务不响应，而不是等待 <code>10</code> 秒获得相同的信息。</p>
+<p>另外断路器可以通过几种方式进行 <strong>监控</strong>。最简单的方法是 <strong>对远程服务</strong> 进行简单的 <strong>心跳检查</strong>，这种方式只是告诉断路器服务是活的，但是要想获取服务存活的详细信息，就需要 <strong>定期</strong>（比如 <code>10</code> 秒）获取一次服务的详细信息。还有一种方式是 <strong>实时用户监控</strong>，这种方式可以 <strong>动态调整</strong>，一旦达到 <strong>阈值</strong>，断路器可以进入 <strong>半开放状态</strong>，可以设置 <strong>一定数量的请求是通过</strong>（说 <code>10</code> 个请求中有 <code>8</code> 个通过）。</p>
+<h2 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h2><ol>
+<li><a href="">微服务的反模式和陷阱(一) - 数据驱动的迁移反模式</a></li>
+<li><a href="">微服务的反模式和陷阱(二) - 超时反模式</a></li>
+<li><a href="">微服务的反模式和陷阱(三) - 共享反模式</a></li>
+<li><a href="">微服务的反模式和陷阱(四) - 到达报告反模式</a></li>
+<li><a href="">微服务的反模式和陷阱(五) - 沙粒陷阱</a></li>
+<li><a href="">微服务的反模式和陷阱(六) - 无因的开发者陷阱</a></li>
+<li><a href="">微服务的反模式和陷阱(七) - 随大流陷阱</a></li>
+<li><a href="">微服务的反模式和陷阱(八) - 其它架构模式</a></li>
+<li><a href="">微服务的反模式和陷阱(九) - 静态契约陷阱</a></li>
+<li><a href="">微服务的反模式和陷阱(十) - 通信协议使用的陷阱</a></li>
+</ol>
 <hr>
-<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
+<p>欢迎关注公众号： <strong>零壹技术栈</strong></p>
 <p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
 <p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
 
@@ -384,7 +383,7 @@ ga('send', 'pageview');
 
             
     
-        <a href="https://ostenant.coding.me/2017/02/25/TCP协议简介/#comments" class="article-comment-link">评论</a>
+        <a href="https://ostenant.coding.me/2018/06/11/微服务的反模式和陷阱(二) - 超时反模式/#comments" class="article-comment-link">评论</a>
     
 
         </footer>
@@ -393,19 +392,10 @@ ga('send', 'pageview');
         
 <nav id="article-nav">
     
-        <a href="/2017/02/25/HTTP协议详解/" id="article-nav-newer" class="article-nav-link-wrap">
-            <strong class="article-nav-caption">上一篇</strong>
-            <div class="article-nav-title">
-                
-                    HTTP协议详解
-                
-            </div>
-        </a>
     
-    
-        <a href="/2017/02/23/WebSocket协议入门简介/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2018/06/10/微服务的反模式和陷阱(一) - 数据驱动的迁移反模式/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">下一篇</strong>
-            <div class="article-nav-title">WebSocket协议入门简介</div>
+            <div class="article-nav-title">微服务的反模式和陷阱(一) - 数据驱动的迁移反模式</div>
         </a>
     
 </nav>
