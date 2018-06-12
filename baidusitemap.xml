@@ -1,1 +1,1173 @@
-PzNbZXZJGn
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/06/12/%E5%AE%9E%E6%88%98Spring%20Boot%202.0%E7%B3%BB%E5%88%97(%E4%B8%80)%20-%20%E4%BD%BF%E7%94%A8Gradle%E6%9E%84%E5%BB%BADocker%E9%95%9C%E5%83%8F/</loc>
+    <lastmod>2018-06-12T14:07:13.616Z</lastmod>
+    <data>
+        <display>
+        <title>实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像</title>
+        <pubTime>2018-06-12T11:35:00.000Z</pubTime>
+        
+        <tag>Docker</tag>
+         
+        <tag>Spring Boot 2.0</tag>
+         
+        <tag>Gradle</tag>
+         
+         
+           
+             
+              <breadCrumb title="实战Spring Boot 2.0系列" url="https://ostenant.coding.me/categories/%E5%AE%9E%E6%88%98Spring-Boot-2-0%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/06/11/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%9A%84%E5%8F%8D%E6%A8%A1%E5%BC%8F%E5%92%8C%E9%99%B7%E9%98%B1(%E4%BA%8C)%20-%20%E8%B6%85%E6%97%B6%E5%8F%8D%E6%A8%A1%E5%BC%8F/</loc>
+    <lastmod>2018-06-11T13:31:46.758Z</lastmod>
+    <data>
+        <display>
+        <title>微服务的反模式和陷阱(二) - 超时反模式</title>
+        <pubTime>2018-06-11T11:40:00.000Z</pubTime>
+        
+        <tag>微服务</tag>
+         
+        <tag>反模式</tag>
+         
+         
+           
+             
+              <breadCrumb title="微服务系列" url="https://ostenant.coding.me/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/06/10/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%9A%84%E5%8F%8D%E6%A8%A1%E5%BC%8F%E5%92%8C%E9%99%B7%E9%98%B1(%E4%B8%80)%20-%20%E6%95%B0%E6%8D%AE%E9%A9%B1%E5%8A%A8%E7%9A%84%E8%BF%81%E7%A7%BB%E5%8F%8D%E6%A8%A1%E5%BC%8F%08/</loc>
+    <lastmod>2018-06-10T14:38:34.255Z</lastmod>
+    <data>
+        <display>
+        <title>微服务的反模式和陷阱(一) - 数据驱动的迁移反模式</title>
+        <pubTime>2018-06-10T10:20:00.000Z</pubTime>
+        
+        <tag>微服务</tag>
+         
+        <tag>反模式</tag>
+         
+         
+           
+             
+              <breadCrumb title="微服务系列" url="https://ostenant.coding.me/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/09/%E8%9A%82%E8%9A%81%E9%87%91%E6%9C%8DSOFA-Boot%E6%95%B4%E5%90%88SOFA-RPC(%E4%B8%AD%E7%AF%87)/</loc>
+    <lastmod>2018-06-10T10:36:56.601Z</lastmod>
+    <data>
+        <display>
+        <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)</title>
+        <pubTime>2018-05-09T07:08:00.000Z</pubTime>
+        
+        <tag>RPC</tag>
+         
+        <tag>SOFA-RPC</tag>
+         
+        <tag>SOFA-Boot</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/12/%E8%9A%82%E8%9A%81%E9%87%91%E6%9C%8DSOFA-Boot%E6%95%B4%E5%90%88SOFA-RPC(%E4%B8%8B%E7%AF%87)/</loc>
+    <lastmod>2018-06-10T10:36:51.271Z</lastmod>
+    <data>
+        <display>
+        <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)</title>
+        <pubTime>2018-05-12T12:12:00.000Z</pubTime>
+        
+        <tag>RPC</tag>
+         
+        <tag>SOFA-RPC</tag>
+         
+        <tag>SOFA-Boot</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/06/10/Docker%20Compose%E6%90%AD%E5%BB%BAMySQL%E4%B8%BB%E4%BB%8E%E9%9B%86%E7%BE%A4/</loc>
+    <lastmod>2018-06-10T10:35:53.463Z</lastmod>
+    <data>
+        <display>
+        <title>Docker Compose搭建MySQL主从复制集群</title>
+        <pubTime>2018-06-10T02:33:00.000Z</pubTime>
+        
+        <tag>Docker</tag>
+         
+        <tag>Docker Compose</tag>
+         
+        <tag>MySQL</tag>
+         
+        <tag>主从复制</tag>
+         
+         
+           
+             
+              <breadCrumb title="MySQL学习系列" url="https://ostenant.coding.me/categories/MySQL%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/30/2018%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%9E%B6%E6%9E%84%E5%B8%88%E6%8A%80%E6%9C%AF%E5%9B%BE%E8%B0%B1/</loc>
+    <lastmod>2018-06-10T02:32:19.638Z</lastmod>
+    <data>
+        <display>
+        <title>2018服务端架构师技术图谱</title>
+        <pubTime>2018-05-30T14:46:00.000Z</pubTime>
+        
+         
+           
+             
+              <breadCrumb title="技术知识图谱" url="https://ostenant.coding.me/categories/%E6%8A%80%E6%9C%AF%E7%9F%A5%E8%AF%86%E5%9B%BE%E8%B0%B1/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/06/09/%E5%B9%B6%E5%8F%91%E4%B8%89%E5%89%91%E5%AE%A2%E4%B9%8B%E9%99%90%E6%B5%81%E6%96%B9%E6%A1%88%E6%80%BB%E7%BB%93/</loc>
+    <lastmod>2018-06-09T03:01:43.445Z</lastmod>
+    <data>
+        <display>
+        <title>并发三剑客之限流方案总结</title>
+        <pubTime>2018-06-09T00:20:00.000Z</pubTime>
+        
+        <tag>高并发</tag>
+         
+        <tag>限流</tag>
+         
+         
+           
+             
+              <breadCrumb title="高并发系统系列" url="https://ostenant.coding.me/categories/%E9%AB%98%E5%B9%B6%E5%8F%91%E7%B3%BB%E7%BB%9F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+    
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/27/%E5%AE%9E%E6%88%98Spring%20Boot%202.0%20Reactive%E7%BC%96%E7%A8%8B%E7%B3%BB%E5%88%97(%E4%B8%80)%20-%20WebFlux%E5%88%9D%E4%BD%93%E9%AA%8C/</loc>
+    <lastmod>2018-06-07T07:21:55.038Z</lastmod>
+    <data>
+        <display>
+        <title>实战Spring Boot 2.0 Reactive编程系列(一) - WebFlux初体验</title>
+        <pubTime>2018-05-27T07:25:00.000Z</pubTime>
+        
+        <tag>Spring Boot 2.0</tag>
+         
+        <tag>Reactive Streams</tag>
+         
+        <tag>Spring WebFlux</tag>
+         
+         
+           
+             
+              <breadCrumb title="Spring Reactive编程系列" url="https://ostenant.coding.me/categories/Spring-Reactive%E7%BC%96%E7%A8%8B%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+    
+    
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/31/%E5%8D%95%E5%85%83%E6%B5%8B%E8%AF%95%08%E5%88%A9%E5%99%A8Mockito%E6%A1%86%E6%9E%B6/</loc>
+    <lastmod>2018-06-06T06:04:00.431Z</lastmod>
+    <data>
+        <display>
+        <title>单元测试利器Mockito框架</title>
+        <pubTime>2018-05-31T15:30:00.000Z</pubTime>
+        
+        <tag>Mockito</tag>
+         
+         
+           
+             
+              <breadCrumb title="测试框架系列" url="https://ostenant.coding.me/categories/%E6%B5%8B%E8%AF%95%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/12/21/%E4%B8%80%E5%A4%A9%E4%B8%80%E4%B8%AA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F(%E5%9B%9B)%20-%20%E5%8E%9F%E5%9E%8B%E6%A8%A1%E5%BC%8F(Prototype)/</loc>
+    <lastmod>2018-06-06T06:03:28.655Z</lastmod>
+    <data>
+        <display>
+        <title>一天一个设计模式(四) - 原型模式(Prototype)</title>
+        <pubTime>2017-12-21T08:22:00.000Z</pubTime>
+        
+        <tag>Prototype</tag>
+         
+         
+           
+             
+              <breadCrumb title="JAVA设计模式系列" url="https://ostenant.coding.me/categories/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/06/05/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA(%E5%85%AD)%20-%20%E4%B8%80%E8%87%B4%E6%80%A7%E5%8D%8F%E8%AE%AERaft/</loc>
+    <lastmod>2018-06-05T15:39:23.025Z</lastmod>
+    <data>
+        <display>
+        <title>分布式理论(六) - 一致性协议Raft</title>
+        <pubTime>2018-06-05T13:20:00.000Z</pubTime>
+        
+        <tag>Raft</tag>
+         
+         
+           
+             
+              <breadCrumb title="分布式系列" url="https://ostenant.coding.me/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/06/03/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA(%E4%BA%94)%20-%20%E4%B8%80%E8%87%B4%E6%80%A7%E7%AE%97%E6%B3%95Paxos/</loc>
+    <lastmod>2018-06-05T15:38:18.755Z</lastmod>
+    <data>
+        <display>
+        <title>分布式理论(五) - 一致性算法Paxos</title>
+        <pubTime>2018-06-03T13:30:00.000Z</pubTime>
+        
+        <tag>Paxos</tag>
+         
+         
+           
+             
+              <breadCrumb title="分布式系列" url="https://ostenant.coding.me/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/26/%E8%81%8A%E8%81%8ASpring%20Reactor%E5%8F%8D%E5%BA%94%E5%BC%8F%E7%BC%96%E7%A8%8B/</loc>
+    <lastmod>2018-05-27T10:03:31.352Z</lastmod>
+    <data>
+        <display>
+        <title>聊聊Spring Reactor反应式编程</title>
+        <pubTime>2018-05-26T08:41:00.000Z</pubTime>
+        
+        <tag>Reactive Streams</tag>
+         
+        <tag>Spring WebFlux</tag>
+         
+        <tag>Reactor</tag>
+         
+         
+           
+             
+              <breadCrumb title="Spring Reactive编程系列" url="https://ostenant.coding.me/categories/Spring-Reactive%E7%BC%96%E7%A8%8B%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/23/Android%E5%BC%82%E6%AD%A5%E6%A1%86%E6%9E%B6RxJava%201.x%E7%B3%BB%E5%88%97(%E4%B8%89)%20-%20%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%08Scheduler/</loc>
+    <lastmod>2018-05-23T15:41:32.662Z</lastmod>
+    <data>
+        <display>
+        <title>Android异步框架RxJava 1.x系列(三) - 线程调度器Scheduler</title>
+        <pubTime>2018-05-23T12:22:00.000Z</pubTime>
+        
+        <tag>Android</tag>
+         
+        <tag>RxJava</tag>
+         
+        <tag>异步</tag>
+         
+         
+           
+             
+              <breadCrumb title="RxJava异步框架系列" url="https://ostenant.coding.me/categories/RxJava%E5%BC%82%E6%AD%A5%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/21/Android%E5%BC%82%E6%AD%A5%E6%A1%86%E6%9E%B6RxJava%201.x%E7%B3%BB%E5%88%97(%E4%BA%8C)%20-%20%E4%BA%8B%E4%BB%B6%E5%8F%8A%E4%BA%8B%E4%BB%B6%E5%BA%8F%E5%88%97%E8%BD%AC%E6%8D%A2%E5%8E%9F%E7%90%86/</loc>
+    <lastmod>2018-05-21T15:30:10.905Z</lastmod>
+    <data>
+        <display>
+        <title>Android异步框架RxJava 1.x系列(二) - 事件及事件序列转换原理</title>
+        <pubTime>2018-05-21T11:14:00.000Z</pubTime>
+        
+        <tag>Android</tag>
+         
+        <tag>RxJava</tag>
+         
+        <tag>异步</tag>
+         
+         
+           
+             
+              <breadCrumb title="RxJava异步框架系列" url="https://ostenant.coding.me/categories/RxJava%E5%BC%82%E6%AD%A5%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/20/Android%E5%BC%82%E6%AD%A5%E6%A1%86%E6%9E%B6RxJava%201.x%E7%B3%BB%E5%88%97(%E4%B8%80)%20-%20%E8%A7%82%E5%AF%9F%E8%80%85%E6%A8%A1%E5%BC%8F%E5%8F%8A%E5%AE%9E%E7%8E%B0/</loc>
+    <lastmod>2018-05-21T15:28:22.014Z</lastmod>
+    <data>
+        <display>
+        <title>Android异步框架RxJava 1.x系列(一) - 观察者模式及实现</title>
+        <pubTime>2018-05-20T10:14:00.000Z</pubTime>
+        
+        <tag>Android</tag>
+         
+        <tag>RxJava</tag>
+         
+        <tag>异步</tag>
+         
+         
+           
+             
+              <breadCrumb title="RxJava异步框架系列" url="https://ostenant.coding.me/categories/RxJava%E5%BC%82%E6%AD%A5%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/14/%E5%88%86%E5%B8%83%E5%BC%8F%E5%94%AF%E4%B8%80ID%E7%9A%84%E5%87%A0%E7%A7%8D%E7%94%9F%E6%88%90%E6%96%B9%E6%A1%88/</loc>
+    <lastmod>2018-05-14T06:04:56.491Z</lastmod>
+    <data>
+        <display>
+        <title>分布式唯一ID的几种生成方案</title>
+        <pubTime>2018-05-13T23:46:00.000Z</pubTime>
+        
+        <tag>Unique ID</tag>
+         
+         
+           
+             
+              <breadCrumb title="分布式系列" url="https://ostenant.coding.me/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/08/%E8%9A%82%E8%9A%81%E9%87%91%E6%9C%8DSOFA-Boot%E6%95%B4%E5%90%88SOFA-RPC(%E4%B8%8A%E7%AF%87)/</loc>
+    <lastmod>2018-05-09T06:28:50.824Z</lastmod>
+    <data>
+        <display>
+        <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)</title>
+        <pubTime>2018-05-08T13:23:00.000Z</pubTime>
+        
+        <tag>RPC</tag>
+         
+        <tag>SOFA-RPC</tag>
+         
+        <tag>SOFA-Boot</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/04/29/%E8%9A%82%E8%9A%81%E9%87%91%E6%9C%8DRPC%E6%A1%86%E6%9E%B6SOFA-RPC%20-%20%E5%88%9D%E4%BD%93%E9%AA%8C/</loc>
+    <lastmod>2018-05-09T06:21:43.934Z</lastmod>
+    <data>
+        <display>
+        <title>蚂蚁金服RPC框架SOFA-RPC - 初体验</title>
+        <pubTime>2018-04-29T09:59:00.000Z</pubTime>
+        
+        <tag>RPC</tag>
+         
+        <tag>SOFA-RPC</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/01/04/%E6%B7%B1%E5%85%A5%E6%B5%85%E5%87%BAOAuth%202.0%E6%8E%88%E6%9D%83%E6%9C%BA%E5%88%B6/</loc>
+    <lastmod>2018-05-08T02:49:46.097Z</lastmod>
+    <data>
+        <display>
+        <title>深入浅出OAuth 2.0授权机制</title>
+        <pubTime>2018-01-04T13:10:00.000Z</pubTime>
+        
+        <tag>OAuth 2.0</tag>
+         
+         
+           
+             
+              <breadCrumb title="认证与授权系列" url="https://ostenant.coding.me/categories/%E8%AE%A4%E8%AF%81%E4%B8%8E%E6%8E%88%E6%9D%83%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/01/18/%E9%98%BF%E9%87%8C%E4%BA%91CentOS%207%E4%B8%8A%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AEDocker/</loc>
+    <lastmod>2018-05-08T02:49:46.097Z</lastmod>
+    <data>
+        <display>
+        <title>阿里云CentOS 7上安装配置Docker</title>
+        <pubTime>2018-01-18T01:44:00.000Z</pubTime>
+        
+        <tag>Docker</tag>
+         
+        <tag>CentOS</tag>
+         
+         
+           
+             
+              <breadCrumb title="Docker学习系列" url="https://ostenant.coding.me/categories/Docker%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/02/05/%E5%9F%BA%E4%BA%8EDocker%20+%20Consul%20+%20Registrator%E7%9A%84%E6%9C%8D%E5%8A%A1%E6%B3%A8%E5%86%8C%E4%B8%8E%E5%8F%91%E7%8E%B0%E9%9B%86%E7%BE%A4%E6%90%AD%E5%BB%BA/</loc>
+    <lastmod>2018-05-08T02:49:46.096Z</lastmod>
+    <data>
+        <display>
+        <title>基于Docker + Consul + Registrator的服务注册与发现集群搭建</title>
+        <pubTime>2018-02-05T03:22:00.000Z</pubTime>
+        
+        <tag>Docker</tag>
+         
+        <tag>Consul</tag>
+         
+        <tag>Registrator</tag>
+         
+         
+           
+             
+              <breadCrumb title="微服务系列" url="https://ostenant.coding.me/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/03/24/%E5%A4%A7%E5%9E%8BWeb%E7%BD%91%E7%AB%99%E6%9E%B6%E6%9E%84%E6%BC%94%E5%8F%98/</loc>
+    <lastmod>2018-05-08T02:49:46.096Z</lastmod>
+    <data>
+        <display>
+        <title>大型Web网站架构演变</title>
+        <pubTime>2017-03-24T07:55:00.000Z</pubTime>
+        
+        <tag>Web</tag>
+         
+         
+           
+             
+              <breadCrumb title="架构学习系列" url="https://ostenant.coding.me/categories/%E6%9E%B6%E6%9E%84%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/02/08/%E5%9F%BA%E4%BA%8EDocker%20+%20Consul%20+%20Nginx%20+%20Consul-template%E7%9A%84%E6%9C%8D%E5%8A%A1%E8%B4%9F%E8%BD%BD%E5%9D%87%E8%A1%A1%E5%AE%9E%E7%8E%B0/</loc>
+    <lastmod>2018-05-08T02:49:46.095Z</lastmod>
+    <data>
+        <display>
+        <title>基于Docker + Consul + Nginx + Consul-template的服务负载均衡实现</title>
+        <pubTime>2018-02-08T03:03:00.000Z</pubTime>
+        
+        <tag>Docker</tag>
+         
+        <tag>Consul</tag>
+         
+        <tag>Nginx</tag>
+         
+        <tag>Consul-template</tag>
+         
+         
+           
+             
+              <breadCrumb title="微服务系列" url="https://ostenant.coding.me/categories/%E5%BE%AE%E6%9C%8D%E5%8A%A1%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/04/25/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA(%E4%B8%89)%20-%202PC%E5%8D%8F%E8%AE%AE/</loc>
+    <lastmod>2018-05-08T02:49:46.095Z</lastmod>
+    <data>
+        <display>
+        <title>分布式理论(三) - 2PC协议</title>
+        <pubTime>2018-04-25T14:22:00.000Z</pubTime>
+        
+        <tag>分布式</tag>
+         
+        <tag>2PC</tag>
+         
+         
+           
+             
+              <breadCrumb title="分布式系列" url="https://ostenant.coding.me/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/04/24/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA(%E4%BA%8C)%20-%20BASE%E7%90%86%E8%AE%BA/</loc>
+    <lastmod>2018-05-08T02:49:46.095Z</lastmod>
+    <data>
+        <display>
+        <title>分布式理论(二) - BASE理论</title>
+        <pubTime>2018-04-24T12:41:00.000Z</pubTime>
+        
+        <tag>分布式</tag>
+         
+        <tag>BASE</tag>
+         
+         
+           
+             
+              <breadCrumb title="分布式系列" url="https://ostenant.coding.me/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/04/28/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA(%E5%9B%9B)%20-%203PC%E5%8D%8F%E8%AE%AE/</loc>
+    <lastmod>2018-05-08T02:49:46.095Z</lastmod>
+    <data>
+        <display>
+        <title>分布式理论(四) - 3PC协议</title>
+        <pubTime>2018-04-28T13:26:00.000Z</pubTime>
+        
+        <tag>分布式</tag>
+         
+        <tag>3PC</tag>
+         
+         
+           
+             
+              <breadCrumb title="分布式系列" url="https://ostenant.coding.me/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/04/23/%E5%88%86%E5%B8%83%E5%BC%8F%E7%90%86%E8%AE%BA(%E4%B8%80)%20-%20CAP%E5%AE%9A%E7%90%86/</loc>
+    <lastmod>2018-05-08T02:49:46.094Z</lastmod>
+    <data>
+        <display>
+        <title>分布式理论(一) - CAP定理</title>
+        <pubTime>2018-04-23T12:33:00.000Z</pubTime>
+        
+        <tag>分布式</tag>
+         
+        <tag>CAP</tag>
+         
+         
+           
+             
+              <breadCrumb title="分布式系列" url="https://ostenant.coding.me/categories/%E5%88%86%E5%B8%83%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/12/25/%E4%B8%80%E5%A4%A9%E4%B8%80%E4%B8%AA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F(%E4%BA%94)%20-%20%E9%80%82%E9%85%8D%E5%99%A8%E6%A8%A1%E5%BC%8F(Adapter)/</loc>
+    <lastmod>2018-05-08T02:49:46.094Z</lastmod>
+    <data>
+        <display>
+        <title>一天一个设计模式(五) - 适配器模式(Adapter)</title>
+        <pubTime>2017-12-25T12:46:00.000Z</pubTime>
+        
+        <tag>Adapter</tag>
+         
+         
+           
+             
+              <breadCrumb title="JAVA设计模式系列" url="https://ostenant.coding.me/categories/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/06/03/%E4%B8%80%E5%A4%A9%E4%B8%80%E4%B8%AA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F(%E4%BA%8C)%20-%20%E5%8D%95%E4%BE%8B%E6%A8%A1%E5%BC%8F(Singleton)/</loc>
+    <lastmod>2018-05-08T02:49:46.093Z</lastmod>
+    <data>
+        <display>
+        <title>一天一个设计模式(二) -单例模式(Singleton)</title>
+        <pubTime>2017-06-03T07:37:00.000Z</pubTime>
+        
+        <tag>Singleton</tag>
+         
+         
+           
+             
+              <breadCrumb title="JAVA设计模式系列" url="https://ostenant.coding.me/categories/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/12/19/%E4%B8%80%E5%A4%A9%E4%B8%80%E4%B8%AA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F(%E4%B8%89)%20-%20Builder%E5%BB%BA%E9%80%A0%E8%80%85%E6%A8%A1%E5%BC%8F/</loc>
+    <lastmod>2018-05-08T02:49:46.093Z</lastmod>
+    <data>
+        <display>
+        <title>一天一个设计模式(三) - 建造者模式(Builder)</title>
+        <pubTime>2017-12-19T09:20:00.000Z</pubTime>
+        
+        <tag>Builder</tag>
+         
+         
+           
+             
+              <breadCrumb title="JAVA设计模式系列" url="https://ostenant.coding.me/categories/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/06/02/%E4%B8%80%E5%A4%A9%E4%B8%80%E4%B8%AA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F(%E4%B8%80)%20-%20%E6%80%BB%E4%BD%93%E6%A6%82%E8%BF%B0/</loc>
+    <lastmod>2018-05-08T02:49:46.093Z</lastmod>
+    <data>
+        <display>
+        <title>一天一个设计模式(一) - 总体概述</title>
+        <pubTime>2017-06-02T05:22:00.000Z</pubTime>
+        
+         
+           
+             
+              <breadCrumb title="JAVA设计模式系列" url="https://ostenant.coding.me/categories/JAVA%E8%AE%BE%E8%AE%A1%E6%A8%A1%E5%BC%8F%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/02/23/WebSocket%E5%8D%8F%E8%AE%AE%E5%85%A5%E9%97%A8%E7%AE%80%E4%BB%8B/</loc>
+    <lastmod>2018-05-08T02:49:46.093Z</lastmod>
+    <data>
+        <display>
+        <title>WebSocket协议入门简介</title>
+        <pubTime>2017-02-23T07:47:00.000Z</pubTime>
+        
+        <tag>WebSocket</tag>
+         
+         
+           
+             
+              <breadCrumb title="网络协议系列" url="https://ostenant.coding.me/categories/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/01/24/Spring%20Cloud%E6%95%B4%E5%90%88Thrift%20RPC(%E4%BA%8C)%20-%20%E5%BA%94%E7%94%A8%E6%A1%88%E4%BE%8B/</loc>
+    <lastmod>2018-05-08T02:49:46.092Z</lastmod>
+    <data>
+        <display>
+        <title>Spring Cloud整合Thrift RPC(二) - 应用案例</title>
+        <pubTime>2018-01-24T02:21:00.000Z</pubTime>
+        
+        <tag>Thrift</tag>
+         
+        <tag>RPC</tag>
+         
+        <tag>Spring Cloud</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/12/31/Java%20NIO%E7%B3%BB%E5%88%97(%E5%9B%9B)%20-%20Selector/</loc>
+    <lastmod>2018-05-08T02:49:46.092Z</lastmod>
+    <data>
+        <display>
+        <title>Java NIO系列(四) - Selector</title>
+        <pubTime>2017-12-31T04:16:00.000Z</pubTime>
+        
+        <tag>NIO</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java编程进阶系列" url="https://ostenant.coding.me/categories/Java%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/12/18/Java%E5%9F%BA%E7%A1%80%E7%AF%87%20-%20%E5%BC%BA%E5%BC%95%E7%94%A8%E3%80%81%E5%BC%B1%E5%BC%95%E7%94%A8%E3%80%81%E8%BD%AF%E5%BC%95%E7%94%A8%E5%92%8C%E8%99%9A%E5%BC%95%E7%94%A8/</loc>
+    <lastmod>2018-05-08T02:49:46.092Z</lastmod>
+    <data>
+        <display>
+        <title>Java基础篇 - 强引用、弱引用、软引用和虚引用</title>
+        <pubTime>2017-12-18T07:38:00.000Z</pubTime>
+        
+        <tag>Java</tag>
+         
+        <tag>Reference</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java编程基础系列" url="https://ostenant.coding.me/categories/Java%E7%BC%96%E7%A8%8B%E5%9F%BA%E7%A1%80%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/01/18/Spring%20Cloud%E6%95%B4%E5%90%88Thrift%20RPC(%E4%B8%80)%20-%20%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/</loc>
+    <lastmod>2018-05-08T02:49:46.092Z</lastmod>
+    <data>
+        <display>
+        <title>Spring Cloud整合Thrift RPC(一) - 使用指南</title>
+        <pubTime>2018-01-18T07:07:00.000Z</pubTime>
+        
+        <tag>Thrift</tag>
+         
+        <tag>RPC</tag>
+         
+        <tag>Spring Cloud</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/02/25/TCP%E5%8D%8F%E8%AE%AE%E7%AE%80%E4%BB%8B/</loc>
+    <lastmod>2018-05-08T02:49:46.092Z</lastmod>
+    <data>
+        <display>
+        <title>TCP协议简介</title>
+        <pubTime>2017-02-25T03:59:00.000Z</pubTime>
+        
+        <tag>TCP</tag>
+         
+         
+           
+             
+              <breadCrumb title="网络协议系列" url="https://ostenant.coding.me/categories/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/12/19/Java%20NIO%E7%B3%BB%E5%88%97(%E4%B8%80)%20-%20%E6%A6%82%E8%BF%B0/</loc>
+    <lastmod>2018-05-08T02:49:46.091Z</lastmod>
+    <data>
+        <display>
+        <title>Java NIO系列(一) - 概述</title>
+        <pubTime>2017-12-19T03:23:00.000Z</pubTime>
+        
+        <tag>Java</tag>
+         
+        <tag>NIO</tag>
+         
+         
+           
+             
+              <breadCrumb title="JAVA编程进阶系列" url="https://ostenant.coding.me/categories/JAVA%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/12/26/Java%20NIO%E7%B3%BB%E5%88%97(%E4%BA%8C)%20-%20Buffer/</loc>
+    <lastmod>2018-05-08T02:49:46.091Z</lastmod>
+    <data>
+        <display>
+        <title>Java NIO系列(二) - Buffer</title>
+        <pubTime>2017-12-26T13:41:00.000Z</pubTime>
+        
+        <tag>NIO</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java编程进阶系列" url="https://ostenant.coding.me/categories/Java%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/12/27/Java%20NIO%E7%B3%BB%E5%88%97(%E4%B8%89)%20-%20Channel/</loc>
+    <lastmod>2018-05-08T02:49:46.091Z</lastmod>
+    <data>
+        <display>
+        <title>Java NIO系列(三) - Channel</title>
+        <pubTime>2017-12-27T07:22:00.000Z</pubTime>
+        
+        <tag>NIO</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java编程进阶系列" url="https://ostenant.coding.me/categories/Java%E7%BC%96%E7%A8%8B%E8%BF%9B%E9%98%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/07/05/Java%208%E7%B3%BB%E5%88%97(%E4%BA%8C)%20-%20JDK1.8%E5%87%BD%E6%95%B0%E5%BC%8F%E6%8E%A5%E5%8F%A3%E8%AF%A6%E8%A7%A3/</loc>
+    <lastmod>2018-05-08T02:49:46.091Z</lastmod>
+    <data>
+        <display>
+        <title>Java 8系列(二) - JDK1.8函数式接口详解</title>
+        <pubTime>2017-07-05T02:24:00.000Z</pubTime>
+        
+        <tag>JDK1.8</tag>
+         
+         
+           
+             
+              <breadCrumb title="JDK1.8编程系列" url="https://ostenant.coding.me/categories/JDK1-8%E7%BC%96%E7%A8%8B%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/04/25/JVM%E7%B3%BB%E5%88%97(%E4%BA%8C)%20-%20JVM%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E5%92%8C%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E5%BC%82%E5%B8%B8%E8%AF%A6%E8%A7%A3/</loc>
+    <lastmod>2018-05-08T02:49:46.090Z</lastmod>
+    <data>
+        <display>
+        <title>JVM系列(二) - JVM内存区域和内存溢出异常详解</title>
+        <pubTime>2017-04-25T09:57:00.000Z</pubTime>
+        
+        <tag>JVM</tag>
+         
+        <tag>Java</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java虚拟机系列" url="https://ostenant.coding.me/categories/Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/05/10/JVM%E7%B3%BB%E5%88%97(%E4%BA%94)%20-%20JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6%E8%AF%A6%E8%A7%A3/</loc>
+    <lastmod>2018-05-08T02:49:46.090Z</lastmod>
+    <data>
+        <display>
+        <title>JVM系列(五) - JVM类加载机制详解</title>
+        <pubTime>2017-05-10T03:17:00.000Z</pubTime>
+        
+        <tag>Java</tag>
+         
+        <tag>JDK</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java虚拟机系列" url="https://ostenant.coding.me/categories/Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/05/02/JVM%E7%B3%BB%E5%88%97(%E5%9B%9B)%20-%20JVM%20GC%E5%9B%9E%E6%94%B6%E7%AE%97%E6%B3%95/</loc>
+    <lastmod>2018-05-08T02:49:46.090Z</lastmod>
+    <data>
+        <display>
+        <title>JVM系列(四) - JVM GC回收算法</title>
+        <pubTime>2017-05-02T10:09:00.000Z</pubTime>
+        
+        <tag>JVM</tag>
+         
+        <tag>Java</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java虚拟机系列" url="https://ostenant.coding.me/categories/Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/07/04/Java%208%E7%B3%BB%E5%88%97(%E4%B8%80)%20-%20JDK1.8%E5%AF%B9%E5%AD%97%E7%AC%A6%E4%B8%B2%E8%BF%9E%E6%8E%A5%E5%A4%84%E7%90%86/</loc>
+    <lastmod>2018-05-08T02:49:46.090Z</lastmod>
+    <data>
+        <display>
+        <title>Java 8系列(一) - JDK1.8对字符串的连接处理</title>
+        <pubTime>2017-07-04T08:35:00.000Z</pubTime>
+        
+        <tag>JDK1.8</tag>
+         
+         
+           
+             
+              <breadCrumb title="JDK1.8编程系列" url="https://ostenant.coding.me/categories/JDK1-8%E7%BC%96%E7%A8%8B%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/02/25/HTTP%E5%8D%8F%E8%AE%AE%E8%AF%A6%E8%A7%A3/</loc>
+    <lastmod>2018-05-08T02:49:46.089Z</lastmod>
+    <data>
+        <display>
+        <title>HTTP协议详解</title>
+        <pubTime>2017-02-25T14:14:00.000Z</pubTime>
+        
+        <tag>HTTP</tag>
+         
+        <tag>HTTPS</tag>
+         
+         
+           
+             
+              <breadCrumb title="网络协议系列" url="https://ostenant.coding.me/categories/%E7%BD%91%E7%BB%9C%E5%8D%8F%E8%AE%AE%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/04/28/JVM%E7%B3%BB%E5%88%97(%E4%B8%89)%20-%20JVM%E5%AF%B9%E8%B1%A1%E6%8E%A2%E7%A7%98/</loc>
+    <lastmod>2018-05-08T02:49:46.089Z</lastmod>
+    <data>
+        <display>
+        <title>JVM系列(三) - JVM对象探秘</title>
+        <pubTime>2017-04-28T03:22:00.000Z</pubTime>
+        
+        <tag>JVM</tag>
+         
+        <tag>Java</tag>
+         
+         
+           
+             
+              <breadCrumb title="JAVA虚拟机系列" url="https://ostenant.coding.me/categories/JAVA%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/04/22/JVM%E7%B3%BB%E5%88%97(%E4%B8%80)%20-%20JVM%E6%80%BB%E4%BD%93%E6%A6%82%E8%BF%B0/</loc>
+    <lastmod>2018-05-08T02:49:46.089Z</lastmod>
+    <data>
+        <display>
+        <title>JVM系列(一) - JVM总体概述</title>
+        <pubTime>2017-04-22T06:55:00.000Z</pubTime>
+        
+        <tag>JVM</tag>
+         
+        <tag>Java</tag>
+         
+         
+           
+             
+              <breadCrumb title="Java虚拟机系列" url="https://ostenant.coding.me/categories/Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/01/11/Apache%20Thrift%E7%B3%BB%E5%88%97%E8%AF%A6%E8%A7%A3(%E4%BA%8C)%20-%20%E7%BD%91%E7%BB%9C%E6%9C%8D%E5%8A%A1%E6%A8%A1%E5%9E%8B/</loc>
+    <lastmod>2018-05-08T02:49:46.088Z</lastmod>
+    <data>
+        <display>
+        <title>Apache Thrift系列详解(二) - 网络服务模型</title>
+        <pubTime>2018-01-11T09:36:00.000Z</pubTime>
+        
+        <tag>Thrift</tag>
+         
+        <tag>Apache</tag>
+         
+        <tag>RPC</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/01/16/Apache%20Thrift%E7%B3%BB%E5%88%97%E8%AF%A6%E8%A7%A3(%E4%B8%89)%20-%20%E5%BA%8F%E5%88%97%E5%8C%96%E6%9C%BA%E5%88%B6/</loc>
+    <lastmod>2018-05-08T02:49:46.087Z</lastmod>
+    <data>
+        <display>
+        <title>Apache Thrift系列详解(三) - 序列化机制</title>
+        <pubTime>2018-01-16T07:37:00.000Z</pubTime>
+        
+        <tag>Thrift</tag>
+         
+        <tag>Apache</tag>
+         
+        <tag>RPC</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/01/08/Apache%20Thrift%E7%B3%BB%E5%88%97%E8%AF%A6%E8%A7%A3(%E4%B8%80)%20-%20%E6%A6%82%E8%BF%B0%E4%B8%8E%E5%85%A5%E9%97%A8/</loc>
+    <lastmod>2018-05-08T02:49:46.087Z</lastmod>
+    <data>
+        <display>
+        <title>Apache Thrift系列详解(一) - 概述与入门</title>
+        <pubTime>2018-01-08T02:14:00.000Z</pubTime>
+        
+        <tag>Thrift</tag>
+         
+        <tag>Apache</tag>
+         
+        <tag>RPC</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+</urlset>
