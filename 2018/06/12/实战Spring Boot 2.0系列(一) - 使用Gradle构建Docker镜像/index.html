@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像 | Harrison&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="前言通常我们使用 Dockerfile 来构建项目的 Docker 镜像。但是也有使用 gradle 在编译项目的时候一起把镜像给 构建 并 上传 的需求。本文将会讲解如何使用 gradle 编写并配置 Dockerfile 并生成 镜像。">
+<meta name="keywords" content="Docker,Spring Boot 2.0,Gradle">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像">
+<meta property="og:url" content="https://ostenant.coding.me/2018/06/12/实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像/index.html">
+<meta property="og:site_name" content="Harrison&#39;s Blog">
+<meta property="og:description" content="前言通常我们使用 Dockerfile 来构建项目的 Docker 镜像。但是也有使用 gradle 在编译项目的时候一起把镜像给 构建 并 上传 的需求。本文将会讲解如何使用 gradle 编写并配置 Dockerfile 并生成 镜像。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/gradle_build_docker_image_2.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/gradle_bulld_docker_images.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/gradle_build_docker_image_2_web.png">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-06-12T14:07:13.616Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像">
+<meta name="twitter:description" content="前言通常我们使用 Dockerfile 来构建项目的 Docker 镜像。但是也有使用 gradle 在编译项目的时候一起把镜像给 构建 并 上传 的需求。本文将会讲解如何使用 gradle 编写并配置 Dockerfile 并生成 镜像。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/gradle_build_docker_image_2.png">
+    
+
+    
+        <link rel="alternate" href="/" title="Harrison&#39;s Blog" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/cat.png" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fontawesome.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-brands.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-solid.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'true', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+        <meta name="google-site-verification" content="true" />
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Harrison&#39;s Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpeg" />
+                            <i class="fas fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fas fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpeg" />
+            <h2 id="name">陈林 | Harrison</h2>
+            <h3 id="title">年轻无为，卖码为生。</h3>
+            <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
+            <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                53
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                52
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/ostenant" target="_blank" title="github" class=tooltip>
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fab fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="linkedin" class=tooltip>
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fab fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2018/06/12/实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像/">
+            <time datetime="2018-06-12T11:35:00.000Z" itemprop="datePublished">2018-06-12</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/Docker/">Docker</a>, <a class="tag-link" href="/tags/Gradle/">Gradle</a>, <a class="tag-link" href="/tags/Spring-Boot-2-0/">Spring Boot 2.0</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>通常我们使用 <code>Dockerfile</code> 来构建项目的 <code>Docker</code> 镜像。但是也有使用 <code>gradle</code> 在编译项目的时候一起把镜像给 <strong>构建</strong> 并 <strong>上传</strong> 的需求。本文将会讲解如何使用 <code>gradle</code> 编写并配置 <code>Dockerfile</code> 并生成 <strong>镜像</strong>。</p>
+<a id="more"></a>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="1-创建项目"><a href="#1-创建项目" class="headerlink" title="1. 创建项目"></a>1. 创建项目</h2><p>利用 <code>Spring Initializer</code> 创建一个 <code>gradle</code> 项目  <code>spring-boot-gradle-for-docker</code>，创建时添加一个 <code>web</code> 依赖。得到的初始 <code>build.gradle</code> 如下：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">buildscript &#123;</span><br><span class="line">    ext &#123;</span><br><span class="line">        springBootVersion = <span class="string">'2.0.2.RELEASE'</span></span><br><span class="line">    &#125;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenCentral()</span><br><span class="line">    &#125;</span><br><span class="line">    dependencies &#123;</span><br><span class="line">        classpath(<span class="string">"org.springframework.boot:spring-boot-gradle-plugin:$&#123;springBootVersion&#125;"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'java'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'org.springframework.boot'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'io.spring.dependency-management'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">group = <span class="string">'io.ostenant.springboot.sample'</span></span><br><span class="line">version = <span class="string">'1.0'</span></span><br><span class="line">sourceCompatibility = <span class="number">1.8</span></span><br><span class="line"></span><br><span class="line">repositories &#123;</span><br><span class="line">    mavenCentral()</span><br><span class="line">    jcenter()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">dependencies &#123;</span><br><span class="line">    compile(<span class="string">'org.springframework.boot:spring-boot-starter-web'</span>)</span><br><span class="line">    testCompile(<span class="string">'org.springframework.boot:spring-boot-starter-test'</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2-配置入口类"><a href="#2-配置入口类" class="headerlink" title="2. 配置入口类"></a>2. 配置入口类</h2><p>为了方便容器部署的测试，在 <code>Spring Boot</code> 启动类上配置一个控制器，响应当前的系统时间。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RestController</span></span><br><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">private</span> ThreadLocal&lt;SimpleDateFormat&gt; threadLocal = ThreadLocal.withInitial(() -&gt; <span class="keyword">new</span> SimpleDateFormat(<span class="string">"yyyy/MM/dd hh:mm:ss"</span>));</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(Application.class, args);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@GetMapping</span>(<span class="string">"/"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> String <span class="title">retrieveTime</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">return</span> threadLocal.get().format(<span class="keyword">new</span> Date());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="3-添加插件"><a href="#3-添加插件" class="headerlink" title="3. 添加插件"></a>3. 添加插件</h2><p>这里使用 <a href="https://github.com/Transmode/gradle-docker" target="_blank" rel="noopener"><code>gradle-docker</code></a> <strong>插件</strong> 来实现 <code>docker</code> 镜像构建。这样，我们就可以直接在 <code>Gradle</code> 的脚本里配置 <code>Dockerfile</code> 达到 <strong>构建镜像</strong> 功能的目的。</p>
+<p><code>gradle-docker</code> 插件已经被上传到 <code>jCenter</code> 和 <code>MavenCentral</code> 上。所以只需要在 <code>dependencies</code> 添加依赖 <code>se.transmode.gradle:gradle-docker:1.2</code> 就能使用 <code>docker</code> 插件。</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">buildscript &#123;</span><br><span class="line">    ext &#123;</span><br><span class="line">        springBootVersion = <span class="string">'2.0.2.RELEASE'</span></span><br><span class="line">    &#125;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenCentral()</span><br><span class="line">    &#125;</span><br><span class="line">    dependencies &#123;</span><br><span class="line">        classpath(<span class="string">"org.springframework.boot:spring-boot-gradle-plugin:$&#123;springBootVersion&#125;"</span>)</span><br><span class="line">        classpath(<span class="string">"se.transmode.gradle:gradle-docker:1.2"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="4-应用插件"><a href="#4-应用插件" class="headerlink" title="4. 应用插件"></a>4. 应用插件</h2><p>添加以下代码到 <code>build.gradle</code>中</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">apply <span class="string">plugin:</span> <span class="string">'application'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'docker'</span></span><br></pre></td></tr></table></figure>
+<p>如果添加了 <code>application</code> 插件的话，默认 <code>gradle-docker</code> 插件会添加一个 <code>distDocker</code> 的 <code>gradle task</code>，用来构建一个 <strong>包含所有程序文件</strong> 的 <code>docker</code> 镜像。</p>
+<h2 id="5-配置镜像构建信息"><a href="#5-配置镜像构建信息" class="headerlink" title="5. 配置镜像构建信息"></a>5. 配置镜像构建信息</h2><h3 id="5-1-配置group"><a href="#5-1-配置group" class="headerlink" title="5.1. 配置group"></a>5.1. 配置group</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">group = <span class="string">'io.ostenant.springboot.sample'</span></span><br></pre></td></tr></table></figure>
+<h3 id="5-2-配置镜像名称和版本号"><a href="#5-2-配置镜像名称和版本号" class="headerlink" title="5.2. 配置镜像名称和版本号"></a>5.2. 配置镜像名称和版本号</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">jar &#123;</span><br><span class="line">    baseName = <span class="string">"spring-boot-gradle-for-docker"</span></span><br><span class="line">    version = <span class="number">1.0</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中镜像的 <code>tag</code> 默认的构成为：<strong>项目组/应用名称:版本号</strong></p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tag = <span class="string">"$&#123;project.group&#125;/$&#123;applicationName&#125;:$&#123;tagVersion&#125;"</span></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>project.group：标准的 <code>gradle</code> 属性，如果不进行定义，插件默认会 <strong>省略</strong> <code>${project.group}</code> 这个属性。</p>
+</li>
+<li><p>applicationName：应用被容器化时的 <strong>名称</strong>。</p>
+</li>
+<li><p>tagVersion：可选属性，会作为镜像的 <strong>标签</strong>。默认值为 <code>project.version</code>，如果未指定 <code>project.version</code>，则使用 <code>latest</code> 作为标记。</p>
+</li>
+</ul>
+<h3 id="5-3-配置docker构建基础信息"><a href="#5-3-配置docker构建基础信息" class="headerlink" title="5.3. 配置docker构建基础信息"></a>5.3. 配置docker构建基础信息</h3><figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">distDocker &#123;</span><br><span class="line">    baseImage = <span class="string">"openjdk"</span></span><br><span class="line">    maintainer = <span class="string">"harrison"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中，<code>baseImage</code> 相当于 <code>Dockerfile</code> 中声明的 <code>FROM</code>。声明了在 <strong>构建镜像</strong> 是基于的 <code>Image</code>，<code>maintainer</code> 相当于 <code>MAINTAINER</code> ，声明了 <strong>镜像作者</strong>。如果声明了 <code>registry</code> 地址，插件在 <strong>镜像射生成后</strong> 可以自动 <code>push</code> 到该地址。其他的配置还包括 <code>docker hub</code> 的 <strong>地址</strong>、<strong>用户名</strong> 和 <strong>密码</strong>。</p>
+<p>更详细的配置案例如下：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">docker &#123;</span><br><span class="line">    baseImage <span class="string">'openjdk'</span></span><br><span class="line">    maintainer <span class="string">'harrison'</span></span><br><span class="line">    useApi <span class="literal">true</span></span><br><span class="line">    hostUrl <span class="string">'http://myserver:4243'</span></span><br><span class="line">    apiUsername <span class="string">'user'</span></span><br><span class="line">    apiPassword <span class="string">'password'</span></span><br><span class="line">    apiEmail <span class="string">'me@mycompany.com'</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="6-添加task任务"><a href="#6-添加task任务" class="headerlink" title="6. 添加task任务"></a>6. 添加task任务</h2><p>完成了基本的配置，我们还需要添加一个 <code>task</code> 用来在 <code>gradle</code> 编译的时候 <strong>执行镜像构建</strong>。</p>
+<p>插件提供了一些 <strong>转换方法</strong>，用来指代 <code>Dockerfile</code> 中的 <strong>关键词语法</strong>，如下表，可以按照需求对照着来：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Dockerfile关键词</th>
+<th style="text-align:left">gradle task方法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">ADD</td>
+<td style="text-align:left">addFile(Closure copySpec)</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">addFile(String source, String dest)</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">addFile(File source, String dest)</td>
+</tr>
+<tr>
+<td style="text-align:left">CMD</td>
+<td style="text-align:left">defaultCommand(List cmd)</td>
+</tr>
+<tr>
+<td style="text-align:left">ENTRYPOINT</td>
+<td style="text-align:left">entryPoint(List entryPoint)</td>
+</tr>
+<tr>
+<td style="text-align:left">ENV</td>
+<td style="text-align:left">setEnvironment(String key, String val)</td>
+</tr>
+<tr>
+<td style="text-align:left">EXPOSE</td>
+<td style="text-align:left">exposePort(Integer port)</td>
+</tr>
+<tr>
+<td style="text-align:left"></td>
+<td style="text-align:left">exposePort(String port)</td>
+</tr>
+<tr>
+<td style="text-align:left">RUN</td>
+<td style="text-align:left">runCommand(String cmd)</td>
+</tr>
+<tr>
+<td style="text-align:left">USER</td>
+<td style="text-align:left">switchUser(String userNameOrUid)</td>
+</tr>
+<tr>
+<td style="text-align:left">VOLUME</td>
+<td style="text-align:left">volume(String… paths)</td>
+</tr>
+<tr>
+<td style="text-align:left">WORKDIR</td>
+<td style="text-align:left">workingDir(String dir)</td>
+</tr>
+</tbody>
+</table>
+<p>下面是本项目的 <code>taskBuilder</code> 的任务配置</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">task dockerBuilder(<span class="string">type:</span> Docker) &#123;</span><br><span class="line">    applicationName = jar.baseName</span><br><span class="line">    tagVersion = jar.version</span><br><span class="line">    volume(<span class="string">'/tmp'</span>)</span><br><span class="line">    addFile(<span class="string">"$&#123;jar.baseName&#125;-$&#123;jar.version&#125;.jar"</span>, <span class="string">"app.jar"</span>)</span><br><span class="line">    entryPoint([<span class="string">"java"</span>, <span class="string">"-Djava.security.egd=file:/dev/./urandom"</span>, <span class="string">"-jar"</span>, <span class="string">'app.jar'</span>])</span><br><span class="line">    exposePort(<span class="number">8080</span>)</span><br><span class="line">    doFirst &#123;</span><br><span class="line">        copy &#123;</span><br><span class="line">            from jar</span><br><span class="line">            into stageDir</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>构建完成y以后，项目根目录的 <code>build/docker</code> 文件夹下面会出现 <code>Dockerfile</code> 和 <code>spring-boot-gradle-for-docker-1.0.jar</code> 文件。其中，以上的 <code>task</code> 等同于以下的 <code>Dockerfile</code>。</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">FROM</span> aglover/java8-pier</span><br><span class="line"><span class="keyword">VOLUME</span><span class="bash"> [<span class="string">"/tmp"</span>]</span></span><br><span class="line"><span class="bash">ADD spring-boot-gradle-for-docker-1.0.jar app.jar</span></span><br><span class="line"><span class="bash">ENTRYPOINT [<span class="string">"java"</span>, <span class="string">"-Djava.security.egd=file:/dev/./urandom"</span>, <span class="string">"-jar"</span>, <span class="string">"app.jar"</span>]</span></span><br><span class="line"><span class="bash">EXPOSE 8080</span></span><br></pre></td></tr></table></figure>
+<p>如果觉的在 <code>task</code> 中编写 <code>Dockerfile</code> <strong>替换脚本</strong> 非常别扭，也可以直接在 <code>task</code> 中指定 <code>Dockfile</code> 的 <strong>文件路径</strong>，直接使用已有的文件来生成镜像：</p>
+<figure class="highlight dockerfile"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">task buildDocker(type: Docker) &#123;</span><br><span class="line">    applicationName = jar.baseName</span><br><span class="line">    tagVersion = jar.version</span><br><span class="line">    dockerfile = file(<span class="string">'Dockerfile'</span>)</span><br><span class="line">    doFirst &#123;</span><br><span class="line">        <span class="keyword">copy</span><span class="bash"> &#123;</span></span><br><span class="line"><span class="bash">            from jar</span></span><br><span class="line"><span class="bash">            into stageDir</span></span><br><span class="line"><span class="bash">        &#125;</span></span><br><span class="line"><span class="bash">    &#125;</span></span><br><span class="line"><span class="bash">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>通过 <code>file()</code> 指定 <code>task</code> 使用位于 <strong>项目根目录</strong> 的 <code>Dockerfile</code> 来生产镜像。</p>
+<h2 id="7-编译并构建Docker镜像"><a href="#7-编译并构建Docker镜像" class="headerlink" title="7. 编译并构建Docker镜像"></a>7. 编译并构建Docker镜像</h2><p>进入项目根目录，运行 <code>gradle</code> 命令进行打包构建。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ./gradlew clean build dockerBuilder --info</span><br></pre></td></tr></table></figure>
+<p><code>gradle</code> 首先会运行 <strong>本地测试</strong>，然后进行 <strong>项目打包</strong>，进一步根据 <code>docker-gradle</code> 插件进行 <strong>镜像构建</strong>。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/gradle_build_docker_image_2.png" alt=""></p>
+<p>等待出现 <code>BUILD SUCCESSFUL</code> 就表明任务运行成功。可以观察到镜像的名称为</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">io.ostenant.springboot.sample/spring-boot-gradle-<span class="keyword">for</span>-<span class="string">docker:</span><span class="number">1.0</span></span><br></pre></td></tr></table></figure>
+<p>运行 <code>docker images</code> 查看本地镜像，进一步验证镜像构建成功。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/gradle_bulld_docker_images.png" alt=""></p>
+<p>下面给出 <code>build.gradle</code> <strong>完整的</strong> 配置文件</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line">buildscript &#123;</span><br><span class="line">    ext &#123;</span><br><span class="line">        springBootVersion = <span class="string">'2.0.2.RELEASE'</span></span><br><span class="line">    &#125;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenCentral()</span><br><span class="line">    &#125;</span><br><span class="line">    dependencies &#123;</span><br><span class="line">        classpath(<span class="string">"org.springframework.boot:spring-boot-gradle-plugin:$&#123;springBootVersion&#125;"</span>)</span><br><span class="line">        classpath(<span class="string">"se.transmode.gradle:gradle-docker:1.2"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'java'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'org.springframework.boot'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'io.spring.dependency-management'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'application'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'docker'</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">group = <span class="string">'io.ostenant.springboot.sample'</span></span><br><span class="line">version = <span class="string">'1.0'</span></span><br><span class="line">sourceCompatibility = <span class="number">1.8</span></span><br><span class="line">targetCompatibility = <span class="number">1.8</span></span><br><span class="line">mainClassName = <span class="string">"io.ostenant.springboot.sample.Application"</span></span><br><span class="line"></span><br><span class="line">repositories &#123;</span><br><span class="line">    mavenCentral()</span><br><span class="line">    jcenter()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">dependencies &#123;</span><br><span class="line">    compile(<span class="string">'org.springframework.boot:spring-boot-starter-web'</span>)</span><br><span class="line">    testCompile(<span class="string">'org.springframework.boot:spring-boot-starter-test'</span>)</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">jar &#123;</span><br><span class="line">    baseName <span class="string">'spring-boot-gradle-for-docker'</span></span><br><span class="line">    version <span class="string">'1.0'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">distDocker &#123;</span><br><span class="line">    baseImage <span class="string">'openjdk'</span></span><br><span class="line">    maintainer <span class="string">'harrison'</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">task dockerBuilder(<span class="string">type:</span> Docker) &#123;</span><br><span class="line">    applicationName = jar.baseName</span><br><span class="line">    tagVersion = jar.version</span><br><span class="line">    volume(<span class="string">'/tmp'</span>)</span><br><span class="line">    addFile(<span class="string">"$&#123;jar.baseName&#125;-$&#123;jar.version&#125;.jar"</span>, <span class="string">"app.jar"</span>)</span><br><span class="line">    entryPoint([<span class="string">"java"</span>, <span class="string">"-Djava.security.egd=file:/dev/./urandom"</span>, <span class="string">"-jar"</span>, <span class="string">'app.jar'</span>])</span><br><span class="line">    exposePort(<span class="number">8080</span>)</span><br><span class="line">    doFirst &#123;</span><br><span class="line">        copy &#123;</span><br><span class="line">            from jar</span><br><span class="line">            into stageDir</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>##8. 使用镜像启动容器</p>
+<p>运行如下命令，根据镜像启动容器，对外暴露 <code>8080</code> 访问端口。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ docker run -d --name gradle-boot -p 8080:8080 io.ostenant.springboot.sample/spring-boot-gradle-for-docker:1.0</span><br></pre></td></tr></table></figure>
+<p>访问 <code>http://127.0.0.1:8080/</code> ，页面会输出当前系统时间，如图所示：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/gradle_build_docker_image_2_web.png" alt=""></p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p><code>gradle-docker</code> 插件还提供了配置 <strong>镜像仓库地址</strong>、配置使用 <code>Docker Remote Api</code> 和 <code>Docker Hub</code> 等用法，可以参考该项目的 <code>GitHub</code> 地址来进行配置使用：<br><a href="https://github.com/Transmode/gradle-docker" target="_blank" rel="noopener">https://github.com/Transmode/gradle-docker</a>。</p>
+<hr>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+        <a href="https://ostenant.coding.me/2018/06/12/实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像/#comments" class="article-comment-link">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2018/06/11/微服务的反模式和陷阱(二) - 超时反模式/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">微服务的反模式和陷阱(二) - 超时反模式</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="lv-container" data-id="city" data-uid=MTAyMC8zNzE2NC8xMzY5OA==></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="no-thumbnail">
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/12/实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像/" class="title">实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像</a></p>
+                            <p class="item-date"><time datetime="2018-06-12T11:35:00.000Z" itemprop="datePublished">2018-06-12</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/微服务系列/">微服务系列</a></p>
+                            <p class="item-title"><a href="/2018/06/11/微服务的反模式和陷阱(二) - 超时反模式/" class="title">微服务的反模式和陷阱(二) - 超时反模式</a></p>
+                            <p class="item-date"><time datetime="2018-06-11T11:40:00.000Z" itemprop="datePublished">2018-06-11</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/微服务系列/">微服务系列</a></p>
+                            <p class="item-title"><a href="/2018/06/10/微服务的反模式和陷阱(一) - 数据驱动的迁移反模式/" class="title">微服务的反模式和陷阱(一) - 数据驱动的迁移反模式</a></p>
+                            <p class="item-date"><time datetime="2018-06-10T10:20:00.000Z" itemprop="datePublished">2018-06-10</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/MySQL学习系列/">MySQL学习系列</a></p>
+                            <p class="item-title"><a href="/2018/06/10/Docker Compose搭建MySQL主从集群/" class="title">Docker Compose搭建MySQL主从复制集群</a></p>
+                            <p class="item-date"><time datetime="2018-06-10T02:33:00.000Z" itemprop="datePublished">2018-06-10</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/高并发系统系列/">高并发系统系列</a></p>
+                            <p class="item-title"><a href="/2018/06/09/并发三剑客之限流方案总结/" class="title">并发三剑客之限流方案总结</a></p>
+                            <p class="item-date"><time datetime="2018-06-09T00:20:00.000Z" itemprop="datePublished">2018-06-09</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL学习系列/">MySQL学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RxJava异步框架系列/">RxJava异步框架系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Reactive编程系列/">Spring Reactive编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术知识图谱/">技术知识图谱</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/测试框架系列/">测试框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/高并发系统系列/">高并发系统系列</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker-Compose/">Docker Compose</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mockito/">Mockito</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paxos/">Paxos</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raft/">Raft</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactive-Streams/">Reactive Streams</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactor/">Reactor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RxJava/">RxJava</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-Boot/">SOFA-Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot-2-0/">Spring Boot 2.0</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-WebFlux/">Spring WebFlux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unique-ID/">Unique ID</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/主从复制/">主从复制</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反模式/">反模式</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异步/">异步</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/限流/">限流</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Android/" style="font-size: 13.33px;">Android</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/Docker/" style="font-size: 16.67px;">Docker</a> <a href="/tags/Docker-Compose/" style="font-size: 10px;">Docker Compose</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Java/" style="font-size: 18.33px;">Java</a> <a href="/tags/Mockito/" style="font-size: 10px;">Mockito</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Paxos/" style="font-size: 10px;">Paxos</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/RPC/" style="font-size: 20px;">RPC</a> <a href="/tags/Raft/" style="font-size: 10px;">Raft</a> <a href="/tags/Reactive-Streams/" style="font-size: 11.67px;">Reactive Streams</a> <a href="/tags/Reactor/" style="font-size: 10px;">Reactor</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/RxJava/" style="font-size: 13.33px;">RxJava</a> <a href="/tags/SOFA-Boot/" style="font-size: 13.33px;">SOFA-Boot</a> <a href="/tags/SOFA-RPC/" style="font-size: 15px;">SOFA-RPC</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Boot-2-0/" style="font-size: 11.67px;">Spring Boot 2.0</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/Spring-WebFlux/" style="font-size: 11.67px;">Spring WebFlux</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Unique-ID/" style="font-size: 10px;">Unique ID</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/主从复制/" style="font-size: 10px;">主从复制</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a> <a href="/tags/反模式/" style="font-size: 11.67px;">反模式</a> <a href="/tags/异步/" style="font-size: 13.33px;">异步</a> <a href="/tags/微服务/" style="font-size: 11.67px;">微服务</a> <a href="/tags/限流/" style="font-size: 10px;">限流</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://ifeve.com" target="_blank">并发编程网</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://juejin.im" target="_blank">掘金</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.jianshu.com" target="_blank">简书</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com" target="_blank">Github</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.infoq.com" target="_blank">Infoq</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fas fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Harrison Chen<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Harrison Chen</a><br>
+            
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+        </div>
+    </div>
+</footer>
+        
+    
+    
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+     (function(d, s) {
+         var j, e = d.getElementsByTagName(s)[0];
+
+         if (typeof LivereTower === 'function') { return; }
+
+         j = d.createElement(s);
+         j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+         j.async = true;
+
+         e.parentNode.insertBefore(j, e);
+     })(document, 'script');
+    </script>
+  <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+  <!-- City版安装代码已完成 -->
+
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
