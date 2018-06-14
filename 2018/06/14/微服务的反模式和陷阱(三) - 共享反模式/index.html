@@ -3,18 +3,25 @@
 <head>
     <meta charset="utf-8">
     
-    <title>归档: 2017/5 | Harrison&#39;s Blog</title>
+    <title>微服务的反模式和陷阱(三) - 共享反模式 | Harrison&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="上善若水任方猿">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Harrison&#39;s Blog">
-<meta property="og:url" content="https://ostenant.coding.me/archives/2017/05/index.html">
+    <meta name="description" content="前言微服务是一种 无共享的架构，另一层意思是 “尽量不共享” 模式(share-as-little-as-possible)， 因为总有一些 代码 会在微服务之间共享。然后如果太过频繁的使用共享代码最终会出现 依赖噩梦**，这就是共享反模式。">
+<meta name="keywords" content="微服务,反模式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="微服务的反模式和陷阱(三) - 共享反模式">
+<meta property="og:url" content="https://ostenant.coding.me/2018/06/14/微服务的反模式和陷阱(三) - 共享反模式/index.html">
 <meta property="og:site_name" content="Harrison&#39;s Blog">
-<meta property="og:description" content="上善若水任方猿">
+<meta property="og:description" content="前言微服务是一种 无共享的架构，另一层意思是 “尽量不共享” 模式(share-as-little-as-possible)， 因为总有一些 代码 会在微服务之间共享。然后如果太过频繁的使用共享代码最终会出现 依赖噩梦**，这就是共享反模式。">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Non_Share1.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Non_Share2.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Non_Share3.png">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-06-14T14:16:54.888Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Harrison&#39;s Blog">
-<meta name="twitter:description" content="上善若水任方猿">
+<meta name="twitter:title" content="微服务的反模式和陷阱(三) - 共享反模式">
+<meta name="twitter:description" content="前言微服务是一种 无共享的架构，另一层意思是 “尽量不共享” 模式(share-as-little-as-possible)， 因为总有一些 代码 会在微服务之间共享。然后如果太过频繁的使用共享代码最终会出现 依赖噩梦**，这就是共享反模式。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Non_Share1.png">
     
 
     
@@ -232,86 +239,178 @@ ga('send', 'pageview');
 </aside>
 
             
-            <section id="main"><div class="timeline timeline-wrap">
-    
-            <div class="timeline-row timeline-row-major">
-                <span class="node"><i class="fas fa-calendar-alt"></i></span>
-                <h1 class="title">2017</h1>
-            </div>
+            <section id="main"><article id="post-微服务的反模式和陷阱(三) - 共享反模式" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
         
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+        
+            <header class="article-header">
                 
     
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2017/05/10/JVM系列(五) - JVM类加载机制详解/">JVM系列(五) - JVM类加载机制详解</a>
+        <h1 class="article-title" itemprop="name">
+            微服务的反模式和陷阱(三) - 共享反模式
         </h1>
     
 
-                <div class="article-meta">
-                    
+                
+                    <div class="article-meta">
+                        
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2017/05/10/JVM系列(五) - JVM类加载机制详解/">
-            <time datetime="2017-05-10T03:17:00.000Z" itemprop="datePublished">2017-05-10</time>
+        <a href="/2018/06/14/微服务的反模式和陷阱(三) - 共享反模式/">
+            <time datetime="2018-06-14T11:40:00.000Z" itemprop="datePublished">2018-06-14</time>
         </a>
     </div>
 
 
-                    
+                        
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a>
+        <a class="article-category-link" href="/categories/微服务系列/">微服务系列</a>
     </div>
 
-                    
+                        
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/JDK/">JDK</a>, <a class="tag-link" href="/tags/Java/">Java</a>
+        <a class="tag-link" href="/tags/反模式/">反模式</a>, <a class="tag-link" href="/tags/微服务/">微服务</a>
     </div>
 
-                </div>
-            </div>
-        </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+                    </div>
                 
-    
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2017/05/02/JVM系列(四) - JVM GC回收算法/">JVM系列(四) - JVM GC回收算法</a>
-        </h1>
-    
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>微服务是一种 <strong>无共享的架构</strong>，另一层意思是 <strong>“尽量不共享”</strong> 模式(<code>share-as-little-as-possible</code>)， 因为总有一些 <strong>代码</strong> 会在微服务之间共享。然后如果太过频繁的使用共享代码<strong>最终会出现 </strong>依赖噩梦**，这就是共享反模式。</p>
+<a id="more"></a>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="共享反模式"><a href="#共享反模式" class="headerlink" title="共享反模式"></a>共享反模式</h2><p>微服务是一种 <strong>无共享的架构</strong>，另一层意思是 <strong>“尽量不共享”</strong> 模式(<code>share-as-little-as-possible</code>)， 因为总有一些 <strong>代码</strong> 会在微服务之间共享。比如 <strong>不提供一个身份验证的微服务</strong>，而是将身份验证的代码打包成一个 <code>jar</code> 文件：<code>security.jar</code>，保证其它服务都能使用。如果安全检查是 <strong>服务级别</strong> 的功能，每个服务接收到请求都会检查安全性，这种方式可以很好的提高性能。</p>
+<p>然后如果太过频繁的使用最终会出现 <strong>依赖噩梦</strong>，如图 <code>1-1</code> 所示，其中每个服务都依赖于 <strong>多个自定义共享库</strong>。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Non_Share1.png" alt=""></p>
+<p>这种共享级别不仅破坏了每个 <strong>服务的限界上下文</strong>，而且还引入了几个问题，包括整体 <strong>可靠性</strong>、<strong>变更控制</strong>、<strong>可测试性</strong> 和 <strong>部署能力</strong>。</p>
+<h3 id="1-过多依赖"><a href="#1-过多依赖" class="headerlink" title="1. 过多依赖"></a>1. 过多依赖</h3><p>在面向对象的软件开发过程中，经常会遇到 <strong>共享</strong> 的问题，特别是从 <strong>单一分层</strong> 结构迁移到 <strong>微服务结构</strong> 时，图 <code>1-2</code> 展示 <strong>抽象类和共享</strong>，它们最终在多数单块分层体系结构中共享。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Non_Share2.png" alt=""></p>
+<p><strong>微服务架构</strong> 的主要目标就是共享要尽可能的少，这有助于维护服务的 <strong>限界上下文</strong>，使我们能够快速的 <strong>测试</strong> 和 <strong>布署</strong>。服务之间 <strong>依赖越强</strong>，<strong>服务隔离</strong> 也就 <strong>越困难</strong>，因此也就越难单独进行 <strong>测试</strong> 和 <strong>布署</strong>。</p>
+<p>创建 <strong>抽象类</strong> 和 <strong>接口</strong> 是 <strong>面向对象编程</strong> 的最重要做法，那我们如何来处理数百个服务共享的代码？</p>
+<h3 id="2-共享代码的技术"><a href="#2-共享代码的技术" class="headerlink" title="2. 共享代码的技术"></a>2. 共享代码的技术</h3><p>要避免这个 <strong>反模式</strong> 的最好办法就是 <strong>代码不共享</strong>，但是实际工作中总会有一些代码需要进行共享，那这些共享代码应该放到哪里呢？</p>
+<p>图 <code>1-3</code> 给了四个最基本的技术：</p>
+<ul>
+<li>共享项目</li>
+<li>共享库</li>
+<li>复制</li>
+<li>服务合并</li>
+</ul>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Non_Share3.png" alt=""></p>
+<h2 id="相关链接"><a href="#相关链接" class="headerlink" title="相关链接"></a>相关链接</h2><ol>
+<li><a href="">微服务的反模式和陷阱(一) - 数据驱动的迁移反模式</a></li>
+<li><a href="">微服务的反模式和陷阱(二) - 超时反模式</a></li>
+<li><a href="">微服务的反模式和陷阱(三) - 共享反模式</a></li>
+<li><a href="">微服务的反模式和陷阱(四) - 到达报告反模式</a></li>
+<li><a href="">微服务的反模式和陷阱(五) - 沙粒陷阱</a></li>
+<li><a href="">微服务的反模式和陷阱(六) - 无因的开发者陷阱</a></li>
+<li><a href="">微服务的反模式和陷阱(七) - 随大流陷阱</a></li>
+<li><a href="">微服务的反模式和陷阱(八) - 其它架构模式</a></li>
+<li><a href="">微服务的反模式和陷阱(九) - 静态契约陷阱</a></li>
+<li><a href="">微服务的反模式和陷阱(十) - 通信协议使用的陷阱</a></li>
+</ol>
+<hr>
+<p>欢迎关注公众号： <strong>零壹技术栈</strong></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
 
-                <div class="article-meta">
-                    
-    <div class="article-date">
-        <i class="fas fa-calendar-alt"></i>
-        <a href="/2017/05/02/JVM系列(四) - JVM GC回收算法/">
-            <time datetime="2017-05-02T10:09:00.000Z" itemprop="datePublished">2017-05-02</time>
-        </a>
-    </div>
-
-
-                    
-    <div class="article-category">
-    	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a>
-    </div>
-
-                    
-    <div class="article-tag">
-        <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/JVM/">JVM</a>, <a class="tag-link" href="/tags/Java/">Java</a>
-    </div>
-
-                </div>
-            </div>
+        
         </div>
-    
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+        <a href="https://ostenant.coding.me/2018/06/14/微服务的反模式和陷阱(三) - 共享反模式/#comments" class="article-comment-link">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2018/06/12/实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">实战Spring Boot 2.0系列(一) - 使用Gradle构建Docker镜像</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="lv-container" data-id="city" data-uid=MTAyMC8zNzE2NC8xMzY5OA==></div>
+</section>
+    
+
 </section>
             
                 
