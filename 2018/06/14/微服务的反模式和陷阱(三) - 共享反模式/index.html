@@ -5,22 +5,22 @@
     
     <title>微服务的反模式和陷阱(三) - 共享反模式 | Harrison&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="前言微服务是一种 无共享的架构，另一层意思是 “尽量不共享” 模式(share-as-little-as-possible)， 因为总有一些 代码 会在微服务之间共享。然后如果太过频繁的使用共享代码最终会出现 依赖噩梦**，这就是共享反模式。">
+    <meta name="description" content="前言微服务是一种 无共享的架构，另一层意思是 “尽量不共享” 模式(share-as-little-as-possible)， 因为总有一些 代码 会在微服务之间共享。然后如果太过频繁的使用 共享代码 最终会出现 依赖噩梦，这就是共享反模式。">
 <meta name="keywords" content="微服务,反模式">
 <meta property="og:type" content="article">
 <meta property="og:title" content="微服务的反模式和陷阱(三) - 共享反模式">
 <meta property="og:url" content="https://ostenant.coding.me/2018/06/14/微服务的反模式和陷阱(三) - 共享反模式/index.html">
 <meta property="og:site_name" content="Harrison&#39;s Blog">
-<meta property="og:description" content="前言微服务是一种 无共享的架构，另一层意思是 “尽量不共享” 模式(share-as-little-as-possible)， 因为总有一些 代码 会在微服务之间共享。然后如果太过频繁的使用共享代码最终会出现 依赖噩梦**，这就是共享反模式。">
+<meta property="og:description" content="前言微服务是一种 无共享的架构，另一层意思是 “尽量不共享” 模式(share-as-little-as-possible)， 因为总有一些 代码 会在微服务之间共享。然后如果太过频繁的使用 共享代码 最终会出现 依赖噩梦，这就是共享反模式。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Non_Share1.png">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Non_Share2.png">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Non_Share3.png">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-06-14T14:16:54.888Z">
+<meta property="og:updated_time" content="2018-06-14T15:05:42.431Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="微服务的反模式和陷阱(三) - 共享反模式">
-<meta name="twitter:description" content="前言微服务是一种 无共享的架构，另一层意思是 “尽量不共享” 模式(share-as-little-as-possible)， 因为总有一些 代码 会在微服务之间共享。然后如果太过频繁的使用共享代码最终会出现 依赖噩梦**，这就是共享反模式。">
+<meta name="twitter:description" content="前言微服务是一种 无共享的架构，另一层意思是 “尽量不共享” 模式(share-as-little-as-possible)， 因为总有一些 代码 会在微服务之间共享。然后如果太过频繁的使用 共享代码 最终会出现 依赖噩梦，这就是共享反模式。">
 <meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/Micro_Service_Non_Share1.png">
     
 
@@ -282,7 +282,7 @@ ga('send', 'pageview');
         <div class="article-entry" itemprop="articleBody">
         
             
-            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>微服务是一种 <strong>无共享的架构</strong>，另一层意思是 <strong>“尽量不共享”</strong> 模式(<code>share-as-little-as-possible</code>)， 因为总有一些 <strong>代码</strong> 会在微服务之间共享。然后如果太过频繁的使用共享代码<strong>最终会出现 </strong>依赖噩梦**，这就是共享反模式。</p>
+            <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>微服务是一种 <strong>无共享的架构</strong>，另一层意思是 <strong>“尽量不共享”</strong> 模式(<code>share-as-little-as-possible</code>)， 因为总有一些 <strong>代码</strong> 会在微服务之间共享。然后如果太过频繁的使用 <strong>共享代码</strong> 最终会出现 <strong>依赖噩梦</strong>，这就是共享反模式。</p>
 <a id="more"></a>
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="共享反模式"><a href="#共享反模式" class="headerlink" title="共享反模式"></a>共享反模式</h2><p>微服务是一种 <strong>无共享的架构</strong>，另一层意思是 <strong>“尽量不共享”</strong> 模式(<code>share-as-little-as-possible</code>)， 因为总有一些 <strong>代码</strong> 会在微服务之间共享。比如 <strong>不提供一个身份验证的微服务</strong>，而是将身份验证的代码打包成一个 <code>jar</code> 文件：<code>security.jar</code>，保证其它服务都能使用。如果安全检查是 <strong>服务级别</strong> 的功能，每个服务接收到请求都会检查安全性，这种方式可以很好的提高性能。</p>
 <p>然后如果太过频繁的使用最终会出现 <strong>依赖噩梦</strong>，如图 <code>1-1</code> 所示，其中每个服务都依赖于 <strong>多个自定义共享库</strong>。</p>
