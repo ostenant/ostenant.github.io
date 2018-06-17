@@ -3,23 +3,23 @@
 <head>
     <meta charset="utf-8">
     
-    <title>一天一个设计模式(一) - 总体概述 | Harrison&#39;s Blog</title>
+    <title>实战Spring Boot 2.0系列(三) - 使用@Async进行异步调用详解 | Harrison&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="前言最近在对设计模式进行了一系列总结，本文将给大家关于设计模式的一个整体的介绍。">
+    <meta name="description" content="前言异步调用 对应的是 同步调用，同步调用 指程序按照 定义顺序 依次执行，每一行程序都必须等待上一行程序执行完成之后才能执行；异步调用 指程序在顺序执行时，不等待 异步调用的语句 返回结果 就执行后面的程序。">
+<meta name="keywords" content="异步,Spring Boot 2.0">
 <meta property="og:type" content="article">
-<meta property="og:title" content="一天一个设计模式(一) - 总体概述">
-<meta property="og:url" content="https://ostenant.coding.me/2017/06/02/一天一个设计模式(一) - 总体概述/index.html">
+<meta property="og:title" content="实战Spring Boot 2.0系列(三) - 使用@Async进行异步调用详解">
+<meta property="og:url" content="https://ostenant.coding.me/2018/06/17/实战Spring Boot 2.0系列(三) - 使用@Async进行异步调用详解/index.html">
 <meta property="og:site_name" content="Harrison&#39;s Blog">
-<meta property="og:description" content="前言最近在对设计模式进行了一系列总结，本文将给大家关于设计模式的一个整体的介绍。">
+<meta property="og:description" content="前言异步调用 对应的是 同步调用，同步调用 指程序按照 定义顺序 依次执行，每一行程序都必须等待上一行程序执行完成之后才能执行；异步调用 指程序在顺序执行时，不等待 异步调用的语句 返回结果 就执行后面的程序。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/jpg/design_pattern_principle.jpg">
-<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/jpg/design_pattern.jpg">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/SpringBootAll.png">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-05-08T02:49:46.093Z">
+<meta property="og:updated_time" content="2018-06-17T05:50:17.632Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="一天一个设计模式(一) - 总体概述">
-<meta name="twitter:description" content="前言最近在对设计模式进行了一系列总结，本文将给大家关于设计模式的一个整体的介绍。">
-<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/image/jpg/design_pattern_principle.jpg">
+<meta name="twitter:title" content="实战Spring Boot 2.0系列(三) - 使用@Async进行异步调用详解">
+<meta name="twitter:description" content="前言异步调用 对应的是 同步调用，同步调用 指程序按照 定义顺序 依次执行，每一行程序都必须等待上一行程序执行完成之后才能执行；异步调用 指程序在顺序执行时，不等待 异步调用的语句 返回结果 就执行后面的程序。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/SpringBootAll.png">
     
 
     
@@ -237,7 +237,7 @@ ga('send', 'pageview');
 </aside>
 
             
-            <section id="main"><article id="post-一天一个设计模式(一) - 总体概述" class="article article-type-post" itemscope itemprop="blogPost">
+            <section id="main"><article id="post-实战Spring Boot 2.0系列(三) - 使用@Async进行异步调用详解" class="article article-type-post" itemscope itemprop="blogPost">
     <div class="article-inner">
         
         
@@ -245,7 +245,7 @@ ga('send', 'pageview');
                 
     
         <h1 class="article-title" itemprop="name">
-            一天一个设计模式(一) - 总体概述
+            实战Spring Boot 2.0系列(三) - 使用@Async进行异步调用详解
         </h1>
     
 
@@ -254,8 +254,8 @@ ga('send', 'pageview');
                         
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2017/06/02/一天一个设计模式(一) - 总体概述/">
-            <time datetime="2017-06-02T05:22:00.000Z" itemprop="datePublished">2017-06-02</time>
+        <a href="/2018/06/17/实战Spring Boot 2.0系列(三) - 使用@Async进行异步调用详解/">
+            <time datetime="2018-06-17T01:40:00.000Z" itemprop="datePublished">2018-06-17</time>
         </a>
     </div>
 
@@ -263,10 +263,15 @@ ga('send', 'pageview');
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a>
+        <a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a>
     </div>
 
                         
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/Spring-Boot-2-0/">Spring Boot 2.0</a>, <a class="tag-link" href="/tags/异步/">异步</a>
+    </div>
+
                     </div>
                 
             </header>
@@ -276,35 +281,74 @@ ga('send', 'pageview');
         
             
             <hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>最近在对设计模式进行了一系列总结，本文将给大家关于设计模式的一个整体的介绍。</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><strong>异步调用</strong> 对应的是 <strong>同步调用</strong>，<strong>同步调用</strong> 指程序按照 <strong>定义顺序</strong> 依次执行，每一行程序都必须等待上一行程序执行完成之后才能执行；<strong>异步调用</strong> 指程序在顺序执行时，<strong>不等待</strong> 异步调用的语句 <strong>返回结果</strong> 就执行后面的程序。</p>
 <a id="more"></a>
-<hr>
-<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="1-定义"><a href="#1-定义" class="headerlink" title="1. 定义"></a>1. 定义</h2><p>设计模式是某类特定问题的代码设计解决方案，是一套代码设计的经验总结。</p>
-<h2 id="2-作用"><a href="#2-作用" class="headerlink" title="2. 作用"></a>2. 作用</h2><ul>
-<li>提高代码复用率，降低开发成本和周期</li>
-<li>提高代码可维护性、可拓展性</li>
-<li>使代码更加优雅，可读性更强</li>
-<li>让代码更容易被他人理解</li>
-</ul>
-<h2 id="3-设计原则"><a href="#3-设计原则" class="headerlink" title="3. 设计原则"></a>3. 设计原则</h2><p>在设计模式进行设计时需要遵循以下的面向对象设计原则：</p>
-<p><img src="http://ols3fdyll.bkt.clouddn.com/image/jpg/design_pattern_principle.jpg" alt=""></p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/SpringBootAll.png" alt=""></p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="1-环境准备"><a href="#1-环境准备" class="headerlink" title="1. 环境准备"></a>1. 环境准备</h2><p>利用 <code>Spring Initializer</code> 创建一个 <code>gradle</code> 项目  <code>spring-boot-async-task</code>，创建时添加相关依赖。得到的初始 <code>build.gradle</code> 如下：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">buildscript &#123;</span><br><span class="line">    ext &#123;</span><br><span class="line">        springBootVersion = <span class="string">'2.0.3.RELEASE'</span></span><br><span class="line">    &#125;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenCentral()</span><br><span class="line">    &#125;</span><br><span class="line">    dependencies &#123;</span><br><span class="line">        classpath(<span class="string">"org.springframework.boot:spring-boot-gradle-plugin:$&#123;springBootVersion&#125;"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'java'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'eclipse'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'org.springframework.boot'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'io.spring.dependency-management'</span></span><br><span class="line"></span><br><span class="line">group = <span class="string">'io.ostenant.springboot.sample'</span></span><br><span class="line">version = <span class="string">'0.0.1-SNAPSHOT'</span></span><br><span class="line">sourceCompatibility = <span class="number">1.8</span></span><br><span class="line"></span><br><span class="line">repositories &#123;</span><br><span class="line">    mavenCentral()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">dependencies &#123;</span><br><span class="line">    compile(<span class="string">'org.springframework.boot:spring-boot-starter-web'</span>)</span><br><span class="line">    compileOnly(<span class="string">'org.projectlombok:lombok'</span>)</span><br><span class="line">    testCompile(<span class="string">'org.springframework.boot:spring-boot-starter-test'</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在 <code>Spring Boot</code> 入口类上配置 <code>@EnableAsync</code> 注解开启异步处理。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@EnableAsync</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(Application.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建任务抽象类 <code>AbstractTask</code>，并分别配置三个任务方法 <code>doTaskOne()</code>，<code>doTaskTwo()</code>，<code>doTaskThree()</code>。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractTask</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> Random random = <span class="keyword">new</span> Random();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTaskOne</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        out.println(<span class="string">"开始做任务一"</span>);</span><br><span class="line">        <span class="keyword">long</span> start = currentTimeMillis();</span><br><span class="line">        sleep(random.nextInt(<span class="number">10000</span>));</span><br><span class="line">        <span class="keyword">long</span> end = currentTimeMillis();</span><br><span class="line">        out.println(<span class="string">"完成任务一，耗时："</span> + (end - start) + <span class="string">"毫秒"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTaskTwo</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        out.println(<span class="string">"开始做任务二"</span>);</span><br><span class="line">        <span class="keyword">long</span> start = currentTimeMillis();</span><br><span class="line">        sleep(random.nextInt(<span class="number">10000</span>));</span><br><span class="line">        <span class="keyword">long</span> end = currentTimeMillis();</span><br><span class="line">        out.println(<span class="string">"完成任务二，耗时："</span> + (end - start) + <span class="string">"毫秒"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTaskThree</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        out.println(<span class="string">"开始做任务三"</span>);</span><br><span class="line">        <span class="keyword">long</span> start = currentTimeMillis();</span><br><span class="line">        sleep(random.nextInt(<span class="number">10000</span>));</span><br><span class="line">        <span class="keyword">long</span> end = currentTimeMillis();</span><br><span class="line">        out.println(<span class="string">"完成任务三，耗时："</span> + (end - start) + <span class="string">"毫秒"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="2-几种调用方式"><a href="#2-几种调用方式" class="headerlink" title="2. 几种调用方式"></a>2. 几种调用方式</h2><h3 id="2-1-同步调用"><a href="#2-1-同步调用" class="headerlink" title="2.1. 同步调用"></a>2.1. 同步调用</h3><p>下面通过一个简单示例来直观的理解什么是同步调用：</p>
 <ul>
-<li><strong>单一职责原则</strong> (<code>SRP</code>)：就一个类而言，应该仅有一个引起它变化的原因。</li>
-<li><strong>开闭原则</strong> (<code>ASD</code>)：类、模块、函数等等应该是可以拓展的，但是不可修改。</li>
-<li><strong>里氏替换原则</strong> (<code>LSP</code>)：所有引用基类（父类）的地方必须能透明地使用其子类的对象。</li>
-<li><strong>依赖倒置原则</strong> (<code>DIP</code>)：高层模块不应该依赖低层模块，两个都应该依赖于抽象。抽象不应该依赖于细节，细节应该依赖于抽象。</li>
-<li><strong>迪米特原则</strong> (<code>LOD</code>)：一个软件实体应当尽可能少地与其他实体发生相互作用。</li>
-<li><strong>接口隔离原则</strong> (<code>ISP</code>)：一个类对另一个类的依赖应该建立在最小的接口上。</li>
+<li>定义 <code>Task</code> 类，继承 <code>AbstractTask</code>，三个处理函数分别模拟三个执行任务的操作，操作消耗时间随机取（<code>10</code> 秒内）。</li>
 </ul>
-<h2 id="4-设计模式分类"><a href="#4-设计模式分类" class="headerlink" title="4. 设计模式分类"></a>4. 设计模式分类</h2><p>常用的<code>23</code>种<strong>设计模式</strong>总体来说分为三大类：<strong>创建型模式</strong>、<strong>结构型模式</strong> 和 <strong>行为型模式</strong>。</p>
-<p><strong>创建型模式</strong> (共五种)：工厂方法模式、抽象工厂模式、单例模式、建造者模式、原型模式。</p>
-<p><strong>结构型模式</strong> (共七种)：适配器模式、装饰器模式、代理模式、外观模式、桥接模式、组合模式、享元模式。</p>
-<p><strong>行为型模式</strong> (共十一种)：策略模式、模板方法模式、观察者模式、迭代子模式、责任链模式、命令模式、备忘录模式、状态模式、访问者模式、中介者模式、解释器模式。</p>
-<p>三大类设计模式及其分类，如下图所示：</p>
-<p><img src="http://ols3fdyll.bkt.clouddn.com/image/jpg/design_pattern.jpg" alt=""></p>
-<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>本文对设计模式的定义进行了大致总体的介绍，接下来我会对几种常用的设计模式进行详细的分析。</p>
-<hr>
-<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Task</span> <span class="keyword">extends</span> <span class="title">AbstractTask</span> </span>&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 <strong>单元测试</strong> 用例中，注入 <code>Task</code> 对象，并在测试用例中执行 <code>doTaskOne()</code>，<code>doTaskTwo()</code>，<code>doTaskThree()</code> 三个方法。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RunWith</span>(SpringRunner.class)</span><br><span class="line"><span class="meta">@SpringBootTest</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TaskTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> Task task;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testSyncTasks</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        task.doTaskOne();</span><br><span class="line">        task.doTaskTwo();</span><br><span class="line">        task.doTaskThree();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>执行单元测试，可以看到类似如下输出：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">开始做任务一</span><br><span class="line">完成任务一，耗时：4059毫秒</span><br><span class="line">开始做任务二</span><br><span class="line">完成任务二，耗时：6316毫秒</span><br><span class="line">开始做任务三</span><br><span class="line">完成任务三，耗时：1973毫秒</span><br></pre></td></tr></table></figure>
+<p>任务一、任务二、任务三顺序的执行完了，换言之 <code>doTaskOne()</code>，<code>doTaskTwo()</code>，<code>doTaskThree()</code> 三个方法顺序的执行完成。</p>
+<h3 id="2-2-异步调用"><a href="#2-2-异步调用" class="headerlink" title="2.2. 异步调用"></a>2.2. 异步调用</h3><p>上述的 <strong>同步调用</strong> 虽然顺利的执行完了三个任务，但是可以看到 <strong>执行时间比较长</strong>，若这三个任务本身之间 <strong>不存在依赖关系</strong>，可以 <strong>并发执行</strong> 的话，同步调用在 <strong>执行效率</strong> 方面就比较差，可以考虑通过 <strong>异步调用</strong> 的方式来 <strong>并发执行</strong>。</p>
+<ul>
+<li>创建 <code>AsyncTask</code>类，分别在方法上配置 <code>@Async</code> 注解，将原来的 <strong>同步方法</strong> 变为 <strong>异步方法</strong>。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncTask</span> <span class="keyword">extends</span> <span class="title">AbstractTask</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Async</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTaskOne</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.doTaskOne();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Async</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTaskTwo</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.doTaskTwo();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Async</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doTaskThree</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.doTaskThree();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 <strong>单元测试</strong> 用例中，注入 <code>AsyncTask</code> 对象，并在测试用例中执行 <code>doTaskOne()</code>，<code>doTaskTwo()</code>，<code>doTaskThree()</code> 三个方法。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RunWith</span>(SpringRunner.class)</span><br><span class="line"><span class="meta">@SpringBootTest</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncTaskTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> AsyncTask task;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAsyncTasks</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        task.doTaskOne();</span><br><span class="line">        task.doTaskTwo();</span><br><span class="line">        task.doTaskThree();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>执行单元测试，可以看到类似如下输出：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">开始做任务三</span><br><span class="line">开始做任务一</span><br><span class="line">开始做任务二</span><br></pre></td></tr></table></figure>
+<p>如果反复执行单元测试，可能会遇到各种不同的结果，比如：</p>
+<ol>
+<li>没有任何任务相关的输出</li>
+<li>有部分任务相关的输出</li>
+<li>乱序的任务相关的输出</li>
+</ol>
+<p>原因是目前 <code>doTaskOne()</code>，<code>doTaskTwo()</code>，<code>doTaskThree()</code> 这三个方法已经 <strong>异步执行</strong> 了。主程序在 <strong>异步调用</strong> 之后，主程序并不会理会这三个函数是否执行完成了，由于没有其他需要执行的内容，所以程序就 <strong>自动结束</strong> 了，导致了 <strong>不完整</strong> 或是 <strong>没有输出任务</strong> 相关内容的情况。</p>
+<blockquote>
+<p>注意：@Async所修饰的函数不要定义为static类型，这样异步调用不会生效。</p>
+</blockquote>
+<h3 id="2-3-异步回调"><a href="#2-3-异步回调" class="headerlink" title="2.3. 异步回调"></a>2.3. 异步回调</h3><p>为了让 <code>doTaskOne()</code>，<code>doTaskTwo()</code>，<code>doTaskThree()</code> 能正常结束，假设我们需要统计一下三个任务 <strong>并发执行</strong> 共耗时多少，这就需要等到上述三个函数都完成动用之后记录时间，并计算结果。</p>
+<p>那么我们如何判断上述三个 <strong>异步调用</strong> 是否已经执行完成呢？我们需要使用 <code>Future&lt;T&gt;</code> 来返回 <strong>异步调用</strong> 的 <strong>结果</strong>。</p>
+<ul>
+<li>创建 <code>AsyncCallBackTask</code> 类，声明 <code>doTaskOneCallback()</code>，<code>doTaskTwoCallback()</code>，<code>doTaskThreeCallback()</code> 三个方法，对原有的三个方法进行包装。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncCallBackTask</span> <span class="keyword">extends</span> <span class="title">AbstractTask</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Async</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Future&lt;String&gt; <span class="title">doTaskOneCallback</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.doTaskOne();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> AsyncResult&lt;&gt;(<span class="string">"任务一完成"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Async</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Future&lt;String&gt; <span class="title">doTaskTwoCallback</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.doTaskTwo();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> AsyncResult&lt;&gt;(<span class="string">"任务二完成"</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Async</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Future&lt;String&gt; <span class="title">doTaskThreeCallback</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">super</span>.doTaskThree();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> AsyncResult&lt;&gt;(<span class="string">"任务三完成"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>在 <strong>单元测试</strong> 用例中，注入 <code>AsyncCallBackTask</code> 对象，并在测试用例中执行 <code>doTaskOneCallback()</code>，<code>doTaskTwoCallback()</code>，<code>doTaskThreeCallback()</code> 三个方法。循环调用 <code>Future</code> 的 <code>isDone()</code> 方法等待三个 <strong>并发任务</strong> 执行完成，记录最终执行时间。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@RunWith</span>(SpringRunner.class)</span><br><span class="line"><span class="meta">@SpringBootTest</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">AsyncCallBackTaskTest</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Autowired</span></span><br><span class="line">    <span class="keyword">private</span> AsyncCallBackTask task;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Test</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">testAsyncCallbackTask</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> start = currentTimeMillis();</span><br><span class="line">        Future&lt;String&gt; task1 = task.doTaskOneCallback();</span><br><span class="line">        Future&lt;String&gt; task2 = task.doTaskTwoCallback();</span><br><span class="line">        Future&lt;String&gt; task3 = task.doTaskThreeCallback();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// 三个任务都调用完成，退出循环等待</span></span><br><span class="line">        <span class="keyword">while</span> (!task1.isDone() || !task2.isDone() || !task3.isDone()) &#123;</span><br><span class="line">            sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="keyword">long</span> end = currentTimeMillis();</span><br><span class="line">        out.println(<span class="string">"任务全部完成，总耗时："</span> + (end - start) + <span class="string">"毫秒"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>看看都做了哪些改变：</p>
+<ul>
+<li>在测试用例一开始记录开始时间；</li>
+<li>在调用三个异步函数的时候，返回Future<string>类型的结果对象；</string></li>
+<li>在调用完三个异步函数之后，开启一个循环，根据返回的Future<string>对象来判断三个异步函数是否都结束了。若都结束，就结束循环；若没有都结束，就等1秒后再判断。</string></li>
+<li>跳出循环之后，根据结束时间 - 开始时间，计算出三个任务并发执行的总耗时。</li>
+</ul>
+<p>执行一下上述的单元测试，可以看到如下结果：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">开始做任务一</span><br><span class="line">开始做任务三</span><br><span class="line">开始做任务二</span><br><span class="line">完成任务二，耗时：4882毫秒</span><br><span class="line">完成任务三，耗时：6484毫秒</span><br><span class="line">完成任务一，耗时：8748毫秒</span><br><span class="line">任务全部完成，总耗时：9043毫秒</span><br></pre></td></tr></table></figure>
+<p>可以看到，通过 <strong>异步调用</strong>，让任务一、任务二、任务三 <strong>并发执行</strong>，有效的 <strong>减少</strong> 了程序的 <strong>运行总时间</strong>。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><hr>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
 <p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
 <p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
 
@@ -372,7 +416,7 @@ ga('send', 'pageview');
 
             
     
-        <a href="https://ostenant.coding.me/2017/06/02/一天一个设计模式(一) - 总体概述/#comments" class="article-comment-link">评论</a>
+        <a href="https://ostenant.coding.me/2018/06/17/实战Spring Boot 2.0系列(三) - 使用@Async进行异步调用详解/#comments" class="article-comment-link">评论</a>
     
 
         </footer>
@@ -381,19 +425,10 @@ ga('send', 'pageview');
         
 <nav id="article-nav">
     
-        <a href="/2017/06/03/一天一个设计模式(二) - 单例模式(Singleton)/" id="article-nav-newer" class="article-nav-link-wrap">
-            <strong class="article-nav-caption">上一篇</strong>
-            <div class="article-nav-title">
-                
-                    一天一个设计模式(二) -单例模式(Singleton)
-                
-            </div>
-        </a>
     
-    
-        <a href="/2017/05/10/JVM系列(五) - JVM类加载机制详解/" id="article-nav-older" class="article-nav-link-wrap">
+        <a href="/2018/06/16/实战Spring Boot 2.0系列(二) - 全局异常处理和测试/" id="article-nav-older" class="article-nav-link-wrap">
             <strong class="article-nav-caption">下一篇</strong>
-            <div class="article-nav-title">JVM系列(五) - JVM类加载机制详解</div>
+            <div class="article-nav-title">实战Spring Boot 2.0系列(二) - 全局异常处理和测试</div>
         </a>
     
 </nav>
