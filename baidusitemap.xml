@@ -5,7 +5,7 @@
     
   <url>
     <loc>https://ostenant.coding.me/2018/06/18/%E5%AE%9E%E6%88%98Spring%20Boot%202.0%E7%B3%BB%E5%88%97(%E5%9B%9B)%20-%20%E4%BD%BF%E7%94%A8WebAsyncTask%E5%A4%84%E7%90%86%E5%BC%82%E6%AD%A5%E4%BB%BB%E5%8A%A1/</loc>
-    <lastmod>2018-06-18T13:42:09.314Z</lastmod>
+    <lastmod>2018-06-18T14:08:49.695Z</lastmod>
     <data>
         <display>
         <title>实战Spring Boot 2.0系列(四) - 使用WebAsyncTask处理异步任务</title>
@@ -324,11 +324,11 @@
         <title>实战Spring Boot 2.0 Reactive编程系列(一) - WebFlux初体验</title>
         <pubTime>2018-05-27T07:25:00.000Z</pubTime>
         
-        <tag>Spring Boot 2.0</tag>
-         
         <tag>Reactive Streams</tag>
          
         <tag>Spring WebFlux</tag>
+         
+        <tag>Spring Boot 2.0</tag>
          
          
            
