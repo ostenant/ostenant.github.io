@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8">
     
-    <title>分布式理论(六) - 一致性协议Raft | Harrison&#39;s Blog</title>
+    <title>分布式理论(六) - 一致性协议Raft | Icarus&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="前言Raft 也是一个 一致性算法，和 Paxos 目标相同。但它还有另一个名字 - 易于理解的一致性算法。Paxos 和 Raft 都是为了实现 一致性 产生的。这个过程如同选举一样，参选者 需要说服 大多数选民 (服务器) 投票给他，一旦选定后就跟随其操作。Paxos 和 Raft 的区别在于选举的 具体过程 不同。">
 <meta name="keywords" content="Raft">
 <meta property="og:type" content="article">
 <meta property="og:title" content="分布式理论(六) - 一致性协议Raft">
 <meta property="og:url" content="https://ostenant.coding.me/2018/06/05/分布式理论(六) - 一致性协议Raft/index.html">
-<meta property="og:site_name" content="Harrison&#39;s Blog">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
 <meta property="og:description" content="前言Raft 也是一个 一致性算法，和 Paxos 目标相同。但它还有另一个名字 - 易于理解的一致性算法。Paxos 和 Raft 都是为了实现 一致性 产生的。这个过程如同选举一样，参选者 需要说服 大多数选民 (服务器) 投票给他，一旦选定后就跟随其操作。Paxos 和 Raft 的区别在于选举的 具体过程 不同。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Raft_prepare.png">
@@ -25,7 +25,7 @@
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Raft_failure_6.png">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Raft_failure_7.png">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-06-05T15:39:23.025Z">
+<meta property="og:updated_time" content="2018-06-18T01:54:52.119Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="分布式理论(六) - 一致性协议Raft">
 <meta name="twitter:description" content="前言Raft 也是一个 一致性算法，和 Paxos 目标相同。但它还有另一个名字 - 易于理解的一致性算法。Paxos 和 Raft 都是为了实现 一致性 产生的。这个过程如同选举一样，参选者 需要说服 大多数选民 (服务器) 投票给他，一旦选定后就跟随其操作。Paxos 和 Raft 的区别在于选举的 具体过程 不同。">
@@ -33,7 +33,7 @@
     
 
     
-        <link rel="alternate" href="/" title="Harrison&#39;s Blog" type="application/atom+xml" />
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
     
 
     
@@ -83,7 +83,7 @@ ga('send', 'pageview');
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">Harrison&#39;s Blog</span>
+                <span class="site-title">Icarus&#39;s Blog</span>
             </a>
             <nav id="main-nav">
                 
@@ -94,6 +94,8 @@ ga('send', 'pageview');
                     <a class="main-nav-link" href="/categories">分类</a>
                 
                     <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
                 
                     <a class="main-nav-link" href="/about">关于我</a>
                 
@@ -160,6 +162,8 @@ ga('send', 'pageview');
                 
                     <td><a class="main-nav-link" href="/tags">标签</a></td>
                 
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
                     <td><a class="main-nav-link" href="/about">关于我</a></td>
                 
                 <td>
@@ -182,7 +186,7 @@ ga('send', 'pageview');
     <div class="inner profile-inner">
         <div class="base-info profile-block">
             <img id="avatar" src="/css/images/avatar.jpeg" />
-            <h2 id="name">陈林 | Harrison</h2>
+            <h2 id="name">陈林 | Icarus</h2>
             <h3 id="title">年轻无为，卖码为生!</h3>
             <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
             <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
@@ -387,8 +391,8 @@ ga('send', 'pageview');
 <h3 id="验证结果"><a href="#验证结果" class="headerlink" title="验证结果"></a>验证结果</h3><p>综上穷举分析了 <strong>最小集群</strong>（<code>3</code> 节点）面临的所有情况，可以看出 <code>Raft</code> 协议都能很好的应对 <strong>一致性问题</strong>，并且很容易理解。</p>
 <h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p><code>Paxos</code> 算法是 <code>Leslie Lamport</code> 在 <code>1990</code> 年就公开发表在了自己的网站上，想想我们是什么时候才听说的？什么时候才有一个可用的实现？而 <code>Raft</code> 算法是 <code>2013</code> 年发表的，大家在参考 <a href="https://raft.github.io/#implementations" target="_blank" rel="noopener">Raft开源实现库</a>，可以看到有很多基于不同语言的 <strong>开源实现库</strong>，这就是 <strong>可理解性</strong> 的重要性。</p>
 <hr>
-<p>欢迎关注公众号： 零壹技术栈</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="零壹技术栈"></p>
 <p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
 
         
@@ -650,8 +654,8 @@ ga('send', 'pageview');
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2018 Harrison Chen<br>
-            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Harrison Chen</a><br>
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
             
     <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
 

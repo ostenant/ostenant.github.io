@@ -3,19 +3,19 @@
 <head>
     <meta charset="utf-8">
     
-    <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇) | Harrison&#39;s Blog</title>
+    <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇) | Icarus&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="前言上文介绍了SOFA-RPC 的几种调用方式，包括单向调用、同步调用、Future调用、回调，引入了泛化调用和过滤器。本文将对 SOFA-RPC 的高级功能，包括参数配置、自定义线程池、预热权重和自动故障剔除等。">
 <meta name="keywords" content="RPC,SOFA-RPC,SOFA-Boot">
 <meta property="og:type" content="article">
 <meta property="og:title" content="蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)">
 <meta property="og:url" content="https://ostenant.coding.me/2018/05/12/蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)/index.html">
-<meta property="og:site_name" content="Harrison&#39;s Blog">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
 <meta property="og:description" content="前言上文介绍了SOFA-RPC 的几种调用方式，包括单向调用、同步调用、Future调用、回调，引入了泛化调用和过滤器。本文将对 SOFA-RPC 的高级功能，包括参数配置、自定义线程池、预热权重和自动故障剔除等。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/SOFA.JPG">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-06-10T10:36:51.271Z">
+<meta property="og:updated_time" content="2018-06-18T02:00:01.633Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)">
 <meta name="twitter:description" content="前言上文介绍了SOFA-RPC 的几种调用方式，包括单向调用、同步调用、Future调用、回调，引入了泛化调用和过滤器。本文将对 SOFA-RPC 的高级功能，包括参数配置、自定义线程池、预热权重和自动故障剔除等。">
@@ -23,7 +23,7 @@
     
 
     
-        <link rel="alternate" href="/" title="Harrison&#39;s Blog" type="application/atom+xml" />
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
     
 
     
@@ -73,7 +73,7 @@ ga('send', 'pageview');
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">Harrison&#39;s Blog</span>
+                <span class="site-title">Icarus&#39;s Blog</span>
             </a>
             <nav id="main-nav">
                 
@@ -84,6 +84,8 @@ ga('send', 'pageview');
                     <a class="main-nav-link" href="/categories">分类</a>
                 
                     <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
                 
                     <a class="main-nav-link" href="/about">关于我</a>
                 
@@ -150,6 +152,8 @@ ga('send', 'pageview');
                 
                     <td><a class="main-nav-link" href="/tags">标签</a></td>
                 
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
                     <td><a class="main-nav-link" href="/about">关于我</a></td>
                 
                 <td>
@@ -172,7 +176,7 @@ ga('send', 'pageview');
     <div class="inner profile-inner">
         <div class="base-info profile-block">
             <img id="avatar" src="/css/images/avatar.jpeg" />
-            <h2 id="name">陈林 | Harrison</h2>
+            <h2 id="name">陈林 | Icarus</h2>
             <h3 id="title">年轻无为，卖码为生!</h3>
             <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
             <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
@@ -533,7 +537,7 @@ ga('send', 'pageview');
 <p>如果单个节点的异常率超过了所有节点的平均异常率的 6 倍，则对该节点进行权重降级，降级的比率为 0.5。权重最小降级到 1。如果单个节点的异常率低于了平均异常率的 6 倍，则对该节点进行权重恢复，恢复的比率为1.2。单个服务最多降级 2 个 IP。</p>
 <h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本文介绍了 <code>SOFA-RPC</code> 的高级功能，包括参数配置，自定义线程池，服务预热和自动降级与权重恢复等用法。对于 <code>SOFA-RPC</code> 提供的基本功能，以及整合 <code>SOFA-Boot</code> 的配置和用法就介绍完了。对此有了初步的认识后，有利于后续深入实现原理和剖析源码。</p>
 <hr>
-<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
 <p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
 <p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
 
@@ -796,8 +800,8 @@ ga('send', 'pageview');
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2018 Harrison Chen<br>
-            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Harrison Chen</a><br>
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
             
     <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
 

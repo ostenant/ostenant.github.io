@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8">
     
-    <title>深入浅出OAuth 2.0授权机制 | Harrison&#39;s Blog</title>
+    <title>深入浅出OAuth 2.0授权机制 | Icarus&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="前言举个简单的例子。新浪微博是你的家，有时候你会想让一些人(第三方应用)去你的家里帮你办点事情，或者取点东西。你可以直接复制一把钥匙(用户名和密码)给他们，但这里存在几个问题：">
 <meta name="keywords" content="OAuth 2.0">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深入浅出OAuth 2.0授权机制">
 <meta property="og:url" content="https://ostenant.coding.me/2018/01/04/深入浅出OAuth 2.0授权机制/index.html">
-<meta property="og:site_name" content="Harrison&#39;s Blog">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
 <meta property="og:description" content="前言举个简单的例子。新浪微博是你的家，有时候你会想让一些人(第三方应用)去你的家里帮你办点事情，或者取点东西。你可以直接复制一把钥匙(用户名和密码)给他们，但这里存在几个问题：">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/oauth_log.png">
@@ -21,7 +21,7 @@
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/crediential_grant_mode.png">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/client_mode.png">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-05-08T02:49:46.097Z">
+<meta property="og:updated_time" content="2018-06-18T01:59:06.018Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="深入浅出OAuth 2.0授权机制">
 <meta name="twitter:description" content="前言举个简单的例子。新浪微博是你的家，有时候你会想让一些人(第三方应用)去你的家里帮你办点事情，或者取点东西。你可以直接复制一把钥匙(用户名和密码)给他们，但这里存在几个问题：">
@@ -29,7 +29,7 @@
     
 
     
-        <link rel="alternate" href="/" title="Harrison&#39;s Blog" type="application/atom+xml" />
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
     
 
     
@@ -79,7 +79,7 @@ ga('send', 'pageview');
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">Harrison&#39;s Blog</span>
+                <span class="site-title">Icarus&#39;s Blog</span>
             </a>
             <nav id="main-nav">
                 
@@ -90,6 +90,8 @@ ga('send', 'pageview');
                     <a class="main-nav-link" href="/categories">分类</a>
                 
                     <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
                 
                     <a class="main-nav-link" href="/about">关于我</a>
                 
@@ -156,6 +158,8 @@ ga('send', 'pageview');
                 
                     <td><a class="main-nav-link" href="/tags">标签</a></td>
                 
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
                     <td><a class="main-nav-link" href="/about">关于我</a></td>
                 
                 <td>
@@ -178,7 +182,7 @@ ga('send', 'pageview');
     <div class="inner profile-inner">
         <div class="base-info profile-block">
             <img id="avatar" src="/css/images/avatar.jpeg" />
-            <h2 id="name">陈林 | Harrison</h2>
+            <h2 id="name">陈林 | Icarus</h2>
             <h3 id="title">年轻无为，卖码为生!</h3>
             <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
             <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
@@ -724,8 +728,8 @@ ga('send', 'pageview');
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">HTTP/<span class="number">1.1</span> <span class="number">200</span> OK</span><br><span class="line">Content-Type: application/json;charset=UTF<span class="number">-8</span></span><br><span class="line">Cache-Control: no-store</span><br><span class="line">Pragma: no-cache</span><br><span class="line"></span><br><span class="line">&#123;</span><br><span class="line">  <span class="string">"access_token"</span>:<span class="string">"2YotnFZFEjr1zCsicMWpAA"</span>,</span><br><span class="line">  <span class="string">"token_type"</span>:<span class="string">"example"</span>,</span><br><span class="line">  <span class="string">"expires_in"</span>:<span class="number">3600</span>,</span><br><span class="line">  <span class="string">"example_parameter"</span>:<span class="string">"example_value"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>本文介绍了<code>OAuth 2.0</code>的一些基本概念，以及四种授权模式：授权码模式、简单模式、密码模式和客户端模式。o</p>
 <hr>
-<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="零壹技术栈"></p>
 <p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
 
         
@@ -987,8 +991,8 @@ ga('send', 'pageview');
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2018 Harrison Chen<br>
-            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Harrison Chen</a><br>
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
             
     <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
 

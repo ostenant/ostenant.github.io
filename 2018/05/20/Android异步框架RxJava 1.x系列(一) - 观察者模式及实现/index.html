@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8">
     
-    <title>Android异步框架RxJava 1.x系列(一) - 观察者模式及实现 | Harrison&#39;s Blog</title>
+    <title>Android异步框架RxJava 1.x系列(一) - 观察者模式及实现 | Icarus&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="前言RxJava 是一款基于 Java VM 实现的响应式编程扩展库 - 基于观察者模式的异步和事件处理框架。RxJava 官方目前同时维护了两个版本，分别是 1.x 和 2.x，区别是它们使用不同的 group id 和 namespaces。">
 <meta name="keywords" content="Android,RxJava,异步">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Android异步框架RxJava 1.x系列(一) - 观察者模式及实现">
 <meta property="og:url" content="https://ostenant.coding.me/2018/05/20/Android异步框架RxJava 1.x系列(一) - 观察者模式及实现/index.html">
-<meta property="og:site_name" content="Harrison&#39;s Blog">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
 <meta property="og:description" content="前言RxJava 是一款基于 Java VM 实现的响应式编程扩展库 - 基于观察者模式的异步和事件处理框架。RxJava 官方目前同时维护了两个版本，分别是 1.x 和 2.x，区别是它们使用不同的 group id 和 namespaces。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/RXjava_logo.jpeg">
@@ -22,7 +22,7 @@
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Rxjava1_006.gif">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Rxjava1_007.jpg">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-05-21T15:28:22.014Z">
+<meta property="og:updated_time" content="2018-06-18T01:46:55.454Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Android异步框架RxJava 1.x系列(一) - 观察者模式及实现">
 <meta name="twitter:description" content="前言RxJava 是一款基于 Java VM 实现的响应式编程扩展库 - 基于观察者模式的异步和事件处理框架。RxJava 官方目前同时维护了两个版本，分别是 1.x 和 2.x，区别是它们使用不同的 group id 和 namespaces。">
@@ -30,7 +30,7 @@
     
 
     
-        <link rel="alternate" href="/" title="Harrison&#39;s Blog" type="application/atom+xml" />
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
     
 
     
@@ -80,7 +80,7 @@ ga('send', 'pageview');
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">Harrison&#39;s Blog</span>
+                <span class="site-title">Icarus&#39;s Blog</span>
             </a>
             <nav id="main-nav">
                 
@@ -91,6 +91,8 @@ ga('send', 'pageview');
                     <a class="main-nav-link" href="/categories">分类</a>
                 
                     <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
                 
                     <a class="main-nav-link" href="/about">关于我</a>
                 
@@ -157,6 +159,8 @@ ga('send', 'pageview');
                 
                     <td><a class="main-nav-link" href="/tags">标签</a></td>
                 
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
                     <td><a class="main-nav-link" href="/about">关于我</a></td>
                 
                 <td>
@@ -179,7 +183,7 @@ ga('send', 'pageview');
     <div class="inner profile-inner">
         <div class="base-info profile-block">
             <img id="avatar" src="/css/images/avatar.jpeg" />
-            <h2 id="name">陈林 | Harrison</h2>
+            <h2 id="name">陈林 | Icarus</h2>
             <h3 id="title">年轻无为，卖码为生!</h3>
             <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
             <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
@@ -451,7 +455,7 @@ ga('send', 'pageview');
 <h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>在 <code>RxJava</code> 的默认规则中，事件的发出和消费都是在<strong>同一个线程</strong>的。也就是说，如果只用上面的方法，实现出来的只是一个<strong>同步的观察者模式</strong>。观察者模式本身的目的就是『后台处理，前台回调』的<strong>异步机制</strong>，因此异步对于 <code>RxJava</code> 是至关重要的。而要实现异步，则需要用到 <code>RxJava</code> 的另一个核心的概念 <code>Scheduler</code>，后续将给出详细介绍。</p>
 <hr>
 <p>欢迎关注技术公众号： 零壹技术栈</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="零壹技术栈"></p>
 <p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
 
         
@@ -713,8 +717,8 @@ ga('send', 'pageview');
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2018 Harrison Chen<br>
-            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Harrison Chen</a><br>
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
             
     <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
 

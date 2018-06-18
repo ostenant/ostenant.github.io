@@ -3,19 +3,19 @@
 <head>
     <meta charset="utf-8">
     
-    <title>Java 8系列(二) - JDK1.8函数式接口详解 | Harrison&#39;s Blog</title>
+    <title>Java 8系列(二) - JDK1.8函数式接口详解 | Icarus&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="简述函数式接口的概念函数式接口本质上还是一个接口，但是它是一种特殊的SAM类型的接口（Single Abstract Method）。">
 <meta name="keywords" content="JDK1.8">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java 8系列(二) - JDK1.8函数式接口详解">
 <meta property="og:url" content="https://ostenant.coding.me/2017/07/05/Java 8系列(二) - JDK1.8函数式接口详解/index.html">
-<meta property="og:site_name" content="Harrison&#39;s Blog">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
 <meta property="og:description" content="简述函数式接口的概念函数式接口本质上还是一个接口，但是它是一种特殊的SAM类型的接口（Single Abstract Method）。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/function_package.png">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-05-08T02:49:46.091Z">
+<meta property="og:updated_time" content="2018-06-18T01:45:39.275Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java 8系列(二) - JDK1.8函数式接口详解">
 <meta name="twitter:description" content="简述函数式接口的概念函数式接口本质上还是一个接口，但是它是一种特殊的SAM类型的接口（Single Abstract Method）。">
@@ -23,7 +23,7 @@
     
 
     
-        <link rel="alternate" href="/" title="Harrison&#39;s Blog" type="application/atom+xml" />
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
     
 
     
@@ -73,7 +73,7 @@ ga('send', 'pageview');
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">Harrison&#39;s Blog</span>
+                <span class="site-title">Icarus&#39;s Blog</span>
             </a>
             <nav id="main-nav">
                 
@@ -84,6 +84,8 @@ ga('send', 'pageview');
                     <a class="main-nav-link" href="/categories">分类</a>
                 
                     <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
                 
                     <a class="main-nav-link" href="/about">关于我</a>
                 
@@ -150,6 +152,8 @@ ga('send', 'pageview');
                 
                     <td><a class="main-nav-link" href="/tags">标签</a></td>
                 
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
                     <td><a class="main-nav-link" href="/about">关于我</a></td>
                 
                 <td>
@@ -172,7 +176,7 @@ ga('send', 'pageview');
     <div class="inner profile-inner">
         <div class="base-info profile-block">
             <img id="avatar" src="/css/images/avatar.jpeg" />
-            <h2 id="name">陈林 | Harrison</h2>
+            <h2 id="name">陈林 | Icarus</h2>
             <h3 id="title">年轻无为，卖码为生!</h3>
             <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
             <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
@@ -371,8 +375,8 @@ ga('send', 'pageview');
 <h3 id="negate"><a href="#negate" class="headerlink" title="negate()"></a>negate()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">default</span> Predicate&lt;T&gt; <span class="title">negate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (t) -&gt; !test(t);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <h3 id="isEqual"><a href="#isEqual" class="headerlink" title="isEqual()"></a>isEqual()</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> &lt;T&gt; <span class="function">Predicate&lt;T&gt; <span class="title">isEqual</span><span class="params">(Object targetRef)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (<span class="keyword">null</span> == targetRef)</span><br><span class="line">        ? Objects::isNull</span><br><span class="line">        : object -&gt; targetRef.equals(object);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 <hr>
-<p>欢迎扫码关注我的个人技术公众号： 零壹技术栈</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="零壹技术栈"></p>
 <p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
 
         
@@ -634,8 +638,8 @@ ga('send', 'pageview');
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2018 Harrison Chen<br>
-            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Harrison Chen</a><br>
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
             
     <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
 

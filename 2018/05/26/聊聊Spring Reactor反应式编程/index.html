@@ -3,19 +3,19 @@
 <head>
     <meta charset="utf-8">
     
-    <title>聊聊Spring Reactor反应式编程 | Harrison&#39;s Blog</title>
+    <title>聊聊Spring Reactor反应式编程 | Icarus&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="前言为了应对 高并发环境下 的服务端编程，微软提出了一个实现 异步编程 的方案 -  Reactive Programming，中文名称 反应式编程。随后，其它技术也迅速地跟上了脚步，像 ES6 通过 Promise 引入了类似的异步编程方式。Java 社区也没有落后很多，Netflix 和 TypeSafe 公司提供了 RxJava 和 Akka Stream 技术，让 Java 平台也有了能">
 <meta name="keywords" content="Reactive Streams,Spring WebFlux,Reactor">
 <meta property="og:type" content="article">
 <meta property="og:title" content="聊聊Spring Reactor反应式编程">
 <meta property="og:url" content="https://ostenant.coding.me/2018/05/26/聊聊Spring Reactor反应式编程/index.html">
-<meta property="og:site_name" content="Harrison&#39;s Blog">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
 <meta property="og:description" content="前言为了应对 高并发环境下 的服务端编程，微软提出了一个实现 异步编程 的方案 -  Reactive Programming，中文名称 反应式编程。随后，其它技术也迅速地跟上了脚步，像 ES6 通过 Promise 引入了类似的异步编程方式。Java 社区也没有落后很多，Netflix 和 TypeSafe 公司提供了 RxJava 和 Akka Stream 技术，让 Java 平台也有了能">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Reactor.png">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-05-27T10:03:31.352Z">
+<meta property="og:updated_time" content="2018-06-18T01:59:19.114Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="聊聊Spring Reactor反应式编程">
 <meta name="twitter:description" content="前言为了应对 高并发环境下 的服务端编程，微软提出了一个实现 异步编程 的方案 -  Reactive Programming，中文名称 反应式编程。随后，其它技术也迅速地跟上了脚步，像 ES6 通过 Promise 引入了类似的异步编程方式。Java 社区也没有落后很多，Netflix 和 TypeSafe 公司提供了 RxJava 和 Akka Stream 技术，让 Java 平台也有了能">
@@ -23,7 +23,7 @@
     
 
     
-        <link rel="alternate" href="/" title="Harrison&#39;s Blog" type="application/atom+xml" />
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
     
 
     
@@ -73,7 +73,7 @@ ga('send', 'pageview');
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">Harrison&#39;s Blog</span>
+                <span class="site-title">Icarus&#39;s Blog</span>
             </a>
             <nav id="main-nav">
                 
@@ -84,6 +84,8 @@ ga('send', 'pageview');
                     <a class="main-nav-link" href="/categories">分类</a>
                 
                     <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
                 
                     <a class="main-nav-link" href="/about">关于我</a>
                 
@@ -150,6 +152,8 @@ ga('send', 'pageview');
                 
                     <td><a class="main-nav-link" href="/tags">标签</a></td>
                 
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
                     <td><a class="main-nav-link" href="/about">关于我</a></td>
                 
                 <td>
@@ -172,7 +176,7 @@ ga('send', 'pageview');
     <div class="inner profile-inner">
         <div class="base-info profile-block">
             <img id="avatar" src="/css/images/avatar.jpeg" />
-            <h2 id="name">陈林 | Harrison</h2>
+            <h2 id="name">陈林 | Icarus</h2>
             <h3 id="title">年轻无为，卖码为生!</h3>
             <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
             <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
@@ -487,7 +491,7 @@ ga('send', 'pageview');
 <h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本文介绍了反应式编程的一些概念和 <code>Spring Reactor</code> 框架的基本用法，还介绍了如何用 <code>Reactor</code> 解决一些稍微复杂一点的问题。<code>Reactor</code> 在 <code>Spring 5</code> 中有大量的应用，后面会给大家分享一些 <code>Spring Reactor</code> 实战系列的博客。</p>
 <hr>
 <p>欢迎关注技术公众号： 零壹技术栈</p>
-<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="image"></p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="零壹技术栈"></p>
 <p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
 
         
@@ -749,8 +753,8 @@ ga('send', 'pageview');
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2018 Harrison Chen<br>
-            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Harrison Chen</a><br>
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
             
     <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
 

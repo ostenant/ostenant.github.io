@@ -3,14 +3,14 @@
 <head>
     <meta charset="utf-8">
     
-    <title>Java NIO系列(三) - Channel | Harrison&#39;s Blog</title>
+    <title>Java NIO系列(三) - Channel | Icarus&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
     <meta name="description" content="前言上文讲到Java NIO一些基本概念。在标准的IO中，都是基于字节流/字符流进行数据操作的，而在NIO中则是是基于Channel和Buffer进行操作，其中的Channel的虽然模拟了流的概念，实则大不相同。 本文将详细阐述NIO中的通道Channel的概念和具体的用法。">
 <meta name="keywords" content="NIO">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Java NIO系列(三) - Channel">
 <meta property="og:url" content="https://ostenant.coding.me/2017/12/27/Java NIO系列(三) - Channel/index.html">
-<meta property="og:site_name" content="Harrison&#39;s Blog">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
 <meta property="og:description" content="前言上文讲到Java NIO一些基本概念。在标准的IO中，都是基于字节流/字符流进行数据操作的，而在NIO中则是是基于Channel和Buffer进行操作，其中的Channel的虽然模拟了流的概念，实则大不相同。 本文将详细阐述NIO中的通道Channel的概念和具体的用法。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Java_NIO_Channel_Buffer.png">
@@ -22,7 +22,7 @@
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/datagramchannel_sender.png">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/datagramchannel_recevirer.png">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-05-08T02:49:46.091Z">
+<meta property="og:updated_time" content="2018-06-18T01:45:23.961Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Java NIO系列(三) - Channel">
 <meta name="twitter:description" content="前言上文讲到Java NIO一些基本概念。在标准的IO中，都是基于字节流/字符流进行数据操作的，而在NIO中则是是基于Channel和Buffer进行操作，其中的Channel的虽然模拟了流的概念，实则大不相同。 本文将详细阐述NIO中的通道Channel的概念和具体的用法。">
@@ -30,7 +30,7 @@
     
 
     
-        <link rel="alternate" href="/" title="Harrison&#39;s Blog" type="application/atom+xml" />
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
     
 
     
@@ -80,7 +80,7 @@ ga('send', 'pageview');
         <div class="outer">
             <a href="/" id="logo">
                 <i class="logo"></i>
-                <span class="site-title">Harrison&#39;s Blog</span>
+                <span class="site-title">Icarus&#39;s Blog</span>
             </a>
             <nav id="main-nav">
                 
@@ -91,6 +91,8 @@ ga('send', 'pageview');
                     <a class="main-nav-link" href="/categories">分类</a>
                 
                     <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
                 
                     <a class="main-nav-link" href="/about">关于我</a>
                 
@@ -157,6 +159,8 @@ ga('send', 'pageview');
                 
                     <td><a class="main-nav-link" href="/tags">标签</a></td>
                 
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
                     <td><a class="main-nav-link" href="/about">关于我</a></td>
                 
                 <td>
@@ -179,7 +183,7 @@ ga('send', 'pageview');
     <div class="inner profile-inner">
         <div class="base-info profile-block">
             <img id="avatar" src="/css/images/avatar.jpeg" />
-            <h2 id="name">陈林 | Harrison</h2>
+            <h2 id="name">陈林 | Icarus</h2>
             <h3 id="title">年轻无为，卖码为生!</h3>
             <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
             <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
@@ -780,8 +784,8 @@ ga('send', 'pageview');
         <footer id="footer">
     <div class="outer">
         <div id="footer-info" class="inner">
-            &copy; 2018 Harrison Chen<br>
-            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Harrison Chen</a><br>
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
             
     <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
 
