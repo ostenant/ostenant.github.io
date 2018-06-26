@@ -15,7 +15,7 @@
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/6/18/16413255f98b30e7?w=620&h=595&f=png&s=81732">
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/6/17/1640df3c27eedf87?w=258&h=258&f=jpeg&s=16109">
-<meta property="og:updated_time" content="2018-06-26T04:00:24.571Z">
+<meta property="og:updated_time" content="2018-06-26T04:48:27.383Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现">
 <meta name="twitter:description" content="前言定时任务 一般会存在 中大型企业级 项目中，为了减少 服务器、数据库 的压力，往往会以 定时任务 的方式去完成某些业务逻辑。">
@@ -290,7 +290,7 @@ ga('send', 'pageview');
 <p>常见的就是 <strong>金融服务系统</strong> 推送回调，一般支付系统订单在没有收到成功的回调返回内容时会 <strong>持续性的回调</strong>，这种回调一般都是 <strong>定时任务</strong> 来完成。</p>
 <p>还有就是 <strong>报表的生成</strong>，我们一般会在客户 <strong>访问量小</strong> 时完成这个操作，也可以采用 <strong>定时任务</strong> 来完成。</p>
 <p><img src="https://user-gold-cdn.xitu.io/2018/6/18/16413255f98b30e7?w=620&amp;h=595&amp;f=png&amp;s=81732" alt=""></p>
-<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="定时任务的几种方式"><a href="#定时任务的几种方式" class="headerlink" title="定时任务的几种方式"></a>定时任务的几种方式</h2><h4 id="Timer"><a href="#Timer" class="headerlink" title="Timer"></a>Timer</h4><p>这是 <code>Java</code> 自带的 <code>java.util.Timer</code> 类，这个类允许调度一个名为 <code>java.util.TimerTask</code> 任务。使用这种方式可以让你的程序按照某一个 <strong>频度</strong> 执行，但不能在 <strong>指定时间</strong> 运行。现在一般用的较少。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="定时任务的几种方式"><a href="#定时任务的几种方式" class="headerlink" title="定时任务的几种方式"></a>定时任务的几种方式</h2><h4 id="Timer"><a href="#Timer" class="headerlink" title="Timer"></a>Timer</h4><p>这是 <code>Java</code> 自带的 <code>java.util.Timer</code> 类，这个类允许调度一个名为 <code>java.util.TimerTask</code> 任务。使用这种方式可以让你的程序按照某一个 <strong>频度</strong> 执行，但不能在 <strong>指定时间</strong> 运行。现在一般用的较少。</p>
 <h4 id="ScheduledExecutorService"><a href="#ScheduledExecutorService" class="headerlink" title="ScheduledExecutorService"></a>ScheduledExecutorService</h4><p><code>JDK</code> 自带的一个类，是基于 <strong>线程池</strong> 设计的定时任务类，每个 <strong>调度任务</strong> 都会分配到 <strong>线程池</strong> 中的一个 <strong>线程</strong> 去执行。也就是说，任务是 <strong>并发执行</strong>，互不影响的。</p>
 <h4 id="Spring-Task"><a href="#Spring-Task" class="headerlink" title="Spring Task"></a>Spring Task</h4><p><code>Spring 3.0</code> 以后自带的 <code>Task</code>，支持 <strong>多线程</strong> 调度，可以将它看成一个 <strong>轻量级</strong> 的 <code>Quartz</code>，而且使用起来比 <code>Quartz</code> 简单许多，但是适用于 <strong>单节点</strong> 的 <strong>定时任务调度</strong>。</p>
 <h4 id="Quartz"><a href="#Quartz" class="headerlink" title="Quartz"></a>Quartz</h4><p>这是一个 <strong>功能比较强大</strong> 的的调度器，可以让你的程序在指定时间执行，也可以按照某一个频度执行，配置起来 <strong>稍显复杂</strong>。<code>Quartz</code> 功能强大，可以结合 <strong>数据库</strong> 做 <strong>持久化</strong>，进行 <strong>分布式</strong> 的 <strong>任务延时调度</strong>。</p>
