@@ -141,9 +141,9 @@
         
         <tag>RPC</tag>
          
-        <tag>SOFA-Boot</tag>
-         
         <tag>SOFA-RPC</tag>
+         
+        <tag>SOFA-Boot</tag>
          
          
            
@@ -165,9 +165,9 @@
         
         <tag>RPC</tag>
          
-        <tag>SOFA-Boot</tag>
-         
         <tag>SOFA-RPC</tag>
+         
+        <tag>SOFA-Boot</tag>
          
          
            
@@ -189,9 +189,9 @@
         
         <tag>RPC</tag>
          
-        <tag>SOFA-Boot</tag>
-         
         <tag>SOFA-RPC</tag>
+         
+        <tag>SOFA-Boot</tag>
          
          
            
@@ -1117,9 +1117,9 @@
         <title>Apache Thrift系列详解(一) - 概述与入门</title>
         <pubTime>2018-01-08T02:14:00.000Z</pubTime>
         
-        <tag>Apache</tag>
-         
         <tag>Thrift</tag>
+         
+        <tag>Apache</tag>
          
         <tag>RPC</tag>
          
@@ -1141,9 +1141,9 @@
         <title>Apache Thrift系列详解(三) - 序列化机制</title>
         <pubTime>2018-01-16T07:37:00.000Z</pubTime>
         
-        <tag>Apache</tag>
-         
         <tag>Thrift</tag>
+         
+        <tag>Apache</tag>
          
         <tag>RPC</tag>
          
@@ -1165,9 +1165,9 @@
         <title>Apache Thrift系列详解(二) - 网络服务模型</title>
         <pubTime>2018-01-11T09:36:00.000Z</pubTime>
         
-        <tag>Apache</tag>
-         
         <tag>Thrift</tag>
+         
+        <tag>Apache</tag>
          
         <tag>RPC</tag>
          
