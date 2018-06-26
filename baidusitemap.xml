@@ -4,6 +4,36 @@
 
     
   <url>
+    <loc>https://ostenant.coding.me/2018/06/25/%E5%AE%9E%E6%88%98Spring%20Boot%202.0%E7%B3%BB%E5%88%97(%E5%85%AD)%20-%20%E5%8D%95%E6%9C%BA%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%9A%84%E5%87%A0%E7%A7%8D%E5%AE%9E%E7%8E%B0/</loc>
+    <lastmod>2018-06-26T04:00:24.571Z</lastmod>
+    <data>
+        <display>
+        <title>实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现</title>
+        <pubTime>2018-06-25T10:20:00.000Z</pubTime>
+        
+        <tag>Spring Boot 2.0</tag>
+         
+        <tag>定时任务</tag>
+         
+        <tag>Spring Task</tag>
+         
+        <tag>Timer</tag>
+         
+        <tag>ScheduledExecutorService</tag>
+         
+        <tag>Quartz</tag>
+         
+         
+           
+             
+              <breadCrumb title="实战Spring Boot 2.0系列" url="https://ostenant.coding.me/categories/%E5%AE%9E%E6%88%98Spring-Boot-2-0%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://ostenant.coding.me/2018/06/20/%E5%AE%9E%E6%88%98Spring%20Boot%202.0%E7%B3%BB%E5%88%97(%E4%BA%94)%20-%20Listener,%20Servlet%E5%92%8CFilter,%20Controller%E5%92%8CInterceptor/</loc>
     <lastmod>2018-06-23T06:02:19.895Z</lastmod>
     <data>

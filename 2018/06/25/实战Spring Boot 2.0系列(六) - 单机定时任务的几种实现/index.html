@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现 | Icarus&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="前言定时任务 一般会存在 中大型企业级 项目中，为了减少 服务器、数据库 的压力，往往会以 定时任务 的方式去完成某些业务逻辑。">
+<meta name="keywords" content="Spring Boot 2.0,定时任务,Spring Task,Timer,ScheduledExecutorService,Quartz">
+<meta property="og:type" content="article">
+<meta property="og:title" content="实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现">
+<meta property="og:url" content="https://ostenant.coding.me/2018/06/25/实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现/index.html">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
+<meta property="og:description" content="前言定时任务 一般会存在 中大型企业级 项目中，为了减少 服务器、数据库 的压力，往往会以 定时任务 的方式去完成某些业务逻辑。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/6/18/16413255f98b30e7?w=620&h=595&f=png&s=81732">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/6/17/1640df3c27eedf87?w=258&h=258&f=jpeg&s=16109">
+<meta property="og:updated_time" content="2018-06-26T04:00:24.571Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现">
+<meta name="twitter:description" content="前言定时任务 一般会存在 中大型企业级 项目中，为了减少 服务器、数据库 的压力，往往会以 定时任务 的方式去完成某些业务逻辑。">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2018/6/18/16413255f98b30e7?w=620&h=595&f=png&s=81732">
+    
+
+    
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/cat.png" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fontawesome.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-brands.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-solid.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'true', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+        <meta name="google-site-verification" content="true" />
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Icarus&#39;s Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpeg" />
+                            <i class="fas fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fas fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpeg" />
+            <h2 id="name">陈林 | Icarus</h2>
+            <h3 id="title">年轻无为，卖码为生!</h3>
+            <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
+            <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                59
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                61
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/ostenant" target="_blank" title="github" class=tooltip>
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fab fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="linkedin" class=tooltip>
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fab fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2018/06/25/实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现/">
+            <time datetime="2018-06-25T10:20:00.000Z" itemprop="datePublished">2018-06-25</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/Quartz/">Quartz</a>, <a class="tag-link" href="/tags/ScheduledExecutorService/">ScheduledExecutorService</a>, <a class="tag-link" href="/tags/Spring-Boot-2-0/">Spring Boot 2.0</a>, <a class="tag-link" href="/tags/Spring-Task/">Spring Task</a>, <a class="tag-link" href="/tags/Timer/">Timer</a>, <a class="tag-link" href="/tags/定时任务/">定时任务</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><strong>定时任务</strong> 一般会存在 <strong>中大型企业级</strong> 项目中，为了减少 <strong>服务器</strong>、<strong>数据库</strong> 的压力，往往会以 <strong>定时任务</strong> 的方式去完成某些业务逻辑。</p>
+<a id="more"></a>
+<p>常见的就是 <strong>金融服务系统</strong> 推送回调，一般支付系统订单在没有收到成功的回调返回内容时会 <strong>持续性的回调</strong>，这种回调一般都是 <strong>定时任务</strong> 来完成。</p>
+<p>还有就是 <strong>报表的生成</strong>，我们一般会在客户 <strong>访问量小</strong> 时完成这个操作，也可以采用 <strong>定时任务</strong> 来完成。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/6/18/16413255f98b30e7?w=620&amp;h=595&amp;f=png&amp;s=81732" alt=""></p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="定时任务的几种方式"><a href="#定时任务的几种方式" class="headerlink" title="定时任务的几种方式"></a>定时任务的几种方式</h2><h4 id="Timer"><a href="#Timer" class="headerlink" title="Timer"></a>Timer</h4><p>这是 <code>Java</code> 自带的 <code>java.util.Timer</code> 类，这个类允许调度一个名为 <code>java.util.TimerTask</code> 任务。使用这种方式可以让你的程序按照某一个 <strong>频度</strong> 执行，但不能在 <strong>指定时间</strong> 运行。现在一般用的较少。</p>
+<h4 id="ScheduledExecutorService"><a href="#ScheduledExecutorService" class="headerlink" title="ScheduledExecutorService"></a>ScheduledExecutorService</h4><p><code>JDK</code> 自带的一个类，是基于 <strong>线程池</strong> 设计的定时任务类，每个 <strong>调度任务</strong> 都会分配到 <strong>线程池</strong> 中的一个 <strong>线程</strong> 去执行。也就是说，任务是 <strong>并发执行</strong>，互不影响的。</p>
+<h4 id="Spring-Task"><a href="#Spring-Task" class="headerlink" title="Spring Task"></a>Spring Task</h4><p><code>Spring 3.0</code> 以后自带的 <code>Task</code>，支持 <strong>多线程</strong> 调度，可以将它看成一个 <strong>轻量级</strong> 的 <code>Quartz</code>，而且使用起来比 <code>Quartz</code> 简单许多，但是适用于 <strong>单节点</strong> 的 <strong>定时任务调度</strong>。</p>
+<h4 id="Quartz"><a href="#Quartz" class="headerlink" title="Quartz"></a>Quartz</h4><p>这是一个 <strong>功能比较强大</strong> 的的调度器，可以让你的程序在指定时间执行，也可以按照某一个频度执行，配置起来 <strong>稍显复杂</strong>。<code>Quartz</code> 功能强大，可以结合 <strong>数据库</strong> 做 <strong>持久化</strong>，进行 <strong>分布式</strong> 的 <strong>任务延时调度</strong>。</p>
+<h2 id="Cron表达式简介"><a href="#Cron表达式简介" class="headerlink" title="Cron表达式简介"></a>Cron表达式简介</h2><p><code>Cron</code> 表达式是一个字符串，字符串以 <code>5</code> 或 <code>6</code> 个 <strong>空格</strong> 隔开，分为 <code>6</code> 或 <code>7</code> 个 <strong>域</strong>，每一个域代表一个含义，<code>Cron</code> 有如下两种语法格式：</p>
+<blockquote>
+<ol>
+<li>Seconds Minutes Hours DayofMonth Month DayofWeek Year</li>
+<li>Seconds Minutes Hours DayofMonth Month DayofWeek</li>
+</ol>
+</blockquote>
+<p>每个域对应的含义、域值范围和特殊表示符，从左到右依次如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">字段</th>
+<th style="text-align:left">允许值</th>
+<th style="text-align:left">允许的特殊字符</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">秒</td>
+<td style="text-align:left">0-59</td>
+<td style="text-align:left">, - * /</td>
+</tr>
+<tr>
+<td style="text-align:left">分</td>
+<td style="text-align:left">0-59</td>
+<td style="text-align:left">, - * /</td>
+</tr>
+<tr>
+<td style="text-align:left">小时</td>
+<td style="text-align:left">0-23</td>
+<td style="text-align:left">, - * /</td>
+</tr>
+<tr>
+<td style="text-align:left">日期</td>
+<td style="text-align:left">1-31</td>
+<td style="text-align:left">, - * / L W C</td>
+</tr>
+<tr>
+<td style="text-align:left">月份</td>
+<td style="text-align:left">1-12 或者 JAN-DEC</td>
+<td style="text-align:left">, - * /</td>
+</tr>
+<tr>
+<td style="text-align:left">星期</td>
+<td style="text-align:left">1-7 或者 SUN-SAT</td>
+<td style="text-align:left">, - * / L C #</td>
+</tr>
+<tr>
+<td style="text-align:left">年（可选）</td>
+<td style="text-align:left">留空, 1970-2099</td>
+<td style="text-align:left">, - * /</td>
+</tr>
+</tbody>
+</table>
+<p>如上面的表达式所示:</p>
+<ul>
+<li><p><strong>“”字符:</strong> 被用来指定所有的值。如：在分钟的字段域里表示”每分钟”。</p>
+</li>
+<li><p><strong>“-“字符:</strong> 被用来指定一个范围。如：”10-12” 在小时域意味着 “10点、11点、12点”。</p>
+</li>
+<li><p><strong>“,”字符:</strong> 被用来指定另外的值。如：”MON,WED,FRI” 在星期域里表示 “星期一、星期三、星期五”。</p>
+</li>
+<li><p><strong>“?”字符:</strong> 只在日期域和星期域中使用。它被用来指定”非明确的值”。当你需要通过在这两个域中的一个来指定一些东西的时候，它是有用的。看下面的例子你就会明白。</p>
+</li>
+<li><p><strong>“L”字符:</strong> 指定在月或者星期中的某天（最后一天）。即 “Last” 的缩写。但是在星期和月中 “Ｌ” 表示不同的意思，如：在月子段中 “L” 指月份的最后一天 - 1月31日，2月28日。</p>
+<ul>
+<li>如果在星期字段中则简单的表示为 “7” 或者 “SAT” 字符。</li>
+<li>如果在星期字段中在某个 value 值得后面，则表示 “某月的最后一个星期value”，如 “6L” 表示某月的最后一个星期五。</li>
+</ul>
+</li>
+<li><p><strong>“W”字符:</strong> 只能用在月份字段中，该字段指定了离指定日期最近的那个星期日。</p>
+</li>
+<li><p><strong>“#”字符:</strong> 只能用在星期字段，该字段指定了第几个星期 value 在某月中</p>
+</li>
+</ul>
+<p>每一个元素都可以显式地规定一个值（如 <code>6</code>），一个区间（如 <code>9-12</code>），一个列表（如 <code>9，11，13</code>）或一个通配符（如 <code>*</code>）。<strong>“月份中的日期”</strong> 和 <strong>“星期中的日期”</strong> 这两个元素是 <strong>互斥的</strong>，因此应该通过设置一个 <strong>问号</strong>（<code>?</code>）来表明你不想设置的那个字段。下表显示了一些 <code>cron</code> 表达式的 <strong>例子</strong> 和它们的意义：</p>
+<table>
+<thead>
+<tr>
+<th>表达式</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>“0 0 12 <em> </em> ?”</td>
+<td>每天中午12点触发</td>
+</tr>
+<tr>
+<td>“0 15 10 ? <em> </em>“</td>
+<td>每天上午10:15触发</td>
+</tr>
+<tr>
+<td>“0 15 10 <em> </em> ?”</td>
+<td>每天上午10:15触发</td>
+</tr>
+<tr>
+<td>“0 15 10 <em> </em> ? *”</td>
+<td>每天上午10:15触发</td>
+</tr>
+<tr>
+<td>“0 15 10 <em> </em> ? 2005”</td>
+<td>2005年的每天上午10:15触发</td>
+</tr>
+<tr>
+<td>“0 <em> 14 </em> * ?”</td>
+<td>在每天下午2点到下午2:59期间的每1分钟触发</td>
+</tr>
+<tr>
+<td>“0 0/5 14 <em> </em> ?”</td>
+<td>在每天下午2点到下午2:55期间的每5分钟触发</td>
+</tr>
+<tr>
+<td>“0 0/5 14,18 <em> </em> ?”</td>
+<td>在每天下午2点到2:55期间和下午6点到6:55期间的每5分钟触发</td>
+</tr>
+<tr>
+<td>“0 0-5 14 <em> </em> ?”</td>
+<td>在每天下午2点到下午2:05期间的每1分钟触发</td>
+</tr>
+<tr>
+<td>“0 10,44 14 ? 3 WED”</td>
+<td>每年三月的星期三的下午2:10和2:44触发</td>
+</tr>
+<tr>
+<td>“0 15 10 ? * MON-FRI”</td>
+<td>周一至周五的上午10:15触发</td>
+</tr>
+<tr>
+<td>“0 15 10 15 * ?”</td>
+<td>每月15日上午10:15触发</td>
+</tr>
+<tr>
+<td>“0 15 10 L * ?”</td>
+<td>每月最后一日的上午10:15触发</td>
+</tr>
+<tr>
+<td>“0 15 10 ? * 6L”</td>
+<td>每月的最后一个星期五上午10:15触发</td>
+</tr>
+<tr>
+<td>“0 15 10 ? * 6L 2002-2005”</td>
+<td>2002年至2005年的每月的最后一个星期五上午10:15触发</td>
+</tr>
+<tr>
+<td>“0 15 10 ? * 6#3”</td>
+<td>每月的第三个星期五上午10:15触发</td>
+</tr>
+<tr>
+<td>0 6 <em> </em> *</td>
+<td>每天早上6点</td>
+</tr>
+<tr>
+<td>0 /2 <em> </em></td>
+<td>每两个小时</td>
+</tr>
+<tr>
+<td>0 23-7/2，8 <em> </em> *</td>
+<td>晚上11点到早上8点之间每两个小时，早上八点</td>
+</tr>
+<tr>
+<td>0 11 4 * 1-3</td>
+<td>每个月的4号和每个礼拜的礼拜一到礼拜三的早上11点</td>
+</tr>
+<tr>
+<td>0 4 1 1 *</td>
+<td>1月1日早上4点</td>
+</tr>
+</tbody>
+</table>
+<h2 id="环境准备"><a href="#环境准备" class="headerlink" title="环境准备"></a>环境准备</h2><h3 id="配置gradle依赖"><a href="#配置gradle依赖" class="headerlink" title="配置gradle依赖"></a>配置gradle依赖</h3><p>利用 <code>Spring Initializer</code> 创建一个 <code>gradle</code> 项目  <code>spring-boot-scheduler-task-management</code>，创建时添加相关依赖。得到的初始 <code>build.gradle</code> 如下：</p>
+<figure class="highlight groovy"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line">buildscript &#123;</span><br><span class="line">    ext &#123;</span><br><span class="line">        springBootVersion = <span class="string">'2.0.3.RELEASE'</span></span><br><span class="line">    &#125;</span><br><span class="line">    repositories &#123;</span><br><span class="line">        mavenCentral()</span><br><span class="line">    &#125;</span><br><span class="line">    dependencies &#123;</span><br><span class="line">        classpath(<span class="string">"org.springframework.boot:spring-boot-gradle-plugin:$&#123;springBootVersion&#125;"</span>)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'java'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'eclipse'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'org.springframework.boot'</span></span><br><span class="line">apply <span class="string">plugin:</span> <span class="string">'io.spring.dependency-management'</span></span><br><span class="line"></span><br><span class="line">group = <span class="string">'io.ostenant.springboot.sample'</span></span><br><span class="line">version = <span class="string">'0.0.1-SNAPSHOT'</span></span><br><span class="line">sourceCompatibility = <span class="number">1.8</span></span><br><span class="line"></span><br><span class="line">repositories &#123;</span><br><span class="line">    mavenCentral()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">dependencies &#123;</span><br><span class="line">    compile(<span class="string">'org.springframework.boot:spring-boot-starter'</span>)</span><br><span class="line">    compile(<span class="string">'org.springframework.boot:spring-boot-starter-web'</span>)</span><br><span class="line">    testCompile(<span class="string">'org.springframework.boot:spring-boot-starter-test'</span>)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在 <code>Spring Boot</code> 入口类上配置 <code>@EnableScheduling</code> 注解开启 <code>Spring</code> 自带的定时处理功能。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@SpringBootApplication</span></span><br><span class="line"><span class="meta">@EnableScheduling</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Application</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        SpringApplication.run(Application.class, args);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="配置Timer任务"><a href="#配置Timer任务" class="headerlink" title="配置Timer任务"></a>配置Timer任务</h2><p>这个 <code>API</code> 目前在项目中很少用，直接给出示例代码。具体的介绍可以查看 <code>API</code>。<code>Timer</code> 的内部只有 <strong>一个线程</strong>，如果有 <strong>多个任务</strong> 的话就会 <strong>顺序执行</strong>，这样任务的 <strong>延迟时间</strong> 和 <strong>循环时间</strong> 就会出现问题。</p>
+<p>TimerService.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TimerService</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(TimerService.class);</span><br><span class="line">    <span class="keyword">private</span> AtomicLong counter = <span class="keyword">new</span> AtomicLong();</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">schedule</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        TimerTask timerTask = <span class="keyword">new</span> TimerTask() &#123;</span><br><span class="line">            <span class="meta">@Override</span></span><br><span class="line">            <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                <span class="keyword">long</span> count = counter.incrementAndGet();</span><br><span class="line">                LOGGER.info(<span class="string">"Schedule timerTask &#123;&#125; times"</span>, count);</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;;</span><br><span class="line">        Timer timer = <span class="keyword">new</span> Timer();</span><br><span class="line">        timer.schedule(timerTask, <span class="number">1000L</span>, <span class="number">10</span> * <span class="number">1000L</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码定义了一个 <code>TimerTask</code>，在 <code>TimerTask</code> 中累加 <strong>执行次数</strong>，并通过 <code>slf4j</code> 进行打印 (自带执行时间)。然后通过 <code>Timer</code> 调度工具类调度 <code>TimerTask</code> 任务，设置 <strong>初始化延迟时间</strong> 为 <code>1s</code>，<strong>定时执行间隔</strong> 为 <code>10s</code>，测试代码如下：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    TimerService timerService = <span class="keyword">new</span> TimerService();</span><br><span class="line">    timerService.schedule();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>观察测试结果，能够发现 <code>TimerTask</code> 配置的任务每隔 <code>10s</code> 被执行了一次，执行线程默认都是 <code>Timer-0</code> 这个线程。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">17:48:18.731 [Timer-0] INFO io.ostenant.springboot.sample.timer.TimerService - Schedule timerTask 1 <span class="built_in">times</span></span><br><span class="line">17:48:28.730 [Timer-0] INFO io.ostenant.springboot.sample.timer.TimerService - Schedule timerTask 2 <span class="built_in">times</span></span><br><span class="line">17:48:38.736 [Timer-0] INFO io.ostenant.springboot.sample.timer.TimerService - Schedule timerTask 3 <span class="built_in">times</span></span><br><span class="line">17:48:48.738 [Timer-0] INFO io.ostenant.springboot.sample.timer.TimerService - Schedule timerTask 4 <span class="built_in">times</span></span><br><span class="line">17:48:58.743 [Timer-0] INFO io.ostenant.springboot.sample.timer.TimerService - Schedule timerTask 5 <span class="built_in">times</span></span><br></pre></td></tr></table></figure>
+<h2 id="配置ScheduledExecutorService任务"><a href="#配置ScheduledExecutorService任务" class="headerlink" title="配置ScheduledExecutorService任务"></a>配置ScheduledExecutorService任务</h2><p><code>ScheduledExecutorService</code> 是 <strong>延时执行</strong> 的线程池，对于 <strong>多线程</strong> 环境下的 <strong>定时任务</strong>，推荐用 <code>ScheduledExecutorService</code> 代替 <code>Timer</code> 定时器。</p>
+<p>创建一个线程数量为 <code>4</code> 的 <strong>任务线程池</strong>，同一时刻并向它提交 <code>4</code> 个定时任务，用于测试延时任务的 <strong>并发处理</strong>。执行 <code>ScheduledExecutorService</code> 的 <code>scheduleWithFixedDelay()</code> 方法，设置任务线程池的 <strong>初始任务延迟时间</strong> 为 <code>2</code> 秒，并在上一次 <strong>执行完毕时间点</strong> 之后 <code>10</code> 秒再执行下一次任务。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleWithFixedDelay</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(<span class="number">4</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++) &#123;</span><br><span class="line">        scheduledExecutor.scheduleWithFixedDelay(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                TimeUnit.MILLISECONDS.sleep(<span class="number">10</span> * <span class="number">1000L</span>);</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                LOGGER.error(<span class="string">"Interrupted exception"</span>, e);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">long</span> count = counter.incrementAndGet();</span><br><span class="line">            LOGGER.info(<span class="string">"Schedule executor &#123;&#125; times with fixed delay"</span>, count);</span><br><span class="line">        &#125;, <span class="number">2000L</span>, <span class="number">10</span> * <span class="number">1000L</span>, TimeUnit.MILLISECONDS);</span><br><span class="line">    &#125;</span><br><span class="line">    LOGGER.info(<span class="string">"Start to schedule"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试结果如下，我们可以发现每隔 <code>20</code> 秒的时间间隔，就会有 <code>4</code> 个定时任务同时执行。因为在任务线程池初始化时，我们同时向线程池提交了 <code>4</code> 个任务，这 <strong>四个任务</strong> 会完全利用线程池中的 <code>4</code> 个线程进行任务执行。</p>
+<p><code>20</code> 秒是怎么来的？首先每个任务的 <strong>时间间隔</strong> 设置为 <code>10</code> 秒。其次因为采用的是 <code>withFixedDelay</code> 策略，即当前任务执行的 <strong>结束时间</strong>，作为下次延时任务的 <strong>开始计时节点</strong>，并且每个任务在执行过程中睡眠了 <code>10</code> 秒的时间，累计起来就是 <code>20</code> 秒的时间。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">19:42:02.444 [main] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Start to schedule</span><br><span class="line">19:42:14.449 [pool-1-thread-1] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 3 <span class="built_in">times</span> with fixed delay</span><br><span class="line">19:42:14.449 [pool-1-thread-2] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 1 <span class="built_in">times</span> with fixed delay</span><br><span class="line">19:42:14.449 [pool-1-thread-3] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 2 <span class="built_in">times</span> with fixed delay</span><br><span class="line">19:42:14.449 [pool-1-thread-4] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 4 <span class="built_in">times</span> with fixed delay</span><br><span class="line">19:42:34.458 [pool-1-thread-4] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 7 <span class="built_in">times</span> with fixed delay</span><br><span class="line">19:42:34.458 [pool-1-thread-3] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 5 <span class="built_in">times</span> with fixed delay</span><br><span class="line">19:42:34.458 [pool-1-thread-2] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 8 <span class="built_in">times</span> with fixed delay</span><br><span class="line">19:42:34.458 [pool-1-thread-1] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 6 <span class="built_in">times</span> with fixed delay</span><br></pre></td></tr></table></figure>
+<p>创建一个线程数量为 <code>4</code> 的 <strong>任务线程池</strong>，同一时刻并向它提交 <code>4</code> 个定时任务，用于测试延时任务的 <strong>并发处理</strong>。每个任务分别执行 <code>ScheduledExecutorService</code> 的 <code>scheduleAtFixedRate()</code> 方法，设置任务线程池的 <strong>初始任务延迟时间</strong> 为 <code>2</code> 秒，并在上一次 <strong>开始执行时间点</strong> 之后 <code>10</code> 秒再执行下一次任务。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleAtFixedRate</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ScheduledExecutorService scheduledExecutor = Executors.newScheduledThreadPool(<span class="number">4</span>);</span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">4</span>; i++) &#123;</span><br><span class="line">        scheduledExecutor.scheduleAtFixedRate(() -&gt; &#123;</span><br><span class="line">            <span class="keyword">long</span> count = counter.incrementAndGet();</span><br><span class="line">            LOGGER.info(<span class="string">"Schedule executor &#123;&#125; times at fixed rate"</span>, count);</span><br><span class="line">        &#125;, <span class="number">2000L</span>, <span class="number">10</span> * <span class="number">1000L</span>, TimeUnit.MILLISECONDS);</span><br><span class="line">    &#125;</span><br><span class="line">    LOGGER.info(<span class="string">"Start to schedule"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>测试结果如下，我们可以发现每隔 <code>10</code> 秒的时间间隔，就会有 <code>4</code> 个定时任务同时执行，因为在任务线程池初始化时，我们同时向线程池提交了 <code>4</code> 个任务，这 <strong>四个任务</strong> 会完全利用线程池中的 <code>4</code> 个线程进行任务执行。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">19:31:46.837 [main] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Start to schedule</span><br><span class="line">19:31:48.840 [pool-1-thread-1] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 1 <span class="built_in">times</span> at fixed rate</span><br><span class="line">19:31:48.840 [pool-1-thread-3] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 3 <span class="built_in">times</span> at fixed rate</span><br><span class="line">19:31:48.840 [pool-1-thread-2] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 2 <span class="built_in">times</span> at fixed rate</span><br><span class="line">19:31:48.840 [pool-1-thread-4] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 4 <span class="built_in">times</span> at fixed rate</span><br><span class="line">19:31:58.839 [pool-1-thread-2] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 6 <span class="built_in">times</span> at fixed rate</span><br><span class="line">19:31:58.840 [pool-1-thread-4] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 8 <span class="built_in">times</span> at fixed rate</span><br><span class="line">19:31:58.839 [pool-1-thread-3] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 7 <span class="built_in">times</span> at fixed rate</span><br><span class="line">19:31:58.839 [pool-1-thread-1] INFO io.ostenant.springboot.sample.executor.ScheduledExecutorsService - Schedule executor 5 <span class="built_in">times</span> at fixed rate</span><br></pre></td></tr></table></figure>
+<h2 id="配置Spring-Task任务"><a href="#配置Spring-Task任务" class="headerlink" title="配置Spring Task任务"></a>配置Spring Task任务</h2><p><code>Spring</code> 提供了 <code>@Scheduled</code> 注解来实现 <strong>定时任务</strong>，<code>@Scheduled</code> 参数可以接受 <strong>两种</strong> 定时的设置，一种是我们常用的 <strong>格林时间表达式</strong> <code>cron = &quot;*/10 * * * * *&quot;</code>，另一种是 <code>fixedRate = 10 * 1000L</code>，两种都表示每隔 <code>10</code> 秒执行一次目标任务。</p>
+<p>参数说明：</p>
+<ul>
+<li>@Scheduled(fixedRate = 10 * 1000L)：上一次 <strong>开始执行时间点</strong> 之后 <code>10</code> 秒再执行。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(fixedRate = <span class="number">10</span> * <span class="number">1000L</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleAtFixedRate</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> count = counter.incrementAndGet();</span><br><span class="line">    LOGGER.info(<span class="string">"Schedule executor &#123;&#125; times at fixed rate"</span>, count);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>@Scheduled(fixedDelay = 10 * 1000L)：上一次 <strong>执行完毕时间点</strong> 之后 <code>10</code> 秒再执行。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(fixedDelay = <span class="number">10</span> * <span class="number">1000L</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleWithFixedDelay</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        TimeUnit.MILLISECONDS.sleep(<span class="number">10</span> * <span class="number">1000L</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">        LOGGER.error(<span class="string">"Interrupted exception"</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">long</span> count = counter.incrementAndGet();</span><br><span class="line">    LOGGER.info(<span class="string">"Schedule executor &#123;&#125; times with fixed delay"</span>, count);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>@Scheduled(initialDelay = 2000L, fixedRate = 10 * 1000L)：第一次延迟 <code>2</code> 秒后执行，之后按 <code>fixedRate</code> 的规则每 <code>10</code> 秒执行一次。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(initialDelay = <span class="number">2000L</span>, fixedDelay = <span class="number">10</span> * <span class="number">1000L</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleWithinitialDelayAndFixedDelay</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        TimeUnit.MILLISECONDS.sleep(<span class="number">10</span> * <span class="number">1000L</span>);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">        LOGGER.error(<span class="string">"Interrupted exception"</span>, e);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">long</span> count = counter.incrementAndGet();</span><br><span class="line">    LOGGER.info(<span class="string">"Schedule executor &#123;&#125; times with fixed delay"</span>, count);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>@Scheduled(cron = “0/10 <em> </em> <em> </em> *”)：根据 <code>cron</code> 表达式定义，每隔 <code>10</code> 秒执行一次。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Scheduled</span>(cron = <span class="string">"0/10 * * * * *"</span>)</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleWithCronExpression</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> count = counter.incrementAndGet();</span><br><span class="line">    LOGGER.info(<span class="string">"Schedule executor &#123;&#125; times with "</span>, count);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>完整的代码如下：</p>
+<p>SpringTaskService.java</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Component</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SpringTaskService</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(SpringTaskService.class);</span><br><span class="line">    <span class="keyword">private</span> AtomicLong counter = <span class="keyword">new</span> AtomicLong();</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled</span>(fixedDelay = <span class="number">10</span> * <span class="number">1000L</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleWithFixedDelay</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            TimeUnit.MILLISECONDS.sleep(<span class="number">10</span> * <span class="number">1000L</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            LOGGER.error(<span class="string">"Interrupted exception"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">long</span> count = counter.incrementAndGet();</span><br><span class="line">        LOGGER.info(<span class="string">"Schedule executor &#123;&#125; times with fixed delay"</span>, count);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled</span>(initialDelay = <span class="number">2000L</span>, fixedDelay = <span class="number">10</span> * <span class="number">1000L</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleWithinitialDelayAndFixedDelay</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            TimeUnit.MILLISECONDS.sleep(<span class="number">10</span> * <span class="number">1000L</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            LOGGER.error(<span class="string">"Interrupted exception"</span>, e);</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">long</span> count = counter.incrementAndGet();</span><br><span class="line">        LOGGER.info(<span class="string">"Schedule executor &#123;&#125; times with fixed delay"</span>, count);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled</span>(fixedRate = <span class="number">10</span> * <span class="number">1000L</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleAtFixedRate</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> count = counter.incrementAndGet();</span><br><span class="line">        LOGGER.info(<span class="string">"Schedule executor &#123;&#125; times at fixed rate"</span>, count);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Scheduled</span>(cron = <span class="string">"0/10 * * * * *"</span>)</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">scheduleWithCronExpression</span><span class="params">()</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">        <span class="keyword">long</span> count = counter.incrementAndGet();</span><br><span class="line">        LOGGER.info(<span class="string">"Schedule executor &#123;&#125; times with "</span>, count);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>查看日志，任务每 <code>20</code> 秒的时间间隔执行一次。每次定时任务在上次 <strong>执行完毕时间点</strong> 之后 <code>10</code> 秒再执行，在任务中设置 <strong>睡眠时间</strong> 为 <code>10</code> 秒。这里只验证了 @Scheduled(initialDelay = 2000L, fixedDelay = 10 * 1000L)。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">2018-06-25 18:00:53.051  INFO 5190 --- [pool-1-thread-1] i.o.s.sample.spring.SpringTaskService    : Schedule executor 1 <span class="built_in">times</span> with fixed delay</span><br><span class="line">2018-06-25 18:01:13.056  INFO 5190 --- [pool-1-thread-1] i.o.s.sample.spring.SpringTaskService    : Schedule executor 2 <span class="built_in">times</span> with fixed delay</span><br><span class="line">2018-06-25 18:01:33.061  INFO 5190 --- [pool-1-thread-1] i.o.s.sample.spring.SpringTaskService    : Schedule executor 3 <span class="built_in">times</span> with fixed delay</span><br><span class="line">2018-06-25 18:01:53.071  INFO 5190 --- [pool-1-thread-1] i.o.s.sample.spring.SpringTaskService    : Schedule executor 4 <span class="built_in">times</span> with fixed delay</span><br><span class="line">2018-06-25 18:02:13.079  INFO 5190 --- [pool-1-thread-1] i.o.s.sample.spring.SpringTaskService    : Schedule executor 5 <span class="built_in">times</span> with fixed delay</span><br></pre></td></tr></table></figure>
+<h3 id="配置任务线程池"><a href="#配置任务线程池" class="headerlink" title="配置任务线程池"></a>配置任务线程池</h3><p>上述配置都是基于 <strong>单线程</strong> 的任务调度，如何引入 <strong>多线程</strong> 提高 <strong>延时任务</strong> 的 <strong>并发处理</strong> 能力？</p>
+<p><code>Spring Boot</code> 提供了一个 <code>SchedulingConfigurer</code> 配置接口。我们通过 <code>ScheduleConfig</code> 配置文件实现 <code>ScheduleConfiguration</code> 接口，并重写 <code>configureTasks()</code> 方法，向 <code>ScheduledTaskRegistrar</code> 注册一个 <code>ThreadPoolTaskScheduler</code> 任务线程对象即可。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Configuration</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ScheduleConfiguration</span> <span class="keyword">implements</span> <span class="title">SchedulingConfigurer</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> Logger LOGGER = LoggerFactory.getLogger(ScheduleConfiguration.class);</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">configureTasks</span><span class="params">(ScheduledTaskRegistrar taskRegistrar)</span> </span>&#123;</span><br><span class="line">        taskRegistrar.setTaskScheduler(taskScheduler());</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Bean</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> ThreadPoolTaskScheduler <span class="title">taskScheduler</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        ThreadPoolTaskScheduler taskScheduler = <span class="keyword">new</span> ThreadPoolTaskScheduler();</span><br><span class="line">        taskScheduler.setPoolSize(<span class="number">4</span>);</span><br><span class="line">        taskScheduler.setWaitForTasksToCompleteOnShutdown(<span class="keyword">true</span>);</span><br><span class="line">        taskScheduler.setThreadNamePrefix(<span class="string">"schedule"</span>);</span><br><span class="line">        taskScheduler.setRemoveOnCancelPolicy(<span class="keyword">true</span>);</span><br><span class="line">        taskScheduler.setErrorHandler(t -&gt; LOGGER.error(<span class="string">"Error occurs"</span>, t));</span><br><span class="line">        <span class="keyword">return</span> taskScheduler;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>启动 <code>Spring Boot</code> 引用，上面 <code>SpringTaskService</code> 配置的 <code>4</code> 个定时任务会同时生效。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">2018-06-20 20:37:50.746  INFO 8142 --- [      schedule1] i.o.s.sample.spring.SpringTaskService    : Schedule executor 1 <span class="built_in">times</span> at fixed rate</span><br><span class="line">2018-06-20 20:38:00.001  INFO 8142 --- [      schedule3] i.o.s.sample.spring.SpringTaskService    : Schedule executor 2 <span class="built_in">times</span> with </span><br><span class="line">2018-06-20 20:38:00.751  INFO 8142 --- [      schedule1] i.o.s.sample.spring.SpringTaskService    : Schedule executor 3 <span class="built_in">times</span> at fixed rate</span><br><span class="line">2018-06-20 20:38:02.748  INFO 8142 --- [      schedule2] i.o.s.sample.spring.SpringTaskService    : Schedule executor 4 <span class="built_in">times</span> with fixed delay</span><br><span class="line">2018-06-20 20:38:10.005  INFO 8142 --- [      schedule4] i.o.s.sample.spring.SpringTaskService    : Schedule executor 5 <span class="built_in">times</span> with </span><br><span class="line">2018-06-20 20:38:10.747  INFO 8142 --- [      schedule3] i.o.s.sample.spring.SpringTaskService    : Schedule executor 6 <span class="built_in">times</span> at fixed rate</span><br><span class="line">2018-06-20 20:38:20.002  INFO 8142 --- [      schedule2] i.o.s.sample.spring.SpringTaskService    : Schedule executor 7 <span class="built_in">times</span> with </span><br><span class="line">2018-06-20 20:38:20.747  INFO 8142 --- [      schedule4] i.o.s.sample.spring.SpringTaskService    : Schedule executor 8 <span class="built_in">times</span> at fixed rate</span><br></pre></td></tr></table></figure>
+<p>观察日志，<strong>线程名前缀</strong> 为 <code>schedule</code>，可以发现 <code>Spring Task</code> 将 <code>@Scheduled</code> 注解配置的 <code>4</code> 个任务，分发给我们配置的 <code>ThreadPoolTaskScheduler</code> 中的 <code>4</code> 个线程并发执行。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本文介绍了基于单节点的定时任务调度及实现，包括 <code>JDK</code> 原生的 <code>Timer</code> 和 <code>ScheduledExecutorService</code>，以及 <code>Spring 3.0</code> 以后自带的基于注解的 <code>Spring Task</code> 任务调度方式。除此之外，重点阐述了基于 <strong>固定延时</strong>、<strong>固定频率</strong> 和 <code>cron</code> <strong>表达式</strong> 的不同之处，并对 <code>ScheduledExecutorService</code> 和 <code>Spring Scheduler</code> 的 <strong>线程池并发处理</strong> 进行了测试。</p>
+<hr>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/6/17/1640df3c27eedf87?w=258&amp;h=258&amp;f=jpeg&amp;s=16109" alt="零壹技术栈"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+        <a href="https://ostenant.coding.me/2018/06/25/实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现/#comments" class="article-comment-link">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2018/06/20/实战Spring Boot 2.0系列(五) - Listener, Servlet和Filter, Controller和Interceptor/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">实战Spring Boot 2.0系列(五) - Listener, Servlet和Filter, Controller和Interceptor</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="lv-container" data-id="city" data-uid=MTAyMC8zNzE2NC8xMzY5OA==></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="no-thumbnail">
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/25/实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现/" class="title">实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现</a></p>
+                            <p class="item-date"><time datetime="2018-06-25T10:20:00.000Z" itemprop="datePublished">2018-06-25</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/20/实战Spring Boot 2.0系列(五) - Listener, Servlet和Filter, Controller和Interceptor/" class="title">实战Spring Boot 2.0系列(五) - Listener, Servlet和Filter, Controller和Interceptor</a></p>
+                            <p class="item-date"><time datetime="2018-06-20T11:20:00.000Z" itemprop="datePublished">2018-06-20</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/18/实战Spring Boot 2.0系列(四) - 使用WebAsyncTask处理异步任务/" class="title">实战Spring Boot 2.0系列(四) - 使用WebAsyncTask处理异步任务</a></p>
+                            <p class="item-date"><time datetime="2018-06-18T00:20:00.000Z" itemprop="datePublished">2018-06-18</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/17/实战Spring Boot 2.0系列(三) - 使用@Async进行异步调用详解/" class="title">实战Spring Boot 2.0系列(三) - 使用@Async进行异步调用详解</a></p>
+                            <p class="item-date"><time datetime="2018-06-17T01:40:00.000Z" itemprop="datePublished">2018-06-17</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/16/实战Spring Boot 2.0系列(二) - 全局异常处理和测试/" class="title">实战Spring Boot 2.0系列(二) - 全局异常处理和测试</a></p>
+                            <p class="item-date"><time datetime="2018-06-16T07:35:00.000Z" itemprop="datePublished">2018-06-16</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL学习系列/">MySQL学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RxJava异步框架系列/">RxJava异步框架系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Reactive编程系列/">Spring Reactive编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术知识图谱/">技术知识图谱</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/测试框架系列/">测试框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/高并发系统系列/">高并发系统系列</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">13</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker-Compose/">Docker Compose</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Filter/">Filter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interceptor/">Interceptor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Listener/">Listener</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mockito/">Mockito</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paxos/">Paxos</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Quartz/">Quartz</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raft/">Raft</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactive-Streams/">Reactive Streams</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactor/">Reactor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RxJava/">RxJava</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-Boot/">SOFA-Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ScheduledExecutorService/">ScheduledExecutorService</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Servlet/">Servlet</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot-2-0/">Spring Boot 2.0</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Task/">Spring Task</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-WebFlux/">Spring WebFlux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Timer/">Timer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unique-ID/">Unique ID</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/主从复制/">主从复制</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反模式/">反模式</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/定时任务/">定时任务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异步/">异步</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/限流/">限流</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Android/" style="font-size: 13.33px;">Android</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/Docker/" style="font-size: 16.67px;">Docker</a> <a href="/tags/Docker-Compose/" style="font-size: 10px;">Docker Compose</a> <a href="/tags/Filter/" style="font-size: 10px;">Filter</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Interceptor/" style="font-size: 10px;">Interceptor</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Java/" style="font-size: 18.33px;">Java</a> <a href="/tags/Listener/" style="font-size: 10px;">Listener</a> <a href="/tags/Mockito/" style="font-size: 10px;">Mockito</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Paxos/" style="font-size: 10px;">Paxos</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/Quartz/" style="font-size: 10px;">Quartz</a> <a href="/tags/RPC/" style="font-size: 20px;">RPC</a> <a href="/tags/Raft/" style="font-size: 10px;">Raft</a> <a href="/tags/Reactive-Streams/" style="font-size: 11.67px;">Reactive Streams</a> <a href="/tags/Reactor/" style="font-size: 10px;">Reactor</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/RxJava/" style="font-size: 13.33px;">RxJava</a> <a href="/tags/SOFA-Boot/" style="font-size: 13.33px;">SOFA-Boot</a> <a href="/tags/SOFA-RPC/" style="font-size: 15px;">SOFA-RPC</a> <a href="/tags/ScheduledExecutorService/" style="font-size: 10px;">ScheduledExecutorService</a> <a href="/tags/Servlet/" style="font-size: 10px;">Servlet</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Boot-2-0/" style="font-size: 18.33px;">Spring Boot 2.0</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/Spring-Task/" style="font-size: 10px;">Spring Task</a> <a href="/tags/Spring-WebFlux/" style="font-size: 11.67px;">Spring WebFlux</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Timer/" style="font-size: 10px;">Timer</a> <a href="/tags/Unique-ID/" style="font-size: 10px;">Unique ID</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/主从复制/" style="font-size: 10px;">主从复制</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a> <a href="/tags/反模式/" style="font-size: 13.33px;">反模式</a> <a href="/tags/定时任务/" style="font-size: 10px;">定时任务</a> <a href="/tags/异步/" style="font-size: 16.67px;">异步</a> <a href="/tags/微服务/" style="font-size: 13.33px;">微服务</a> <a href="/tags/限流/" style="font-size: 10px;">限流</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://ifeve.com" target="_blank">并发编程网</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://juejin.im" target="_blank">掘金</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.jianshu.com" target="_blank">简书</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com" target="_blank">Github</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.infoq.com" target="_blank">Infoq</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fas fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
+            
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+        </div>
+    </div>
+</footer>
+        
+    
+    
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+     (function(d, s) {
+         var j, e = d.getElementsByTagName(s)[0];
+
+         if (typeof LivereTower === 'function') { return; }
+
+         j = d.createElement(s);
+         j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+         j.async = true;
+
+         e.parentNode.insertBefore(j, e);
+     })(document, 'script');
+    </script>
+  <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+  <!-- City版安装代码已完成 -->
+
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
