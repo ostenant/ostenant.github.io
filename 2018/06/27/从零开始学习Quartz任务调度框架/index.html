@@ -3,18 +3,22 @@
 <head>
     <meta charset="utf-8">
     
-    <title>标签: CAP | Icarus&#39;s Blog</title>
+    <title>从零开始学习Quartz任务调度框架 | Icarus&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="上善若水任方猿">
-<meta property="og:type" content="website">
-<meta property="og:title" content="Icarus&#39;s Blog">
-<meta property="og:url" content="https://ostenant.coding.me/tags/CAP/index.html">
+    <meta name="description" content="前言Quartz 是个 任务调度工具，就是 定时 执行指定的任务。Quartz 提供了极为广泛的特性如 持久化任务，集群 和 分布式任务 等。Quartz 是用 Java 构建的，与 Spring 集成方便，伸缩性，负载均衡，高可用性。">
+<meta name="keywords" content="Quartz">
+<meta property="og:type" content="article">
+<meta property="og:title" content="从零开始学习Quartz任务调度框架">
+<meta property="og:url" content="https://ostenant.coding.me/2018/06/27/从零开始学习Quartz任务调度框架/index.html">
 <meta property="og:site_name" content="Icarus&#39;s Blog">
-<meta property="og:description" content="上善若水任方猿">
+<meta property="og:description" content="前言Quartz 是个 任务调度工具，就是 定时 执行指定的任务。Quartz 提供了极为广泛的特性如 持久化任务，集群 和 分布式任务 等。Quartz 是用 Java 构建的，与 Spring 集成方便，伸缩性，负载均衡，高可用性。">
 <meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Quartz_Logo_large.jpg">
+<meta property="og:updated_time" content="2018-06-27T15:06:17.784Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Icarus&#39;s Blog">
-<meta name="twitter:description" content="上善若水任方猿">
+<meta name="twitter:title" content="从零开始学习Quartz任务调度框架">
+<meta name="twitter:description" content="前言Quartz 是个 任务调度工具，就是 定时 执行指定的任务。Quartz 提供了极为广泛的特性如 持久化任务，集群 和 分布式任务 等。Quartz 是用 Java 构建的，与 Spring 集成方便，伸缩性，负载均衡，高可用性。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/Quartz_Logo_large.jpg">
     
 
     
@@ -236,50 +240,188 @@ ga('send', 'pageview');
 </aside>
 
             
-            <section id="main">
-<div class="timeline timeline-wrap">
-    <div class="timeline-row timeline-row-major">
-        <span class="node"><i class="fas fa-tag"></i></span>
-        <h1 class="title">#CAP</h1>
-    </div>
-    
-        <div class="timeline-row">
-            <span class="node"></span>
-            <div class="content">
+            <section id="main"><article id="post-从零开始学习Quartz任务调度框架" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
                 
     
-        <h1 itemprop="name">
-            <a class="timeline-article-title" href="/2018/04/23/分布式理论(一) - CAP定理/">分布式理论(一) - CAP定理</a>
+        <h1 class="article-title" itemprop="name">
+            从零开始学习Quartz任务调度框架
         </h1>
     
 
-                <div class="article-meta">
-                    
+                
+                    <div class="article-meta">
+                        
     <div class="article-date">
         <i class="fas fa-calendar-alt"></i>
-        <a href="/2018/04/23/分布式理论(一) - CAP定理/">
-            <time datetime="2018-04-23T12:33:00.000Z" itemprop="datePublished">2018-04-23</time>
+        <a href="/2018/06/27/从零开始学习Quartz任务调度框架/">
+            <time datetime="2018-06-27T04:17:00.000Z" itemprop="datePublished">2018-06-27</time>
         </a>
     </div>
 
 
-                    
+                        
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/分布式系列/">分布式系列</a>
+        <a class="article-category-link" href="/categories/任务调度框架系列/">任务调度框架系列</a>
     </div>
 
-                    
+                        
     <div class="article-tag">
         <i class="fas fa-tag"></i>
-        <a class="tag-link" href="/tags/CAP/">CAP</a>, <a class="tag-link" href="/tags/分布式/">分布式</a>
+        <a class="tag-link" href="/tags/Quartz/">Quartz</a>
     </div>
 
-                </div>
-            </div>
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Quartz</code> 是个 <strong>任务调度工具</strong>，就是 <strong>定时</strong> 执行指定的任务。<code>Quartz</code> 提供了极为广泛的特性如 <strong>持久化任务</strong>，<strong>集群</strong> 和 <strong>分布式任务</strong> 等。<code>Quartz</code> 是用 <code>Java</code> 构建的，与 <code>Spring</code> 集成方便，<strong>伸缩性</strong>，<strong>负载均衡</strong>，<strong>高可用性</strong>。</p>
+<a id="more"></a>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Quartz_Logo_large.jpg" alt=""></p>
+<p>本文只关注基于 <strong>数据库</strong> 的 <code>Quartz</code> 集群，基于 <code>Quartz 2.2.x</code> 来说明。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="Quartz的核心组件"><a href="#Quartz的核心组件" class="headerlink" title="Quartz的核心组件"></a>Quartz的核心组件</h2><p><code>Quartz</code> 大致有三个核心的组件：</p>
+<h3 id="1-调度器Scheduler"><a href="#1-调度器Scheduler" class="headerlink" title="1. 调度器Scheduler"></a>1. 调度器Scheduler</h3><p>一个 <strong>计划调度器容器</strong>，容器里面可以装载众多的 <code>JobDetail</code> 和 <code>Trigger</code>。当容器启动后，里面的每个 <code>JobDetail</code> 都会根据 <code>Trigger</code> 按部就班地 <strong>自动</strong> 去执行.</p>
+<h3 id="2-任务Job"><a href="#2-任务Job" class="headerlink" title="2. 任务Job"></a>2. 任务Job</h3><p><code>Job</code> 表示要执行的 <strong>具体内容</strong>。<code>JobDetail</code> 表示具体的、可执行的调度程序，包含了这个任务的 <strong>调度方案</strong> 和 <strong>策略</strong>。</p>
+<h3 id="3-触发器Trigger"><a href="#3-触发器Trigger" class="headerlink" title="3. 触发器Trigger"></a>3. 触发器Trigger</h3><p><strong>调度参数</strong> 的配置，配置任务执行触发的 <strong>时间间隔</strong>。</p>
+<blockquote>
+<p>几者的关系：<strong>调度器</strong> 就相当于一个 <strong>容器</strong>，装载着 <strong>任务</strong> 和 <strong>触发器</strong>。任务和触发器又是绑定在一起的，然而一个任务可以对应多个触发器，但一个触发器却只能对应一个任务。当 <code>JobDetail</code> 和 <code>Trigger</code> 在 <code>Scheduler</code> 容器上 <strong>注册</strong> 后，形成了装配好的 <strong>任务作业</strong>（<code>JobDetail</code> 和 <code>Trigger</code> 所组成的一对），伴随 <strong>容器启动</strong> 而调度执行。</p>
+</blockquote>
+<h2 id="Quartz的核心类"><a href="#Quartz的核心类" class="headerlink" title="Quartz的核心类"></a>Quartz的核心类</h2><h3 id="1-Scheduler"><a href="#1-Scheduler" class="headerlink" title="1. Scheduler"></a>1. Scheduler</h3><p><code>Quartz</code> 中 <strong>独立运行</strong> 的容器，<code>Trigger</code> 和 <code>JobDetail</code> 可以注册到 <code>Scheduler</code> 上。<code>Scheduler</code> 定义了多个 <strong>接口方法</strong>，允许外部通过 <strong>组及名称</strong> 访问和控制 <strong>容器</strong> 中 <code>Trigger</code> 和 <code>JobDetail</code>。</p>
+<h3 id="2-Job"><a href="#2-Job" class="headerlink" title="2. Job"></a>2. Job</h3><p>任务接口，<strong>任务类</strong> 代表要调度执行的 <strong>业务逻辑实现</strong>，<strong>任务</strong> 必须实现该接口。</p>
+<p>如果任务不允许 <strong>并发执行</strong>，则 <strong>任务类</strong> 必须添加注解 <code>@DisallowConcurrentExecution</code>。</p>
+<p>该接口只定义了一个方法：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">execute</span><span class="params">(JobExecutionContext context)</span> <span class="keyword">throws</span> JobExecutionException</span>;</span><br></pre></td></tr></table></figure>
+<p>通过 <code>context</code> 可以访问配置给任务的 <strong>数据</strong> <code>context.getJobDetail().getJobDataMap()</code>，如果这个 <code>JobDataMap</code> 需要在修改后 <strong>持久化</strong> 到 <strong>数据库</strong> 里，则需要给 <strong>任务类</strong> 加上注解 <code>@PersistJobDataAfterExecution</code>。<code>Quartz</code> 在下次调度执行这个任务时，会把 <strong>持久化</strong> 的数据 <strong>反序列化</strong> 成 <code>JobDataMap</code> 供应用使用。</p>
+<blockquote>
+<p>不建议通过 <code>Quartz</code> 的这个机制 <strong>持久化</strong> 任何与 <strong>业务有关</strong> 的数据。因为 <strong>业务数据</strong> 应该由 <strong>应用</strong> 来存储，<code>Quartz</code> 只关注于调度执行。</p>
+</blockquote>
+<h3 id="3-JobDetail"><a href="#3-JobDetail" class="headerlink" title="3. JobDetail"></a>3. JobDetail</h3><p>任务在 <strong>内存</strong> 的标示。表示 <strong>任务详细信息</strong> 的接口，如 <code>Job</code> <strong>名字</strong>、<strong>描述信息</strong>、<strong>关联监听器</strong> 等信息。任务用调度器名称、任务名称和任务所归属的组名来作为 <strong>唯一标识</strong>。</p>
+<h3 id="4-Trigger"><a href="#4-Trigger" class="headerlink" title="4. Trigger"></a>4. Trigger</h3><p><strong>触发器</strong>，用调度器名称、触发器名称和触发器所归属的组名来做 <strong>唯一标识</strong>。用于定义在什么情况、什么时间点执行任务。最常用的触发器类型就是基于 <code>cron</code> <strong>表达式</strong> 的触发器。</p>
+<h3 id="5-JobStore"><a href="#5-JobStore" class="headerlink" title="5. JobStore"></a>5. JobStore</h3><p><strong>数据存储抽象</strong>，该接口定义了 <strong>任务</strong>、<strong>触发器</strong> 的 <strong>存储</strong>、<strong>检索</strong>、<strong>更新</strong> 的钩子函数，该接口还定义了任务执行完成后的 <strong>回调方法</strong>。</p>
+<p><code>Quartz</code> 内建支持把 <strong>任务</strong>、<strong>触发器</strong> 等数据存储在 <code>JVM</code> <strong>内存</strong>、<strong>文件</strong>、<strong>数据库</strong> 中。通过这个接口，就隔离了 <strong>底层存储机制</strong> 的差异。可以在配置文件里通过 <code>org.quartz.JobStore.class</code> 属性来指定该接口的实现，比如基于 <code>Redis</code> 做 <strong>数据存储</strong> 的实现。</p>
+<h3 id="6-JobFactory"><a href="#6-JobFactory" class="headerlink" title="6. JobFactory"></a>6. JobFactory</h3><p><strong>任务工厂</strong>，接口抽象了如何生成 <strong>任务实例</strong>，以便让应用来决定如何实例化任务类。</p>
+<h3 id="7-JobStoreSupport"><a href="#7-JobStoreSupport" class="headerlink" title="7. JobStoreSupport"></a>7. JobStoreSupport</h3><p>提供了 <strong>基于数据库</strong> 的 <code>JobStore</code> 实现，通过 <code>MisfireHandler</code> 来检查错过发射的 <strong>触发器</strong>。如果是以 <strong>集群方式部署</strong>，还会通过内部类 <code>ClusterManager</code> 提供 <strong>集群健康检查</strong> 与 <strong>恢复</strong>。</p>
+<h3 id="8-MisfireHandler"><a href="#8-MisfireHandler" class="headerlink" title="8. MisfireHandler"></a>8. MisfireHandler</h3><p><code>JobStoreSupport</code> 有个内部类 <code>MisfireHandler</code>，用于检查是否有 <strong>触发器</strong> 错过发射，它是用 <strong>单独的线程</strong> 执行。</p>
+<p>但检测到有触发器 <strong>错过发射</strong> 时，该处理器只是 <strong>更新</strong> 触发器的状态为 <code>WAITING</code>，然后通知 <strong>监听器</strong>、通知 <strong>调度器</strong> 去处理。</p>
+<h3 id="9-ClusterManager"><a href="#9-ClusterManager" class="headerlink" title="9. ClusterManager"></a>9. ClusterManager</h3><p>用于 <strong>管理集群</strong> 的 <strong>线程</strong>。<code>JobStoreSupport</code> 有个 <strong>内部类</strong> <code>ClusterManager</code> 用于进行 <strong>集群管理</strong>，它也是用 <strong>单独的线程</strong> 来执行，以防止 <strong>任务阻塞</strong>，其核心逻辑有：</p>
+<ol>
+<li>签入，向其他节点传达它所在的 <strong>调度器实例</strong> 还处于存活状态。</li>
+<li>检查失败的节点，进行 <strong>恢复</strong>。<code>Quartz</code> 认为在一定时间后 <strong>没有签入</strong> 的节点是失败的，需要恢复。</li>
+</ol>
+<h3 id="10-Calendar"><a href="#10-Calendar" class="headerlink" title="10. Calendar"></a>10. Calendar</h3><p><code>org.quartz.Calendar</code> 和 <code>java.util.Calendar</code> 不同，它是一些 <strong>特定时间点</strong> 的 <strong>集合</strong>。一个 <code>Trigger</code> 可以和 <strong>多个</strong> <code>Calendar</code> 关联，以便 <strong>排除</strong> 或包含 <strong>某些时间点</strong>。</p>
+<blockquote>
+<p><code>Quartz</code> 在 <code>org.quartz.impl.calendar</code> 包下提供了若干个 <code>Calendar</code> 的 <strong>实现类</strong>，比如: <code>AnnualCalendar</code>、<code>MonthlyCalendar</code>、<code>WeeklyCalendar</code> 分别针对每年、每月和每周进行定义。</p>
+</blockquote>
+<h3 id="11-工作线程池"><a href="#11-工作线程池" class="headerlink" title="11. 工作线程池"></a>11. 工作线程池</h3><p><code>Quartz</code> 可以配置一个 <strong>线程池</strong> 来执行任务，线程池里的 <strong>线程用完</strong> 后，后续到期需要执行的任务就会 <strong>被阻塞</strong>。</p>
+<h3 id="12-调度器线程"><a href="#12-调度器线程" class="headerlink" title="12. 调度器线程"></a>12. 调度器线程</h3><p>每个 <strong>调度器</strong> 都有自己的名称，对应一个 <code>org.quartz.core.QuartzSchedulerThread</code> <strong>调度器线程实例</strong>，调度逻辑就在这个线程类的 <code>run()</code> 方法里。</p>
+<h2 id="Quartz的核心表"><a href="#Quartz的核心表" class="headerlink" title="Quartz的核心表"></a>Quartz的核心表</h2><h3 id="1-job-details"><a href="#1-job-details" class="headerlink" title="1. job_details"></a>1. job_details</h3><p>存储 <strong>任务</strong> 的信息，每一条记录表示一个任务。</p>
+<h3 id="2-triggers"><a href="#2-triggers" class="headerlink" title="2. triggers"></a>2. triggers</h3><p>存储 <strong>触发器</strong> 的信息，<code>TRIGGER_STATE</code> 字段表示 <strong>触发器状态</strong>，用来控制这个 <strong>触发器</strong> 能不能被调度器 <strong>处理</strong>。</p>
+<h3 id="3-fired-triggers"><a href="#3-fired-triggers" class="headerlink" title="3. fired_triggers"></a>3. fired_triggers</h3><p><strong>已发射触发器</strong> 的记录表，<code>STATE</code> 列用来表示任务的 <strong>执行状态</strong>。该表的作用是 <strong>跟踪任务</strong> 的 <strong>执行进度</strong>，用于 <strong>失败处理</strong>。</p>
+<h3 id="4-locks"><a href="#4-locks" class="headerlink" title="4. locks"></a>4. locks</h3><p><code>locks</code> 表里的每条记录作为一个 <strong>悲观锁</strong>，要 <strong>加锁</strong> 时，用 <code>for update</code> 语句锁住对应的记录。</p>
+<h3 id="5-scheduler-state"><a href="#5-scheduler-state" class="headerlink" title="5. scheduler_state"></a>5. scheduler_state</h3><p><strong>调度器状态表</strong>，集群的节点通过这个表来检查 <strong>其他节点</strong> 是否存活。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1>
+        
         </div>
-    
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
 </div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+        <a href="https://ostenant.coding.me/2018/06/27/从零开始学习Quartz任务调度框架/#comments" class="article-comment-link">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2018/06/25/实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="lv-container" data-id="city" data-uid=MTAyMC8zNzE2NC8xMzY5OA==></div>
+</section>
+    
+
 </section>
             
                 
