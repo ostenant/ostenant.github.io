@@ -440,11 +440,11 @@
       <category term="Spring Reactive编程系列" scheme="https://ostenant.coding.me/categories/Spring-Reactive%E7%BC%96%E7%A8%8B%E7%B3%BB%E5%88%97/"/>
     
     
-      <category term="Spring Boot 2.0" scheme="https://ostenant.coding.me/tags/Spring-Boot-2-0/"/>
-    
       <category term="Reactive Streams" scheme="https://ostenant.coding.me/tags/Reactive-Streams/"/>
     
       <category term="Spring WebFlux" scheme="https://ostenant.coding.me/tags/Spring-WebFlux/"/>
+    
+      <category term="Spring Boot 2.0" scheme="https://ostenant.coding.me/tags/Spring-Boot-2-0/"/>
     
   </entry>
   
