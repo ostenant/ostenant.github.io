@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>浅谈分布式存储系统的数据分布算法 | Icarus&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="前言分布式存储系统 面临着的首要问题，就是如何将 大量的数据 分布在 不同的存储节点 上。无论上层接口是 KV 存储、对象存储、块存储、亦或是 列存储，在这个问题上大体是一致的。本文将介绍如何 分布式存储系统 中 做数据分布目标 及可选的 方案，并试着总结和权衡他们之间的关系及。">
+<meta name="keywords" content="分布式存储,一致性哈希,分片">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈分布式存储系统的数据分布算法">
+<meta property="og:url" content="https://ostenant.coding.me/2018/07/01/浅谈分布式存储系统的数据分布算法/index.html">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
+<meta property="og:description" content="前言分布式存储系统 面临着的首要问题，就是如何将 大量的数据 分布在 不同的存储节点 上。无论上层接口是 KV 存储、对象存储、块存储、亦或是 列存储，在这个问题上大体是一致的。本文将介绍如何 分布式存储系统 中 做数据分布目标 及可选的 方案，并试着总结和权衡他们之间的关系及。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b670a4be?w=576&h=412&f=png&s=38351">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b6ac1b85?w=431&h=397&f=png&s=46890">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b6940588?w=700&h=338&f=png&s=64488">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b68eee2d?w=546&h=462&f=png&s=34445">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b9a03c5b?w=700&h=388&f=png&s=49049">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b6abde68?w=700&h=254&f=png&s=72421">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5dcc40392?w=258&h=258&f=jpeg&s=16109">
+<meta property="og:updated_time" content="2018-07-01T13:01:25.154Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈分布式存储系统的数据分布算法">
+<meta name="twitter:description" content="前言分布式存储系统 面临着的首要问题，就是如何将 大量的数据 分布在 不同的存储节点 上。无论上层接口是 KV 存储、对象存储、块存储、亦或是 列存储，在这个问题上大体是一致的。本文将介绍如何 分布式存储系统 中 做数据分布目标 及可选的 方案，并试着总结和权衡他们之间的关系及。">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b670a4be?w=576&h=412&f=png&s=38351">
+    
+
+    
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/cat.png" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fontawesome.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-brands.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-solid.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'true', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+        <meta name="google-site-verification" content="true" />
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Icarus&#39;s Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpeg" />
+                            <i class="fas fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fas fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpeg" />
+            <h2 id="name">陈林 | Icarus</h2>
+            <h3 id="title">年轻无为，卖码为生!</h3>
+            <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
+            <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                61
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                64
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/ostenant" target="_blank" title="github" class=tooltip>
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fab fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="linkedin" class=tooltip>
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fab fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-浅谈分布式存储系统的数据分布算法" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            浅谈分布式存储系统的数据分布算法
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2018/07/01/浅谈分布式存储系统的数据分布算法/">
+            <time datetime="2018-07-01T09:43:00.000Z" itemprop="datePublished">2018-07-01</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/分布式系列/">分布式系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/一致性哈希/">一致性哈希</a>, <a class="tag-link" href="/tags/分布式存储/">分布式存储</a>, <a class="tag-link" href="/tags/分片/">分片</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><strong>分布式存储系统</strong> 面临着的首要问题，就是如何将 <strong>大量的数据</strong> 分布在 <strong>不同的存储节点</strong> 上。无论上层接口是 <code>KV</code> <strong>存储</strong>、<strong>对象存储</strong>、<strong>块存储</strong>、亦或是 <strong>列存储</strong>，在这个问题上大体是一致的。本文将介绍如何 <strong>分布式存储系统</strong> 中 <strong>做数据分布目标</strong> 及可选的 <strong>方案</strong>，并试着总结和权衡他们之间的关系及。</p>
+<a id="more"></a>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="一-指标"><a href="#一-指标" class="headerlink" title="(一) 指标"></a>(一) 指标</h2><p>这里假设 <strong>目标数据</strong> 是以 <code>key</code> 标识的 <strong>数据块</strong> 或 <strong>对象</strong>。在一个包含 <strong>多个存储节点</strong> 的集群中，<strong>数据分布算法</strong> 需要为每一个给定的 <code>key</code> 指定 <strong>一个</strong> 或 <strong>多个</strong> 对应的 <strong>存储节点</strong> 负责，<strong>数据分布算法</strong> 有两个基本目标：</p>
+<ul>
+<li><p><strong>均匀性(Uniformity)</strong>：不同存储节点的 <strong>负载</strong> 应该 <strong>均衡</strong>；</p>
+</li>
+<li><p><strong>稳定性(Consistency)</strong>：每次一个 <code>key</code> 通过 <strong>数据分布算法</strong> 得到的 <strong>分布结果</strong> 应该保持 <strong>基本稳定</strong>，即使再有存储节点发生变化的情况下。</p>
+</li>
+</ul>
+<p>可以看出，这两个目标在一定程度上是 <strong>相互矛盾</strong> 的。当有 <strong>存储节点增加或删除</strong> 时，为了保持稳定应该 <strong>尽量少</strong> 的进行 <strong>数据的移动</strong> 和 <strong>重新分配</strong>，而这样又势必会带来 <strong>负载不均衡</strong>。同样追求 <strong>极致均匀</strong> 也会导致较多的 <strong>数据迁移</strong>。</p>
+<p>所以我们希望在这两个极端之间，找到一个点以获得合适的均匀性和稳定性。除了上述两个基本目标外，工程中还需要从以下几个方面考虑数据分布算法的优劣：</p>
+<ol>
+<li><p><strong>性能可扩展性</strong>：这个主要考虑的是算法相对于 <strong>存储节点规模</strong> 的 <strong>时间复杂度</strong>。为了整个系统的可扩展性，数据分布算法不应该在集群规模扩大后显著的增加运行时间。</p>
+</li>
+<li><p><strong>考虑节点异构</strong>：实际工程中，不同 <strong>存储节点</strong> 之间可能会有很大的 <strong>性能</strong> 或 <strong>容量差异</strong>，好的数据分布算法应该能很好的应对这种 <strong>异构</strong>，提供 <strong>加权的数据均匀</strong>。</p>
+</li>
+<li><p><strong>隔离故障域</strong>：为了 <strong>数据的高可用</strong>，数据分布算法应该为每个 <code>key</code> 找到 <strong>一组存储节点</strong>，这些节点可能提供的是 <strong>数据的镜像副本</strong>，也可能是类似 <strong>擦除码</strong> 的副本方式。数据分布算法应该尽量 <strong>隔离</strong> 这些副本的故障域，如 <strong>不同机房</strong>、<strong>不同机架</strong>、<strong>不同交换机</strong>、<strong>不同机器</strong>。</p>
+</li>
+</ol>
+<h2 id="二-演进"><a href="#二-演进" class="headerlink" title="(二) 演进"></a>(二) 演进</h2><p>看完算法的评价指标后，接下来介绍一些可能的方案演进，并分析他们的优劣。这里假设 <code>key</code> 的值足够分散。</p>
+<h3 id="1-Hash"><a href="#1-Hash" class="headerlink" title="1. Hash"></a>1. Hash</h3><p>一个简单直观的想法是直接用 <code>Hash</code> 来计算，简单的以 <code>Key</code> 做 <strong>哈希</strong> 后 <strong>对节点数取模</strong>。可以看出，在 <code>key</code> 足够分散的情况下，<strong>均匀性</strong> 可以获得，但一旦有 <strong>节点加入</strong> 或 <strong>退出</strong> 时，所有的原有节点都会受到影响。<strong>稳定性</strong> 无从谈起。</p>
+<h3 id="2-一致性Hash"><a href="#2-一致性Hash" class="headerlink" title="2. 一致性Hash"></a>2. 一致性Hash</h3><p><img src="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b670a4be?w=576&amp;h=412&amp;f=png&amp;s=38351" alt=""></p>
+<p>一致性 <code>Hash</code> 可以很好的解决 <strong>稳定性问题</strong>，可以将所有的 <strong>存储节点</strong> 排列在收尾相接的 <code>Hash</code> 环上，每个 <code>key</code> 在计算 <code>Hash</code> 后会 <strong>顺时针</strong> 找到先遇到的 <strong>存储节点</strong> 存放。而当有节点 <strong>加入</strong> 或 <strong>退出</strong> 时，仅影响该节点在 <code>Hash</code> 环上 <strong>顺时针相邻</strong> 的 <strong>后续节点</strong>。但这有带来 <strong>均匀性</strong> 的问题，即使可以将存储节点等距排列，也会在 <strong>存储节点个数</strong> 变化时带来 <strong>数据的不均匀</strong>。而这种可能 <strong>成倍数的不均匀</strong> 在实际工程中是不可接受的。</p>
+<h3 id="3-带负载上限的一致性Hash"><a href="#3-带负载上限的一致性Hash" class="headerlink" title="3. 带负载上限的一致性Hash"></a>3. 带负载上限的一致性Hash</h3><p>一致性 <code>Hash</code> 有 <strong>节点变化时不均匀</strong>的问题。<code>Google</code> 在 <code>2017</code> 年提出了 Consistent Hashing with Bounded Loads 来控制这种 <strong>不均匀的程度</strong>。简单的说，该算法给 <code>Hash</code> 环上的每个节点一个 <strong>负载上限</strong> 为 <code>1 + e</code> 倍的 <strong>平均负载</strong>，这个 <code>e</code>可以自定义。当 <code>key</code> 在 <code>Hash</code> 环上 <strong>顺时针</strong> 找到合适的节点后，会判断这个节点的 <strong>负载</strong> 是否已经 <strong>到达上限</strong>，如果 <strong>已达上限</strong>，则需要继续找 <strong>之后的节点</strong> 进行分配。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b6ac1b85?w=431&amp;h=397&amp;f=png&amp;s=46890" alt=""></p>
+<p>如上图所示，假设每个桶 <strong>当前上限</strong> 是 <code>2</code>，红色的小球按序号访问，当编号为 <code>6</code> 的红色小球到达时，发现顺时针首先遇到的 <code>B（3，4）</code>，<code>C（1，5）</code>都已经 <strong>达到上限</strong>，因此最终放置在桶 <code>A</code> 里。</p>
+<p>这个算法最吸引人的地方在于 <strong>当有节点变化</strong> 时，需要迁移的数据量是 <code>1/e^2</code> 相关，而与 <strong>节点数</strong> 或 <strong>数据数量</strong> 均无关。</p>
+<p>也就是说当 <strong>集群规模扩大</strong> 时，<strong>数据迁移量</strong> 并不会随着显著增加。另外，使用者可以通过调整 <code>e</code> 的值来控制 <strong>均匀性</strong> 和 <strong>稳定性</strong> 之间的权衡，就是一种 <strong>以时间换空间</strong> 的算法。总体来说，无论是 <strong>一致性</strong> <code>Hash</code> 还是 <strong>带负载限制</strong> 的 <strong>一致性</strong> <code>Hash</code>，都无法解决 <strong>节点异构</strong> 的问题。</p>
+<h3 id="4-带虚拟节点的一致性Hash"><a href="#4-带虚拟节点的一致性Hash" class="headerlink" title="4. 带虚拟节点的一致性Hash"></a>4. 带虚拟节点的一致性Hash</h3><p>为了解决 <strong>负载不均匀</strong> 和 <strong>异构</strong> 的问题，可以在 <strong>一致性</strong> <code>Hash</code> 的基础上引入 <strong>虚拟节点</strong>。即 <code>hash</code> 环上的 <strong>每个节点</strong> 并不是 <strong>实际</strong> 的 <strong>存储节点</strong>，而是一个 <strong>虚拟节点</strong>。实际的 <strong>存储节点</strong> 根据其 <strong>不同的权重</strong>，对应 <strong>一个</strong> 或 <strong>多个虚拟节点</strong>，所有落到相应虚拟节点上的 <code>key</code> 都由该 <strong>存储节点负责</strong>。</p>
+<p>如下图所示，存储节点 <code>A</code> 负责 <code>(1,3]</code>，<code>(4,8]</code>，<code>(10, 14]</code>，存储节点 <code>B</code> 负责 <code>(14,1]</code>，<code>(8,10]</code>。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b6940588?w=700&amp;h=338&amp;f=png&amp;s=64488" alt=""></p>
+<p>这个算法的问题在于，一个 <strong>实际存储节点</strong> 的 <strong>加入</strong> 或 <strong>退出</strong>，会影响 <strong>多个虚拟节点</strong>的重新分配，进而引起 <strong>很多节点</strong> 参与到 <strong>数据迁移</strong> 中来。</p>
+<p>另外，实践中将一个 <strong>虚拟节点</strong> 重新分配给 <strong>新的实际节点</strong> 时，需要将这部分数据 <strong>遍历</strong> 出来 <strong>发送给新节点</strong>。我们需要一个更合适的 <strong>虚拟节点切分</strong> 和 <strong>分配方式</strong>，那就是 <strong>分片</strong>。</p>
+<h3 id="5-分片"><a href="#5-分片" class="headerlink" title="5. 分片"></a>5. 分片</h3><p><strong>分片</strong> 将 <strong>哈希环</strong> 切割为 <strong>相同大小的分片</strong>，然后将这些 <strong>分片</strong> 交给 <strong>不同的节点</strong> 负责。</p>
+<p>注意这里跟上面提到的 <strong>虚拟节点</strong> 有着很 <strong>本质的区别</strong>：<strong>分片的划分和分片的分配被解耦</strong>。</p>
+<p>一个 <strong>节点退出</strong> 时，其所负责的 <strong>分片</strong> 并不需要 <strong>顺时针合并</strong> 给之后节点，而是可以更灵活的 <strong>将整个分片</strong> 作为一个 <strong>整体</strong> 交给 <strong>任意节点</strong>。在实践中，一个 <strong>分片</strong> 多作为 <strong>最小的数据迁移</strong> 和 <strong>备份单位</strong>。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b68eee2d?w=546&amp;h=462&amp;f=png&amp;s=34445" alt=""></p>
+<p>而也正是由于上面提到的 <strong>解耦</strong>，相当于将原先的 <code>key</code> 到 <strong>节点</strong> 的 <strong>映射</strong> 拆成了两层。需要一个 <strong>新的机制</strong> 来进行 <strong>分片</strong> 到 <strong>存储节点</strong> 的 <strong>映射</strong>。由于 <strong>分片数</strong> 相对 <code>key</code> 空间已经很小并且 <strong>数量确定</strong>，可以更精确地初始设置，并引入 <strong>中心目录服务</strong> 来根据 <strong>节点存活</strong> 修改 <strong>分片的映射关系</strong>。同时将这个 <strong>映射信息</strong> 通知给所有的 <strong>存储节点</strong> 和 <strong>客户端</strong>。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b9a03c5b?w=700&amp;h=388&amp;f=png&amp;s=49049" alt=""></p>
+<p>上图是 <strong>分布式KV存储</strong> <code>Zeppelin</code>中的 <strong>分片方式</strong>，<code>Key Space</code> 通过 <code>Hash</code> 到 <strong>分片</strong>，<strong>分片及其副本</strong> 又通过一层映射到 <strong>最终的存储节点</strong> <code>Node Server</code>。</p>
+<h3 id="6-CRUSH算法"><a href="#6-CRUSH算法" class="headerlink" title="6. CRUSH算法"></a>6. CRUSH算法</h3><p><code>CRUSH</code> 算法本质上也是一种 <strong>基于分片</strong> 的数据分布方式，其试图在以下几个方面进行优化：</p>
+<ul>
+<li><p><strong>分片映射信息量</strong>：避免 <strong>中心目录服务</strong> 和 <strong>存储节点</strong> 及 <strong>客户端之间</strong> 交互大量的 <strong>分片映射信息</strong>，而改由 <strong>存储节点</strong> 或 <strong>客户端</strong> 自己根据 <strong>少量</strong> 且 <strong>稳定</strong> 的集群节点拓扑和确定的规则自己计算分片映射。</p>
+</li>
+<li><p><strong>完善的故障域划分</strong>：支持 <strong>层级</strong> 的 <strong>故障域控制</strong>，将 <strong>同一分片</strong> 的 <strong>不同副本</strong> 按照配置划分到 <strong>不同层级</strong> 的 <strong>故障域中</strong>。</p>
+</li>
+</ul>
+<p><strong>客户端</strong> 或 <strong>存储节点</strong> 利用 <code>key</code>、<strong>存储节点</strong> 的 <strong>拓扑结构</strong> 和 <strong>分配算法</strong>，独立的进行 <strong>分片位置</strong> 的计算，得到一组负责对应 <strong>分片</strong> 及 <strong>副本</strong> 的 <strong>存储位置</strong>。</p>
+<p>如图所示是 <strong>一次定位</strong> 的过程，最终选择了一个 <code>row</code> 下的 <code>cab21</code>，<code>cab23</code>，<code>cab24</code> 三个机柜下的三个存储节点。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5b6abde68?w=700&amp;h=254&amp;f=png&amp;s=72421" alt=""></p>
+<p>当 <strong>节点变化</strong> 时，由于 <strong>节点拓扑</strong> 的变化，会影响 <strong>少量分片</strong> 数据进行迁移，如下图是加入 <strong>新节点</strong> 引起的 <strong>数据迁移</strong>。通过良好的 <strong>分配算法</strong>，可以得到很好的 <strong>负载均衡</strong> 和 <strong>稳定性</strong>，<code>CRUSH</code> 提供了 <code>Uniform</code>、<code>List</code>、<code>Tree</code>、<code>Straw</code> 四种分配算法。</p>
+<h2 id="三-应用案例"><a href="#三-应用案例" class="headerlink" title="(三) 应用案例"></a>(三) 应用案例</h2><p>常见的 <strong>分布式存储系统</strong> 大多采用类似于 <strong>分片</strong> 的 <strong>数据分布和定位方式</strong>：</p>
+<ol>
+<li><p><strong>Cassandra/Dynamo</strong>：采用 <strong>分片</strong> 的方式并通过 <code>Gossip</code> 协议在对等节点间通信；</p>
+</li>
+<li><p><strong>Redis Cluster</strong>：将 <code>key Space</code> 划分为 <code>slots</code>，同样利用 <code>Gossip</code> 协议通信；</p>
+</li>
+<li><p><strong>Zeppelin</strong>：将数据分片为 <code>Partition</code>，通过 <code>Meta</code> 集群提供 <strong>中心目录服务</strong>；</p>
+</li>
+<li><p><strong>Bigtable</strong>：将数据切割为 <code>Tablet</code>，类似于可变的分片，<code>Tablet Server</code> 可以进行分片的切割，最终分片信息记录在 <code>Chubby</code> 中；</p>
+</li>
+<li><p><strong>Ceph</strong>：采用 <code>CRUSH</code> 方式，由 <strong>中心集群</strong> <code>Monitor</code> 提供并维护 <strong>集群拓扑</strong> 的变化。</p>
+</li>
+</ol>
+<hr>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5dcc40392?w=258&amp;h=258&amp;f=jpeg&amp;s=16109" alt="零壹技术栈"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+        <a href="https://ostenant.coding.me/2018/07/01/浅谈分布式存储系统的数据分布算法/#comments" class="article-comment-link">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2018/06/27/从零开始学习Quartz任务调度框架/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">从零开始学习Quartz任务调度框架</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="lv-container" data-id="city" data-uid=MTAyMC8zNzE2NC8xMzY5OA==></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="no-thumbnail">
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/分布式系列/">分布式系列</a></p>
+                            <p class="item-title"><a href="/2018/07/01/浅谈分布式存储系统的数据分布算法/" class="title">浅谈分布式存储系统的数据分布算法</a></p>
+                            <p class="item-date"><time datetime="2018-07-01T09:43:00.000Z" itemprop="datePublished">2018-07-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/任务调度框架系列/">任务调度框架系列</a></p>
+                            <p class="item-title"><a href="/2018/06/27/从零开始学习Quartz任务调度框架/" class="title">从零开始学习Quartz任务调度框架</a></p>
+                            <p class="item-date"><time datetime="2018-06-27T04:17:00.000Z" itemprop="datePublished">2018-06-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/25/实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现/" class="title">实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现</a></p>
+                            <p class="item-date"><time datetime="2018-06-25T10:20:00.000Z" itemprop="datePublished">2018-06-25</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/20/实战Spring Boot 2.0系列(五) - Listener, Servlet和Filter, Controller和Interceptor/" class="title">实战Spring Boot 2.0系列(五) - Listener, Servlet, Filter和Interceptor</a></p>
+                            <p class="item-date"><time datetime="2018-06-20T11:20:00.000Z" itemprop="datePublished">2018-06-20</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/18/实战Spring Boot 2.0系列(四) - 使用WebAsyncTask处理异步任务/" class="title">实战Spring Boot 2.0系列(四) - 使用WebAsyncTask处理异步任务</a></p>
+                            <p class="item-date"><time datetime="2018-06-18T00:20:00.000Z" itemprop="datePublished">2018-06-18</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL学习系列/">MySQL学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RxJava异步框架系列/">RxJava异步框架系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Reactive编程系列/">Spring Reactive编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/任务调度框架系列/">任务调度框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术知识图谱/">技术知识图谱</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/测试框架系列/">测试框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/高并发系统系列/">高并发系统系列</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker-Compose/">Docker Compose</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Filter/">Filter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interceptor/">Interceptor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Listener/">Listener</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mockito/">Mockito</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paxos/">Paxos</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Quartz/">Quartz</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raft/">Raft</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactive-Streams/">Reactive Streams</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactor/">Reactor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RxJava/">RxJava</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-Boot/">SOFA-Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ScheduledExecutorService/">ScheduledExecutorService</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Servlet/">Servlet</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot-2-0/">Spring Boot 2.0</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Task/">Spring Task</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-WebFlux/">Spring WebFlux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Timer/">Timer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unique-ID/">Unique ID</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一致性哈希/">一致性哈希</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/主从复制/">主从复制</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式存储/">分布式存储</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分片/">分片</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反模式/">反模式</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/定时任务/">定时任务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异步/">异步</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/限流/">限流</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Android/" style="font-size: 13.33px;">Android</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/Docker/" style="font-size: 16.67px;">Docker</a> <a href="/tags/Docker-Compose/" style="font-size: 10px;">Docker Compose</a> <a href="/tags/Filter/" style="font-size: 10px;">Filter</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Interceptor/" style="font-size: 10px;">Interceptor</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Java/" style="font-size: 18.33px;">Java</a> <a href="/tags/Listener/" style="font-size: 10px;">Listener</a> <a href="/tags/Mockito/" style="font-size: 10px;">Mockito</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Paxos/" style="font-size: 10px;">Paxos</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/Quartz/" style="font-size: 11.67px;">Quartz</a> <a href="/tags/RPC/" style="font-size: 20px;">RPC</a> <a href="/tags/Raft/" style="font-size: 10px;">Raft</a> <a href="/tags/Reactive-Streams/" style="font-size: 11.67px;">Reactive Streams</a> <a href="/tags/Reactor/" style="font-size: 10px;">Reactor</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/RxJava/" style="font-size: 13.33px;">RxJava</a> <a href="/tags/SOFA-Boot/" style="font-size: 13.33px;">SOFA-Boot</a> <a href="/tags/SOFA-RPC/" style="font-size: 15px;">SOFA-RPC</a> <a href="/tags/ScheduledExecutorService/" style="font-size: 10px;">ScheduledExecutorService</a> <a href="/tags/Servlet/" style="font-size: 10px;">Servlet</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Boot-2-0/" style="font-size: 18.33px;">Spring Boot 2.0</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/Spring-Task/" style="font-size: 10px;">Spring Task</a> <a href="/tags/Spring-WebFlux/" style="font-size: 11.67px;">Spring WebFlux</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Timer/" style="font-size: 10px;">Timer</a> <a href="/tags/Unique-ID/" style="font-size: 10px;">Unique ID</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/一致性哈希/" style="font-size: 10px;">一致性哈希</a> <a href="/tags/主从复制/" style="font-size: 10px;">主从复制</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a> <a href="/tags/分布式存储/" style="font-size: 10px;">分布式存储</a> <a href="/tags/分片/" style="font-size: 10px;">分片</a> <a href="/tags/反模式/" style="font-size: 13.33px;">反模式</a> <a href="/tags/定时任务/" style="font-size: 10px;">定时任务</a> <a href="/tags/异步/" style="font-size: 16.67px;">异步</a> <a href="/tags/微服务/" style="font-size: 13.33px;">微服务</a> <a href="/tags/限流/" style="font-size: 10px;">限流</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://ifeve.com" target="_blank">并发编程网</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://juejin.im" target="_blank">掘金</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.jianshu.com" target="_blank">简书</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com" target="_blank">Github</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.infoq.com" target="_blank">Infoq</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fas fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
+            
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+        </div>
+    </div>
+</footer>
+        
+    
+    
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+     (function(d, s) {
+         var j, e = d.getElementsByTagName(s)[0];
+
+         if (typeof LivereTower === 'function') { return; }
+
+         j = d.createElement(s);
+         j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+         j.async = true;
+
+         e.parentNode.insertBefore(j, e);
+     })(document, 'script');
+    </script>
+  <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+  <!-- City版安装代码已完成 -->
+
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

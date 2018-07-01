@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>标签: 一致性哈希 | Icarus&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="上善若水任方猿">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Icarus&#39;s Blog">
+<meta property="og:url" content="https://ostenant.coding.me/tags/一致性哈希/index.html">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
+<meta property="og:description" content="上善若水任方猿">
+<meta property="og:locale" content="zh-CN">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Icarus&#39;s Blog">
+<meta name="twitter:description" content="上善若水任方猿">
+    
+
+    
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/cat.png" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fontawesome.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-brands.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-solid.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'true', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+        <meta name="google-site-verification" content="true" />
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Icarus&#39;s Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpeg" />
+                            <i class="fas fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fas fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpeg" />
+            <h2 id="name">陈林 | Icarus</h2>
+            <h3 id="title">年轻无为，卖码为生!</h3>
+            <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
+            <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                61
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                64
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/ostenant" target="_blank" title="github" class=tooltip>
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fab fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="linkedin" class=tooltip>
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fab fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main">
+<div class="timeline timeline-wrap">
+    <div class="timeline-row timeline-row-major">
+        <span class="node"><i class="fas fa-tag"></i></span>
+        <h1 class="title">#一致性哈希</h1>
+    </div>
+    
+        <div class="timeline-row">
+            <span class="node"></span>
+            <div class="content">
+                
+    
+        <h1 itemprop="name">
+            <a class="timeline-article-title" href="/2018/07/01/浅谈分布式存储系统的数据分布算法/">浅谈分布式存储系统的数据分布算法</a>
+        </h1>
+    
+
+                <div class="article-meta">
+                    
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2018/07/01/浅谈分布式存储系统的数据分布算法/">
+            <time datetime="2018-07-01T09:43:00.000Z" itemprop="datePublished">2018-07-01</time>
+        </a>
+    </div>
+
+
+                    
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/分布式系列/">分布式系列</a>
+    </div>
+
+                    
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/一致性哈希/">一致性哈希</a>, <a class="tag-link" href="/tags/分布式存储/">分布式存储</a>, <a class="tag-link" href="/tags/分片/">分片</a>
+    </div>
+
+                </div>
+            </div>
+        </div>
+    
+</div>
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="no-thumbnail">
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/分布式系列/">分布式系列</a></p>
+                            <p class="item-title"><a href="/2018/07/01/浅谈分布式存储系统的数据分布算法/" class="title">浅谈分布式存储系统的数据分布算法</a></p>
+                            <p class="item-date"><time datetime="2018-07-01T09:43:00.000Z" itemprop="datePublished">2018-07-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/任务调度框架系列/">任务调度框架系列</a></p>
+                            <p class="item-title"><a href="/2018/06/27/从零开始学习Quartz任务调度框架/" class="title">从零开始学习Quartz任务调度框架</a></p>
+                            <p class="item-date"><time datetime="2018-06-27T04:17:00.000Z" itemprop="datePublished">2018-06-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/25/实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现/" class="title">实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现</a></p>
+                            <p class="item-date"><time datetime="2018-06-25T10:20:00.000Z" itemprop="datePublished">2018-06-25</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/20/实战Spring Boot 2.0系列(五) - Listener, Servlet和Filter, Controller和Interceptor/" class="title">实战Spring Boot 2.0系列(五) - Listener, Servlet, Filter和Interceptor</a></p>
+                            <p class="item-date"><time datetime="2018-06-20T11:20:00.000Z" itemprop="datePublished">2018-06-20</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/18/实战Spring Boot 2.0系列(四) - 使用WebAsyncTask处理异步任务/" class="title">实战Spring Boot 2.0系列(四) - 使用WebAsyncTask处理异步任务</a></p>
+                            <p class="item-date"><time datetime="2018-06-18T00:20:00.000Z" itemprop="datePublished">2018-06-18</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL学习系列/">MySQL学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RxJava异步框架系列/">RxJava异步框架系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Reactive编程系列/">Spring Reactive编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/任务调度框架系列/">任务调度框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术知识图谱/">技术知识图谱</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/测试框架系列/">测试框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/高并发系统系列/">高并发系统系列</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker-Compose/">Docker Compose</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Filter/">Filter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interceptor/">Interceptor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Listener/">Listener</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mockito/">Mockito</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paxos/">Paxos</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Quartz/">Quartz</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raft/">Raft</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactive-Streams/">Reactive Streams</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactor/">Reactor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RxJava/">RxJava</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-Boot/">SOFA-Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ScheduledExecutorService/">ScheduledExecutorService</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Servlet/">Servlet</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot-2-0/">Spring Boot 2.0</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Task/">Spring Task</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-WebFlux/">Spring WebFlux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Timer/">Timer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unique-ID/">Unique ID</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一致性哈希/">一致性哈希</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/主从复制/">主从复制</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式存储/">分布式存储</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分片/">分片</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反模式/">反模式</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/定时任务/">定时任务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异步/">异步</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/限流/">限流</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Android/" style="font-size: 13.33px;">Android</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/Docker/" style="font-size: 16.67px;">Docker</a> <a href="/tags/Docker-Compose/" style="font-size: 10px;">Docker Compose</a> <a href="/tags/Filter/" style="font-size: 10px;">Filter</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Interceptor/" style="font-size: 10px;">Interceptor</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/Java/" style="font-size: 18.33px;">Java</a> <a href="/tags/Listener/" style="font-size: 10px;">Listener</a> <a href="/tags/Mockito/" style="font-size: 10px;">Mockito</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Paxos/" style="font-size: 10px;">Paxos</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/Quartz/" style="font-size: 11.67px;">Quartz</a> <a href="/tags/RPC/" style="font-size: 20px;">RPC</a> <a href="/tags/Raft/" style="font-size: 10px;">Raft</a> <a href="/tags/Reactive-Streams/" style="font-size: 11.67px;">Reactive Streams</a> <a href="/tags/Reactor/" style="font-size: 10px;">Reactor</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/RxJava/" style="font-size: 13.33px;">RxJava</a> <a href="/tags/SOFA-Boot/" style="font-size: 13.33px;">SOFA-Boot</a> <a href="/tags/SOFA-RPC/" style="font-size: 15px;">SOFA-RPC</a> <a href="/tags/ScheduledExecutorService/" style="font-size: 10px;">ScheduledExecutorService</a> <a href="/tags/Servlet/" style="font-size: 10px;">Servlet</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Boot-2-0/" style="font-size: 18.33px;">Spring Boot 2.0</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/Spring-Task/" style="font-size: 10px;">Spring Task</a> <a href="/tags/Spring-WebFlux/" style="font-size: 11.67px;">Spring WebFlux</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Timer/" style="font-size: 10px;">Timer</a> <a href="/tags/Unique-ID/" style="font-size: 10px;">Unique ID</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/一致性哈希/" style="font-size: 10px;">一致性哈希</a> <a href="/tags/主从复制/" style="font-size: 10px;">主从复制</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a> <a href="/tags/分布式存储/" style="font-size: 10px;">分布式存储</a> <a href="/tags/分片/" style="font-size: 10px;">分片</a> <a href="/tags/反模式/" style="font-size: 13.33px;">反模式</a> <a href="/tags/定时任务/" style="font-size: 10px;">定时任务</a> <a href="/tags/异步/" style="font-size: 16.67px;">异步</a> <a href="/tags/微服务/" style="font-size: 13.33px;">微服务</a> <a href="/tags/限流/" style="font-size: 10px;">限流</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://ifeve.com" target="_blank">并发编程网</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://juejin.im" target="_blank">掘金</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.jianshu.com" target="_blank">简书</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com" target="_blank">Github</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.infoq.com" target="_blank">Infoq</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fas fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
+            
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+        </div>
+    </div>
+</footer>
+        
+    
+    
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+     (function(d, s) {
+         var j, e = d.getElementsByTagName(s)[0];
+
+         if (typeof LivereTower === 'function') { return; }
+
+         j = d.createElement(s);
+         j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+         j.async = true;
+
+         e.parentNode.insertBefore(j, e);
+     })(document, 'script');
+    </script>
+  <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+  <!-- City版安装代码已完成 -->
+
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
