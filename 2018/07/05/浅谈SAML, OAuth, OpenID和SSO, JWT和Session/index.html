@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>浅谈SAML, OAuth, OpenID和SSO, JWT和Session | Icarus&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="前言通常为了弄清楚一个概念，我们需要掌握十个概念。在判断 JWT(JsonWebToken) 是否能代替 session 管理之前，我们要了解什么是 token，以及 access token 和 refresh token 的区别。">
+<meta name="keywords" content="SAML,OAuth,SSO,JWT,Session">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈SAML, OAuth, OpenID和SSO, JWT和Session">
+<meta property="og:url" content="https://ostenant.coding.me/2018/07/05/浅谈SAML, OAuth, OpenID和SSO, JWT和Session/index.html">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
+<meta property="og:description" content="前言通常为了弄清楚一个概念，我们需要掌握十个概念。在判断 JWT(JsonWebToken) 是否能代替 session 管理之前，我们要了解什么是 token，以及 access token 和 refresh token 的区别。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/OAuth_logo.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Token_flow.webp">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/SAML_2">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Oauth_process">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Google_gmail">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/OpenID">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Auth_Resource">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Session_Flow">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-07-05T14:27:53.562Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈SAML, OAuth, OpenID和SSO, JWT和Session">
+<meta name="twitter:description" content="前言通常为了弄清楚一个概念，我们需要掌握十个概念。在判断 JWT(JsonWebToken) 是否能代替 session 管理之前，我们要了解什么是 token，以及 access token 和 refresh token 的区别。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/OAuth_logo.png">
+    
+
+    
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/cat.png" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fontawesome.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-brands.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-solid.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'true', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+        <meta name="google-site-verification" content="true" />
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Icarus&#39;s Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpeg" />
+                            <i class="fas fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fas fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpeg" />
+            <h2 id="name">陈林 | Icarus</h2>
+            <h3 id="title">年轻无为，卖码为生!</h3>
+            <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
+            <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                62
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                69
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/ostenant" target="_blank" title="github" class=tooltip>
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fab fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="linkedin" class=tooltip>
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fab fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-浅谈SAML, OAuth, OpenID和SSO, JWT和Session" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            浅谈SAML, OAuth, OpenID和SSO, JWT和Session
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2018/07/05/浅谈SAML, OAuth, OpenID和SSO, JWT和Session/">
+            <time datetime="2018-07-05T05:50:00.000Z" itemprop="datePublished">2018-07-05</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/认证与授权系列/">认证与授权系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/JWT/">JWT</a>, <a class="tag-link" href="/tags/OAuth/">OAuth</a>, <a class="tag-link" href="/tags/SAML/">SAML</a>, <a class="tag-link" href="/tags/SSO/">SSO</a>, <a class="tag-link" href="/tags/Session/">Session</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>通常为了弄清楚一个概念，我们需要掌握十个概念。在判断 <code>JWT(JsonWebToken)</code> 是否能代替 <code>session</code> 管理之前，我们要了解什么是 <code>token</code>，以及 <code>access token</code> 和 <code>refresh token</code> 的区别。</p>
+<a id="more"></a>
+<p>了解什么是 <code>OAuth</code>，什么是 <code>SSO</code>，<code>SSO</code> 下不同策略 <code>OAuth</code> 和 <code>SAML</code> 的不同，以及 <code>OAuth</code> 与 <code>OpenID</code> 的不同，更重要的是区分 <code>authorisation</code> 和 <code>authentication</code>。</p>
+<p>最后我们引出 <code>JSON WEB TOKEN</code>，聊聊 <code>JWT</code> 在 <code>Session</code> 管理方面的优势和劣势，同时尝试解决这些劣势，看看成本和代价有多少。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/OAuth_logo.png" alt=""></p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p>本文关于 <code>OAuth</code> <strong>授权</strong> 和 <code>API</code> 调用实例都来自 <code>Google API</code>。</p>
+<h2 id="关于Token"><a href="#关于Token" class="headerlink" title="关于Token"></a>关于Token</h2><p><code>Token</code> 即使是在计算机领域中也有不同的定义，这里我们说的 <code>token</code>，是指 <strong>访问资源</strong> 的凭据。例如当你调用 <code>Google API</code> 时，需要带上有效 <code>token</code> 来表明你请求的 <strong>合法性</strong>。这个 <code>Token</code> 是 <code>Google</code> 给你的，这代表 <code>Google</code> 给你的 <strong>授权</strong> 使得你有能力访问 <code>API</code> 背后的 <strong>资源</strong>。</p>
+<p>请求 <code>API</code> 时携带 <code>token</code> 的方式也有很多种，通过 <code>HTTP Header</code> 或者 <code>url</code> 参数或者 <code>google</code> 提供的类库都可以：</p>
+<ul>
+<li><strong>HTTP Header</strong></li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">GET /drive/v2/files HTTP/1.1</span><br><span class="line"></span><br><span class="line">Authorization: Bearer &lt;token&gt;</span><br><span class="line">Host: www.googleapis.com/</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>URL参数</strong></li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">GET https://www.googleapis.com/drive/v2/files?token=&lt;token&gt;</span><br></pre></td></tr></table></figure>
+<ul>
+<li><strong>Python函数库</strong></li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> googleapiclient.discovery <span class="keyword">import</span> build</span><br><span class="line">drive = build(<span class="string">'drive'</span>, <span class="string">'v2'</span>, credentials=credentials)</span><br></pre></td></tr></table></figure>
+<p>更具体的说，上面用于调用 <code>API</code> 的 <code>token</code>，我们称为细分为 <code>access token</code>。通常 <code>access token</code> 是有 <strong>有效期限</strong> 的，如果 <strong>过期</strong> 就需要 <strong>重新获取</strong>。那么如何重新获取？先看看第一次获取 <code>token</code> 的流程是怎样的:</p>
+<ol>
+<li><p>首先需要向 <code>Google API</code> 注册一个应用程序，注册完毕之后就会拿到 <strong>认证信息</strong>（<code>credentials</code>）包括 <code>ID</code> 和 <code>secret</code>。不是所有的程序类型都有 <code>secret</code>。</p>
+</li>
+<li><p>接下来就要向 <code>Google</code> 请求 <code>access token</code>。这里先忽略一些细节，例如请求参数（当然需要上面申请到的 <code>secret</code>）。重要的是，如果你想访问的是 <strong>用户资源</strong>，这里就会提醒用户进行 <strong>授权</strong>。</p>
+</li>
+<li><p>如果 <strong>用户授权</strong> 完毕。<code>Google</code> 就会返回 <code>access token</code>。又或者是返回 <strong>授权代码</strong>（<code>authorization code</code>），再通过代码取得 <code>access token</code>。</p>
+</li>
+</ol>
+<p><code>token</code> 获取到之后，就能够带上 <code>token</code> 访问 <code>API</code> 了。</p>
+<p>流程如下图所示：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Token_flow.webp" alt=""></p>
+<blockquote>
+<p>注意：在第三步通过 <code>authorization code</code> 兑换 <code>access token</code> 的过程中，<code>Google</code> 并不会仅仅返回 <code>access token</code>，还会返回额外的信息，这其中和之后更新相关的就是 <code>refresh token</code>。</p>
+</blockquote>
+<p>一旦 <code>access token</code> 过期，你就可以通过 <code>refresh token</code> 再次请求 <code>access token</code>。</p>
+<p>以上只是大致的流程，并且故意省略了一些额外的概念。比如更新 <code>access token</code> 当然也可以不需要 <code>refresh token</code>，这要根据你的 <strong>请求方式</strong> 和访问的 <strong>资源类型</strong> 而定。</p>
+<p>这里又会引起另外的两个问题：</p>
+<ol>
+<li><p>如果 <code>refesh token</code> 也过期了怎么办？这时就需要用户 <strong>重新登陆授权</strong>。</p>
+</li>
+<li><p>为什么要区分 <code>refresh token</code> 和 <code>access token</code>？如果合并成一个 <code>token</code> 然后把 <strong>过期时间</strong> 调整的 <strong>更长</strong>，并且每次 <strong>失效</strong> 之后用户 <strong>重新登陆授权</strong> 就好了？这个问题会和后面谈的相关概念有关，后面会给予解释说明。</p>
+</li>
+</ol>
+<h3 id="OAuth-2-0"><a href="#OAuth-2-0" class="headerlink" title="OAuth 2.0"></a>OAuth 2.0</h3><p>从获取 <code>token</code> 到使用 <code>token</code> 访问接口。这其实是标准的 <code>OAuth2.0</code> 机制下访问 <code>API</code> 的流程。这里介绍一下 <code>OAuth</code> 里外相关的概念，更深入的理解 <code>token</code> 的作用。</p>
+<h3 id="SSO-Single-sign-on"><a href="#SSO-Single-sign-on" class="headerlink" title="SSO (Single sign-on)"></a>SSO (Single sign-on)</h3><p>通常公司内部会有非常多的平台供大家使用，比如人力资源，代码管理，日志监控，预算申请等等。如果每一个平台都实现自己的用户体系的话无疑是巨大的浪费，所以公司内部会有一套 <strong>公用的用户体系</strong>，用户只要登陆之后，就能够 <strong>访问所有的系统</strong>。这就是 <strong>单点登录</strong>。</p>
+<p><code>SSO</code> 是一类 <strong>解决方案</strong> 的统称，而在具体的实施方面，我们有两种策略可供选择：</p>
+<ul>
+<li><p><strong>SAML 2.0</strong></p>
+</li>
+<li><p><strong>OAuth 2.0</strong></p>
+</li>
+</ul>
+<p>接下来我们区别这 <strong>两种授权方式</strong> 有什么不同。但是在描述 <strong>不同的策略</strong> 之前，我们先叙述几个 <strong>共有的特性</strong>，并且相当重要的概念。</p>
+<h4 id="Authentication-VS-Authorisation"><a href="#Authentication-VS-Authorisation" class="headerlink" title="Authentication VS Authorisation"></a>Authentication VS Authorisation</h4><ul>
+<li><p><strong>Authentication:</strong> 身份鉴别，以下简称 <strong>认证</strong>；</p>
+</li>
+<li><p><strong>Authorisation:</strong> 资源访问 <strong>授权</strong>。</p>
+</li>
+</ul>
+<p><strong>认证</strong> 的作用在于 <strong>认可</strong> 你能够访问系统，用于 <strong>鉴别访问者</strong> 是否是 <strong>合法用户</strong>；而 <strong>授权</strong> 用于决定你有访问 <strong>哪些资源的权限</strong>。</p>
+<p>大多数人不会区分这两者的区别，因为站在用户的立场上。而作为系统的设计者来说，这两者是有差别的，这是不同的两个工作职责。我们可以只需要 <strong>认证功能</strong>，而不需要 <strong>授权功能</strong>，甚至不需要自己实现 <strong>认证功能</strong>。而借助 <code>Google</code> 的认证系统，即用户可以用 <code>Google</code> 的账号进行登陆。</p>
+<h4 id="Authorization-Server-Identity-Provider-IdP"><a href="#Authorization-Server-Identity-Provider-IdP" class="headerlink" title="Authorization Server/Identity Provider(IdP)"></a>Authorization Server/Identity Provider(IdP)</h4><p>把负责 <strong>认证的服务</strong> 称为 <code>AuthorizationServer</code> 或者 <code>IdentityProvider</code>，以下简称 <code>IDP</code>。</p>
+<h4 id="Service-Provider-SP-Resource-Server"><a href="#Service-Provider-SP-Resource-Server" class="headerlink" title="Service Provider(SP)/Resource Server"></a>Service Provider(SP)/Resource Server</h4><p>把负责 <strong>提供资源</strong>（<code>API</code> 调用）的服务称为 <code>ResourceServer</code> 或者 <code>ServiceProvider</code>，以下简称 <code>SP</code>。</p>
+<h3 id="SAML-2-0"><a href="#SAML-2-0" class="headerlink" title="SAML 2.0"></a>SAML 2.0</h3><p>下图是 <code>SAML2.0</code> 的流程图，看图说话：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/SAML_2" alt=""></p>
+<ol>
+<li><p>还 <strong>未登陆</strong> 的用户 <strong>打开浏览器</strong> 访问你的网站（<code>SP</code>），网站 <strong>提供服务</strong> 但是并 <strong>不负责用户认证</strong>。</p>
+</li>
+<li><p>于是 <code>SP</code> 向 <code>IDP</code> 发送了一个 <code>SAML</code> 认证请求，同时 <code>SP</code> 将 <strong>用户浏览器</strong> 重定向到 <code>IDP</code>。</p>
+</li>
+<li><p><code>IDP</code> 在验证完来自 <code>SP</code> 的 <strong>请求无误</strong> 之后，在浏览器中呈现 <strong>登陆表单</strong> 让用户填写 <strong>用户名</strong> 和 <strong>密码</strong> 进行登陆。</p>
+</li>
+<li><p>一旦用户登陆成功， <code>IDP</code> 会生成一个包含 <strong>用户信息</strong>（<strong>用户名</strong> 或者 <strong>密码</strong>）的 <code>SAML token</code>（<code>SAML token</code> 又称为 <code>SAML Assertion</code>，本质上是 <code>XML</code> 节点）。<code>IDP</code> 向 <code>SP</code> 返回 <code>token</code>，并且将 <strong>用户重定向</strong> 到 <code>SP</code> (<code>token</code> 的返回是在 <strong>重定向步骤</strong> 中实现的，下面会详细说明)。</p>
+</li>
+<li><p><code>SP</code> 对拿到的 <code>token</code> 进行验证，并从中解析出 <strong>用户信息</strong>，例如 <strong>用户是谁</strong> 以及 <strong>用户的权限</strong> 有哪些。此时就能够根据这些信息允许用户访问我们网站的内容。</p>
+</li>
+</ol>
+<p>当用户在 <code>IDP</code> 登陆成功之后，<code>IDP</code> 需要将用户 <strong>再次重定向</strong> 到 <code>SP</code> 站点，这一步通常有两个办法：</p>
+<ul>
+<li><p><code>HTTP</code> 重定向：这并不推荐，因为 <strong>重定向</strong> 的 <code>URL</code> 长度 <strong>有限制</strong>，无法携带更长的信息，比如 <code>SAML Token</code>。</p>
+</li>
+<li><p><code>HTTP POST</code> 请求：这个是更常规的做法，当用户登陆完毕之后渲染出一个表单，用户点击后向 <code>SP</code> 提交 <code>POST</code> 请求。又或者可以使用 <code>JavaScript</code> 向 <code>SP</code> 发出一个 <code>POST</code> 请求。</p>
+</li>
+</ul>
+<p>如果你的应用是基于 <code>Web</code>，那么以上的方案没有任何问题。但如果你开发的是一个 <code>iOS</code> 或者 <code>Android</code> 的手机应用，那么问题就来了：</p>
+<ol>
+<li><p>用户在 <code>iPhone</code> 上打开应用，此时用户需要通过 <code>IDP</code> 进行认证。</p>
+</li>
+<li><p>应用跳转至 <code>Safari</code> 浏览器，在登陆认证完毕之后，需要通过 <code>HTTP POST</code> 的形式将 <code>token</code> 返回至 <strong>手机应用</strong>。</p>
+</li>
+</ol>
+<p>虽然 <code>POST</code> 的 <code>url</code> 可以 <strong>拉起应用</strong>，但是 <strong>手机应用</strong> 无法解析 <code>POST</code> 的内容，我们也就无法读取 <code>SAML Token</code>。</p>
+<blockquote>
+<p>当然还是有办法的，比如在 <code>IDP</code> <strong>授权阶段</strong> 不跳转至系统的 <code>Safari</code> 浏览器，在 <strong>内嵌</strong> 的 <code>Webview</code> 中解决，在想方设法从 <code>Webview</code> 中提取 <code>token</code>，或者利用 <strong>代理服务器</strong>。</p>
+</blockquote>
+<p>无论如何，<code>SAML 2.0</code> 并 <strong>不适用</strong> 于当下 <strong>跨平台</strong> 的场景，这也许与它产生的年代也有关系，它诞生于 <code>2005</code> 年，在那个时刻 <code>HTTP POST</code> 确实是最好的选择方案。</p>
+<h3 id="OAuth-2-0-1"><a href="#OAuth-2-0-1" class="headerlink" title="OAuth 2.0"></a>OAuth 2.0</h3><p>我们先简单了解 <code>SSO</code> 下的 <code>OAuth2.0</code> 的流程。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Oauth_process" alt=""></p>
+<ol>
+<li><p>用户通过 <strong>客户端</strong>（可以是 <strong>浏览器</strong> 也可以是 <strong>手机应用</strong>）想要访问 <code>SP</code> 上的资源，但是 <code>SP</code> 告诉用户需要进行 <strong>认证</strong>，将用户 <strong>重定向</strong> 至 <code>IDP</code>。</p>
+</li>
+<li><p><code>IDP</code> 向 <strong>用户</strong> 询问 <code>SP</code> 是否可以访问 <strong>用户信息</strong>。如果用户同意，<code>IDP</code> 向 <strong>客户端</strong> 返回 <code>authorization code</code>。</p>
+</li>
+<li><p>客户端拿到 <code>authorization code</code> 向 <code>IDP</code> 交换 <code>access token</code>，并拿着 <code>access token</code> 向 <code>SP</code> 请求资源。</p>
+</li>
+<li><p><code>SP</code> 接受到请求之后，拿着附带的 <code>token</code> 向 <code>IDP</code> 验证 <strong>用户的身份</strong>。确认身份无误后，<code>SP</code> 向 <strong>客户端</strong> 发放相关资源。</p>
+</li>
+</ol>
+<p>那么 <code>OAuth</code> 是如何避免 <code>SAML</code> 流程下 <strong>无法解析</strong> <code>POST</code> 内容的信息的呢？</p>
+<ul>
+<li><p>一方面是用户从 <code>IDP</code> 返回 <strong>客户端</strong> 的方式，也是通过 <code>URL</code> 重定向，这里的 <code>URL</code> 允许 <strong>自定义</strong> <code>schema</code>，所以即使在 <strong>手机</strong> 上也能 <strong>拉起应用</strong>；</p>
+</li>
+<li><p>另一方面因为 <code>IDP</code> 向 <strong>客户端</strong> 传递的是 <code>authorization code</code>，而不是 <code>XML</code> 信息，所以 <code>code</code> 可以很轻易的附着在 <strong>重定向</strong> <code>URL</code> 上进行传递。</p>
+</li>
+</ul>
+<p>但以上的 <code>SSO</code> 流程体现不出 <code>OAuth</code> 的本意。<code>OAuth</code> 的本意是 <strong>一个应用</strong> 允许 <strong>另一个应用</strong> 在 <strong>用户授权</strong> 的情况下 <strong>访问自己的数据</strong>。</p>
+<p><code>OAuth</code> 的设计本意更倾向于 <strong>授权而非认证</strong>（当然授权用户信息就间接实现了认证），虽然 <code>Google</code> 的 <code>OAuth 2.0 API</code> 同时支持 <strong>授权</strong> 和 <strong>认证</strong>。所以你在使用 <code>Facebook</code> 或者 <code>Gmail</code> 账号登陆第三方站点时，会出现 <strong>授权对话框</strong>，告诉你 <strong>第三方站点</strong> 可以访问你的哪些信息，需要征得你的同意。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Google_gmail" alt=""></p>
+<p>在上面 <code>SSO</code> 的 <code>OAuth</code> 流程中涉及三方角色: <code>SP</code>, <code>IDP</code> 以及 <code>Client</code>。但在实际工作中 <code>Client</code> 可以是不存在的，例如你编写了一个 <strong>后端程序</strong> 定时的通过 <code>Google API</code> 从 <code>Youtube</code> 拉取最新的节目数据，那么你的 <strong>后端程序</strong> 需要得到 <code>Youtube</code> 的 <code>OAuth</code> <strong>授权</strong> 即可。</p>
+<h3 id="OAuth-VS-OpenId"><a href="#OAuth-VS-OpenId" class="headerlink" title="OAuth VS OpenId"></a>OAuth VS OpenId</h3><p>如果你有留心的话，你会在某些站点看到允许以 <code>OpenID</code> 的方式登陆，其实也就是以 <code>Facebook</code> 账号或者 <code>Google</code> 账号登陆站点：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/OpenID" alt=""></p>
+<p><code>OpenID</code> 和 <code>OAuth</code> 很像。但本质上来说它们是截然不同的两个东西：</p>
+<ul>
+<li><p><strong>OpenID:</strong> 只用于 <strong>身份认证</strong>（<code>Authentication</code>），允许你以 <strong>同一个账户</strong> 在 <strong>多个网站登陆</strong>。它仅仅是为你的 <strong>合法身份</strong> 背书，当你以 <code>Facebook</code> 账号登陆某个站点之后，该站点 <strong>无权访问</strong> 你的在 <code>Facebook</code> 上的 <strong>数据</strong>。</p>
+</li>
+<li><p><strong>OAuth:</strong> 用于 <strong>授权</strong>（<code>Authorisation</code>），允许 <strong>被授权方</strong> 访问 <strong>授权方</strong> 的 <strong>用户数据</strong>。</p>
+</li>
+</ul>
+<h4 id="Refresh-Token"><a href="#Refresh-Token" class="headerlink" title="Refresh Token"></a>Refresh Token</h4><p>现在可以回答上面的问题了，为什么我们需要 <code>refresh token</code>？</p>
+<p>这样的处理是为了 <strong>职责的分离</strong>：</p>
+<ul>
+<li><p><strong>refresh token:</strong> 负责 <strong>身份认证</strong>；</p>
+</li>
+<li><p><strong>access token:</strong> 负责 <strong>请求资源</strong>。</p>
+</li>
+</ul>
+<p>虽然 <code>refresh token</code> 和 <code>access token</code> 都由 <code>IDP</code> 发出，但是 <code>access token</code> 还要和 <code>SP</code> 进行 <strong>数据交换</strong>，如果 <strong>公用的话</strong> 这样就会有 <strong>身份泄露</strong> 的可能。并且 <code>IDP</code> 和 <code>SP</code> 可能是 <strong>完全不同</strong> 的 <strong>服务提供</strong> 的。而在上文，我们之所以没有这样的顾虑是因为 <code>IDP</code> 和 <code>SP</code> 都是 <code>Google</code>。</p>
+<h3 id="JWT"><a href="#JWT" class="headerlink" title="JWT"></a>JWT</h3><h4 id="初步认识"><a href="#初步认识" class="headerlink" title="初步认识"></a>初步认识</h4><p>本质上来说 <code>JWT</code> 也是 <code>token</code>，正如我们在上文提到的，它是 <strong>访问资源</strong> 的 <strong>凭证</strong>。</p>
+<p><code>Google</code> 的一些 <code>API</code> 诸如 <code>Prediction API</code> 或者 <code>Google Cloud Storage</code>，是不需要 <strong>访问</strong> 用户的 <strong>个人数据</strong> 的。因而不需要经过 <strong>用户的授权</strong> 这一步骤，应用程序可以直接访问。就像上面 <code>OAuth</code> 中没有 <code>Client</code> 没有参与的流程类似。这就要借助 <code>JWT</code> 完成访问了, 具体流程如下：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Auth_Resource" alt=""></p>
+<ol>
+<li><p>首先需要在 <code>Google API</code> 上创建一个服务账号（<code>service account</code>）。</p>
+</li>
+<li><p>获取 <strong>服务账号</strong> 的 <strong>认证信息</strong>（<code>credential</code>），包括 <strong>邮箱地址</strong>，<code>client ID</code>，以及一对 <strong>公钥/私钥</strong>。</p>
+</li>
+<li><p>使用 <code>Client ID</code> 和 <strong>私钥</strong> 创一个 <strong>签名</strong> 的 <code>JWT</code>，然后将这个 <code>JWT</code> 发送给 <code>Google</code> 交换 <code>access token</code>。</p>
+</li>
+<li><p><code>Google</code> 返回 <code>access token</code>。</p>
+</li>
+<li><p>程序通过 <code>access token</code> 访问 <code>API</code>。</p>
+</li>
+</ol>
+<p>甚至你可以不需要向 <code>Google</code> 索要 <code>access token</code>，而是携带 <code>JWT</code> 作为 <code>HTTP header</code> 里的 <code>bearer token</code> 直接访问 <code>API</code> 也是可以的。这才是 <code>JWT</code> 的最大魅力。</p>
+<h4 id="理性认识"><a href="#理性认识" class="headerlink" title="理性认识"></a>理性认识</h4><p><code>JWT</code> 顾名思义，它是 <code>JSON</code> 结构的 <code>token</code>，由三部分组成：</p>
+<ul>
+<li><p><strong>header</strong></p>
+</li>
+<li><p><strong>payload</strong></p>
+</li>
+<li><p><strong>signature</strong></p>
+</li>
+</ul>
+<h4 id="header"><a href="#header" class="headerlink" title="header"></a>header</h4><p><code>header</code> 用于描述 <strong>元信息</strong>，例如产生 <code>signature</code> 的算法：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;    </span><br><span class="line">    <span class="attr">"typ"</span>: <span class="string">"JWT"</span>,</span><br><span class="line">    <span class="attr">"alg"</span>: <span class="string">"HS256"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中 <code>alg</code> 关键字就指定了使用哪一种 <strong>哈希算法</strong> 来创建 <code>signature</code>。</p>
+<h4 id="payload"><a href="#payload" class="headerlink" title="payload"></a>payload</h4><p><code>payload</code> 用于携带你希望 <strong>向服务端传递</strong> 的信息。你既可以往里添加 <strong>官方字段</strong>，例如：<code>iss(Issuer)</code>, <code>sub(Subject)</code>, <code>exp(Expirationtime)</code>，也可以塞入 <strong>自定义的字段</strong>，比如 <code>userId</code>:</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"userId"</span>: <span class="string">"b08f86af-35da-48f2-8fab-cef3904660bd"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="signature"><a href="#signature" class="headerlink" title="signature"></a>signature</h4><p><code>signature</code> 译为 <strong>签名</strong>，创建签名要分以下几个步骤：</p>
+<ol>
+<li><p>从 <strong>接口服务端</strong> 拿到 <strong>密钥</strong>，假设为 <code>secret</code>。</p>
+</li>
+<li><p>对 <code>header</code> 进行 <code>base64</code> 编码，假设结果为 <code>headerStr</code>。</p>
+</li>
+<li><p>将 <code>payload</code> 进行 <code>base64</code> 编码，假设结果为 <code>payloadStr</code>。</p>
+</li>
+<li><p>将 <code>headerStr</code> 和 <code>payloadStr</code> 用 <code>.</code> <strong>字符</strong> 拼装起来成为字符 <code>data</code>。</p>
+</li>
+<li><p>以 <code>data</code> 和 <code>secret</code> 作为参数，使用 <strong>哈希算法</strong> 计算出 <strong>签名</strong>。</p>
+</li>
+</ol>
+<p>如果上述描述还不直观，用 <strong>伪代码</strong> 表示就是：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// Signature algorithm</span><br><span class="line">data = base64urlEncode( header ) + “.” + base64urlEncode( payload )</span><br><span class="line">signature = Hash( data, secret );</span><br></pre></td></tr></table></figure>
+<p>假设我们的原始 <code>JSON</code> 结构是这样的：</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">// Header</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"typ"</span>: <span class="string">"JWT"</span>,</span><br><span class="line">    <span class="attr">"alg"</span>: <span class="string">"HS256"</span></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">// Payload</span><br><span class="line">&#123;</span><br><span class="line">    <span class="attr">"userId"</span>: <span class="string">"b08f86af-35da-48f2-8fab-cef3904660bd"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果 <strong>密钥</strong> 是字符串 <code>secret</code> 的话，那么最终 <code>JWT</code> 的结果就是这样的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJiMDhmODZhZi0zNWRhLTQ4ZjItOGZhYi1jZWYzOTA0NjYwYmQifQ.-xN_h82PHVTCMA9vdoHrcZxH-x5mb11y1537t3rGzcM</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p>可以在 <code>jwt.io</code> 上 <strong>验证</strong> 这个结果。</p>
+</blockquote>
+<h3 id="JWT究竟带来了什么"><a href="#JWT究竟带来了什么" class="headerlink" title="JWT究竟带来了什么"></a>JWT究竟带来了什么</h3><h4 id="确保数据完整性"><a href="#确保数据完整性" class="headerlink" title="确保数据完整性"></a>确保数据完整性</h4><p><code>JWT</code> 的目的不是为了 <strong>隐藏</strong> 或者 <strong>保密数据</strong>，而是为了确保 <strong>数据</strong> 确实来自被 <strong>授权的人</strong> 创建的，以防止 <strong>中途篡改</strong>。</p>
+<p>回想一下，当你拿到 <code>JWT</code> 时候，你完全可以在没有 <code>secret</code> 的情况下解码出 <code>header</code> 和 <code>payload</code>，因为 <code>header</code> 和 <code>payload</code> 只是经过了 <code>base64</code> 编码（<code>encode</code>）而已，编码的目的在于 <strong>利于数据结构的传输</strong>。</p>
+<p>虽然创建 <code>signature</code> 的过程近似于 <strong>加密</strong> (<code>encrypt</code>)，但本质其实是一种 <strong>签名</strong> (<code>sign</code>) 的行为，用于保证 <strong>数据的完整性</strong>，实际上也并且并 <strong>没有加密任何数据</strong>。</p>
+<h4 id="用于接口调用"><a href="#用于接口调用" class="headerlink" title="用于接口调用"></a>用于接口调用</h4><p>接下来在 <code>API</code> 调用中就可以附上 <code>JWT</code>（通常是在 <code>HTTP Header</code> 中）。又因为 <code>SP</code> 会与程序 <strong>共享</strong> 一个 <code>secret</code>，所以 <strong>程序</strong> 可以通过 <code>header</code> 提供的相同的 <code>hash</code> 算法来 <strong>验证签名</strong> 是否正确，从而判断应用是否有权力调用 <code>API</code>。</p>
+<h3 id="有状态的对话Session"><a href="#有状态的对话Session" class="headerlink" title="有状态的对话Session"></a>有状态的对话Session</h3><p>因为 <code>HTTP</code> 是 <strong>无状态</strong> 的，所以 <strong>客户端</strong> 和 <strong>服务端</strong> 需要解决的问题是，如何让它们之间的对话变得有状态。例如只有是 <strong>登陆状态</strong> 的 <strong>用户</strong> 才有权限调用某些接口，那么在 <strong>用户登陆</strong> 之后，需要记住该用户是 <strong>已经登陆</strong> 的状态。常见的方法是使用 <code>session</code> 机制。</p>
+<p>常见的 <code>session</code> 模型是这样工作的：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Session_Flow" alt=""></p>
+<ol>
+<li><p>用户在浏览器 <strong>登陆</strong> 之后，服务端为用户生成 <strong>唯一</strong> 的 <code>session id</code>，存储在 <strong>服务端</strong> 的 <strong>存储服务</strong>（例如 <code>MySQL</code>, <code>Redis</code>）中。</p>
+</li>
+<li><p>该 <code>session id</code> 也同时 <strong>返回给浏览器</strong>，以 <code>SESSION_ID</code> 为 <code>KEY</code> 存储在浏览器的 <code>cookie</code> 中。</p>
+</li>
+<li><p>如果用户再次访问该网站，<code>cookie</code> 里的 <code>SESSION_ID</code> 会随着 <strong>请求</strong> 一同发往 <strong>服务端</strong>。</p>
+</li>
+<li><p>服务端通过判断 <code>SESSION_ID</code> 是否已经在 <code>Redis</code> 中判断用户是否处于 <strong>登陆状态</strong>。</p>
+</li>
+</ol>
+<p>相信你已经察觉了，理论上来说，<code>JWT</code> 机制可以取代 <code>session</code> 机制。用户不需要提前进行登陆，后端也不需要 <code>Redis</code> 记录用户的登陆信息。客户端的本地保存一份合法的 <code>JWT</code>，当用户需要调用接口时，附带上该合法的 <code>JWT</code>，每一次调用接口，后端都使用请求中附带的 <code>JWT</code> 做一次 <strong>合法性的验证</strong>。这样也间接达到了 <strong>认证用户</strong> 的目的。</p>
+<p>然而 <code>JWT</code> 真的能取代 <code>session</code> 机制吗？这么做有哪些好处和坏处？这些问题将留在下一篇再讨论。</p>
+<hr>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="零壹技术栈"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+        <a href="https://ostenant.coding.me/2018/07/05/浅谈SAML, OAuth, OpenID和SSO, JWT和Session/#comments" class="article-comment-link">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2018/07/01/浅谈分布式存储系统的数据分布算法/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">浅谈分布式存储系统的数据分布算法</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="lv-container" data-id="city" data-uid=MTAyMC8zNzE2NC8xMzY5OA==></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="no-thumbnail">
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/认证与授权系列/">认证与授权系列</a></p>
+                            <p class="item-title"><a href="/2018/07/05/浅谈SAML, OAuth, OpenID和SSO, JWT和Session/" class="title">浅谈SAML, OAuth, OpenID和SSO, JWT和Session</a></p>
+                            <p class="item-date"><time datetime="2018-07-05T05:50:00.000Z" itemprop="datePublished">2018-07-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/分布式系列/">分布式系列</a></p>
+                            <p class="item-title"><a href="/2018/07/01/浅谈分布式存储系统的数据分布算法/" class="title">浅谈分布式存储系统的数据分布算法</a></p>
+                            <p class="item-date"><time datetime="2018-07-01T09:43:00.000Z" itemprop="datePublished">2018-07-01</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/任务调度框架系列/">任务调度框架系列</a></p>
+                            <p class="item-title"><a href="/2018/06/27/从零开始学习Quartz任务调度框架/" class="title">从零开始学习Quartz任务调度框架</a></p>
+                            <p class="item-date"><time datetime="2018-06-27T04:17:00.000Z" itemprop="datePublished">2018-06-27</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/25/实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现/" class="title">实战Spring Boot 2.0系列(六) - 单机定时任务的几种实现</a></p>
+                            <p class="item-date"><time datetime="2018-06-25T10:20:00.000Z" itemprop="datePublished">2018-06-25</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a></p>
+                            <p class="item-title"><a href="/2018/06/20/实战Spring Boot 2.0系列(五) - Listener, Servlet和Filter, Controller和Interceptor/" class="title">实战Spring Boot 2.0系列(五) - Listener, Servlet和Filter, Controller和Interceptor</a></p>
+                            <p class="item-date"><time datetime="2018-06-20T11:20:00.000Z" itemprop="datePublished">2018-06-20</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL学习系列/">MySQL学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RxJava异步框架系列/">RxJava异步框架系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Reactive编程系列/">Spring Reactive编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/任务调度框架系列/">任务调度框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术知识图谱/">技术知识图谱</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/测试框架系列/">测试框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/高并发系统系列/">高并发系统系列</a><span class="category-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker-Compose/">Docker Compose</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Filter/">Filter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interceptor/">Interceptor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JWT/">JWT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Listener/">Listener</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mockito/">Mockito</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth/">OAuth</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paxos/">Paxos</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Quartz/">Quartz</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raft/">Raft</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactive-Streams/">Reactive Streams</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactor/">Reactor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RxJava/">RxJava</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SAML/">SAML</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-Boot/">SOFA-Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SSO/">SSO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ScheduledExecutorService/">ScheduledExecutorService</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Servlet/">Servlet</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Session/">Session</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot-2-0/">Spring Boot 2.0</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Task/">Spring Task</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-WebFlux/">Spring WebFlux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Timer/">Timer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unique-ID/">Unique ID</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一致性哈希/">一致性哈希</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/主从复制/">主从复制</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式存储/">分布式存储</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分片/">分片</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反模式/">反模式</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/定时任务/">定时任务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异步/">异步</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/限流/">限流</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Android/" style="font-size: 13.33px;">Android</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/Docker/" style="font-size: 16.67px;">Docker</a> <a href="/tags/Docker-Compose/" style="font-size: 10px;">Docker Compose</a> <a href="/tags/Filter/" style="font-size: 10px;">Filter</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Interceptor/" style="font-size: 10px;">Interceptor</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/tags/Java/" style="font-size: 18.33px;">Java</a> <a href="/tags/Listener/" style="font-size: 10px;">Listener</a> <a href="/tags/Mockito/" style="font-size: 10px;">Mockito</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 10px;">Nginx</a> <a href="/tags/OAuth/" style="font-size: 10px;">OAuth</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Paxos/" style="font-size: 10px;">Paxos</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/Quartz/" style="font-size: 11.67px;">Quartz</a> <a href="/tags/RPC/" style="font-size: 20px;">RPC</a> <a href="/tags/Raft/" style="font-size: 10px;">Raft</a> <a href="/tags/Reactive-Streams/" style="font-size: 11.67px;">Reactive Streams</a> <a href="/tags/Reactor/" style="font-size: 10px;">Reactor</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/RxJava/" style="font-size: 13.33px;">RxJava</a> <a href="/tags/SAML/" style="font-size: 10px;">SAML</a> <a href="/tags/SOFA-Boot/" style="font-size: 13.33px;">SOFA-Boot</a> <a href="/tags/SOFA-RPC/" style="font-size: 15px;">SOFA-RPC</a> <a href="/tags/SSO/" style="font-size: 10px;">SSO</a> <a href="/tags/ScheduledExecutorService/" style="font-size: 10px;">ScheduledExecutorService</a> <a href="/tags/Servlet/" style="font-size: 10px;">Servlet</a> <a href="/tags/Session/" style="font-size: 10px;">Session</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Boot-2-0/" style="font-size: 18.33px;">Spring Boot 2.0</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/Spring-Task/" style="font-size: 10px;">Spring Task</a> <a href="/tags/Spring-WebFlux/" style="font-size: 11.67px;">Spring WebFlux</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Timer/" style="font-size: 10px;">Timer</a> <a href="/tags/Unique-ID/" style="font-size: 10px;">Unique ID</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/一致性哈希/" style="font-size: 10px;">一致性哈希</a> <a href="/tags/主从复制/" style="font-size: 10px;">主从复制</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a> <a href="/tags/分布式存储/" style="font-size: 10px;">分布式存储</a> <a href="/tags/分片/" style="font-size: 10px;">分片</a> <a href="/tags/反模式/" style="font-size: 13.33px;">反模式</a> <a href="/tags/定时任务/" style="font-size: 10px;">定时任务</a> <a href="/tags/异步/" style="font-size: 16.67px;">异步</a> <a href="/tags/微服务/" style="font-size: 13.33px;">微服务</a> <a href="/tags/限流/" style="font-size: 10px;">限流</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://ifeve.com" target="_blank">并发编程网</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://juejin.im" target="_blank">掘金</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.jianshu.com" target="_blank">简书</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com" target="_blank">Github</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.infoq.com" target="_blank">Infoq</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fas fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
+            
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+        </div>
+    </div>
+</footer>
+        
+    
+    
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+     (function(d, s) {
+         var j, e = d.getElementsByTagName(s)[0];
+
+         if (typeof LivereTower === 'function') { return; }
+
+         j = d.createElement(s);
+         j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+         j.async = true;
+
+         e.parentNode.insertBefore(j, e);
+     })(document, 'script');
+    </script>
+  <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+  <!-- City版安装代码已完成 -->
+
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
