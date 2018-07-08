@@ -4,6 +4,58 @@
 
     
   <url>
+    <loc>https://ostenant.coding.me/2018/07/07/%E6%B5%85%E8%B0%88%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E5%8F%8A%E5%B8%B8%E8%A7%81%E7%9A%84%E6%B6%88%E6%81%AF%E4%B8%AD%E9%97%B4%E4%BB%B6/</loc>
+    <lastmod>2018-07-08T12:04:21.163Z</lastmod>
+    <data>
+        <display>
+        <title>浅谈消息队列及常见的消息中间件</title>
+        <pubTime>2018-07-07T15:27:00.000Z</pubTime>
+        
+        <tag>消息队列</tag>
+         
+        <tag>ActiveMQ</tag>
+         
+        <tag>RabbitMQ</tag>
+         
+        <tag>RocketMQ</tag>
+         
+        <tag>Kafka</tag>
+         
+         
+           
+             
+              <breadCrumb title="消息队列系列" url="https://ostenant.coding.me/categories/%E6%B6%88%E6%81%AF%E9%98%9F%E5%88%97%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/23/Android%E5%BC%82%E6%AD%A5%E6%A1%86%E6%9E%B6RxJava%201.x%E7%B3%BB%E5%88%97(%E4%B8%89)%20-%20%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%08Scheduler/</loc>
+    <lastmod>2018-07-05T23:48:19.807Z</lastmod>
+    <data>
+        <display>
+        <title>Android异步框架RxJava 1.x系列(三) - 线程调度器Scheduler</title>
+        <pubTime>2018-05-23T12:22:00.000Z</pubTime>
+        
+        <tag>Android</tag>
+         
+        <tag>RxJava</tag>
+         
+        <tag>异步</tag>
+         
+         
+           
+             
+              <breadCrumb title="RxJava异步框架系列" url="https://ostenant.coding.me/categories/RxJava%E5%BC%82%E6%AD%A5%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://ostenant.coding.me/2018/07/05/%E6%B5%85%E8%B0%88SAML,%20OAuth,%20OpenID%E5%92%8CSSO,%20JWT%E5%92%8CSession/</loc>
     <lastmod>2018-07-05T14:27:53.562Z</lastmod>
     <data>
@@ -1116,30 +1168,6 @@
         <display>
         <title>Android异步框架RxJava 1.x系列(一) - 观察者模式及实现</title>
         <pubTime>2018-05-20T10:14:00.000Z</pubTime>
-        
-        <tag>Android</tag>
-         
-        <tag>RxJava</tag>
-         
-        <tag>异步</tag>
-         
-         
-           
-             
-              <breadCrumb title="RxJava异步框架系列" url="https://ostenant.coding.me/categories/RxJava%E5%BC%82%E6%AD%A5%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://ostenant.coding.me/2018/05/23/Android%E5%BC%82%E6%AD%A5%E6%A1%86%E6%9E%B6RxJava%201.x%E7%B3%BB%E5%88%97(%E4%B8%89)%20-%20%E7%BA%BF%E7%A8%8B%E8%B0%83%E5%BA%A6%E5%99%A8%08Scheduler/</loc>
-    <lastmod>2018-06-18T01:46:48.302Z</lastmod>
-    <data>
-        <display>
-        <title>Android异步框架RxJava 1.x系列(三) - 线程调度器Scheduler</title>
-        <pubTime>2018-05-23T12:22:00.000Z</pubTime>
         
         <tag>Android</tag>
          
