@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>浅谈Nginx服务器的内部核心架构设计 | Icarus&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="前言Nginx 是一个 免费的，开源的，高性能 的 HTTP 服务器和 反向代理，以及 IMAP/POP3 代理服务器。 Nginx 以其高性能，稳定性，丰富的功能，简单的配置和低资源消耗而闻名。Nginx是一个 Web 服务器，也可以用作 反向代理，负载均衡器 和 HTTP 缓存。">
+<meta name="keywords" content="Nginx,服务器,反向代理,负载均衡,高性能">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈Nginx服务器的内部核心架构设计">
+<meta property="og:url" content="https://ostenant.coding.me/2018/07/15/浅谈Nginx服务器的内部核心架构设计/index.html">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
+<meta property="og:description" content="前言Nginx 是一个 免费的，开源的，高性能 的 HTTP 服务器和 反向代理，以及 IMAP/POP3 代理服务器。 Nginx 以其高性能，稳定性，丰富的功能，简单的配置和低资源消耗而闻名。Nginx是一个 Web 服务器，也可以用作 反向代理，负载均衡器 和 HTTP 缓存。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/16/164a050bd16fbfc9?w=626&h=144&f=png&s=32239">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/16/164a050bce75a47b?w=944&h=587&f=png&s=128919">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/16/164a050bd21be9ae?w=640&h=479&f=webp&s=19204">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/16/164a050bd23976e0?w=604&h=486&f=webp&s=8094">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/16/164a050bd00922f3?w=640&h=458&f=webp&s=9848">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/13/16494267ed546a0c?w=258&h=258&f=jpeg&s=16109">
+<meta property="og:updated_time" content="2018-07-15T23:47:46.842Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈Nginx服务器的内部核心架构设计">
+<meta name="twitter:description" content="前言Nginx 是一个 免费的，开源的，高性能 的 HTTP 服务器和 反向代理，以及 IMAP/POP3 代理服务器。 Nginx 以其高性能，稳定性，丰富的功能，简单的配置和低资源消耗而闻名。Nginx是一个 Web 服务器，也可以用作 反向代理，负载均衡器 和 HTTP 缓存。">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2018/7/16/164a050bd16fbfc9?w=626&h=144&f=png&s=32239">
+    
+
+    
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/cat.png" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fontawesome.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-brands.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-solid.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'true', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+        <meta name="google-site-verification" content="true" />
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Icarus&#39;s Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpeg" />
+                            <i class="fas fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fas fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpeg" />
+            <h2 id="name">陈林 | Icarus</h2>
+            <h3 id="title">年轻无为，卖码为生!</h3>
+            <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
+            <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                65
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                83
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/ostenant" target="_blank" title="github" class=tooltip>
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fab fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="linkedin" class=tooltip>
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fab fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-浅谈Nginx服务器的内部核心架构设计" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            浅谈Nginx服务器的内部核心架构设计
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2018/07/15/浅谈Nginx服务器的内部核心架构设计/">
+            <time datetime="2018-07-15T10:50:00.000Z" itemprop="datePublished">2018-07-15</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/高并发系统系列/">高并发系统系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/Nginx/">Nginx</a>, <a class="tag-link" href="/tags/反向代理/">反向代理</a>, <a class="tag-link" href="/tags/服务器/">服务器</a>, <a class="tag-link" href="/tags/负载均衡/">负载均衡</a>, <a class="tag-link" href="/tags/高性能/">高性能</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Nginx</code> 是一个 <strong>免费的</strong>，<strong>开源的</strong>，<strong>高性能</strong> 的 <code>HTTP</code> 服务器和 <strong>反向代理</strong>，以及 <code>IMAP</code>/<code>POP3</code> 代理服务器。 <code>Nginx</code> 以其高性能，稳定性，丰富的功能，简单的配置和低资源消耗而闻名。<code>Nginx</code>是一个 <code>Web</code> 服务器，也可以用作 <strong>反向代理</strong>，<strong>负载均衡器</strong> 和 <code>HTTP</code> <strong>缓存</strong>。</p>
+<a id="more"></a>
+<p>很多高知名度的网站都使用 <code>Nginx</code>，如：<code>Netflix</code>，<code>GitHub</code>，<code>SoundCloud</code>，<code>MaxCDN</code> 等。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/16/164a050bd16fbfc9?w=626&amp;h=144&amp;f=png&amp;s=32239" alt=""></p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="1-Nginx的整体架构"><a href="#1-Nginx的整体架构" class="headerlink" title="1. Nginx的整体架构"></a>1. Nginx的整体架构</h2><p><img src="https://user-gold-cdn.xitu.io/2018/7/16/164a050bce75a47b?w=944&amp;h=587&amp;f=png&amp;s=128919" alt=""></p>
+<h3 id="1-1-主进程"><a href="#1-1-主进程" class="headerlink" title="1.1. 主进程"></a>1.1. 主进程</h3><p><code>Nginx</code> 启动时，会生成两种类型的 <strong>进程*</strong>，一个是 <strong>主进程</strong>（<code>master</code>），<strong>一个</strong>（<code>windows</code> 版本的目前只有一个）或 <strong>多个工作进程</strong>（<code>worker</code>）。<strong>主进程</strong> 并不处理网络请求，主要负责 <strong>调度工作进程</strong>，也就是图示的 <code>3</code> 项：<strong>加载配置</strong>、<strong>启动工作进程</strong> 及 <strong>非停升级</strong>。所以，<code>Nginx</code> 启动以后，查看操作系统的进程列表，我们就能看到 <strong>至少有两个</strong> <code>Nginx</code> 进程。</p>
+<h3 id="1-2-工作进程"><a href="#1-2-工作进程" class="headerlink" title="1.2. 工作进程"></a>1.2. 工作进程</h3><p>服务器实际 <strong>处理网络请求</strong> 及 <strong>响应</strong> 的是 <strong>工作进程</strong>（<code>worker</code>），在类 <code>unix</code> 系统上，<code>Nginx</code> 可以配置 <strong>多个</strong> <code>worker</code>，而每个 <code>worker</code> <strong>进程</strong> 都可以同时处理 <strong>数以千计</strong> 的 <strong>网络请求</strong>。</p>
+<h3 id="1-3-模块化设计"><a href="#1-3-模块化设计" class="headerlink" title="1.3. 模块化设计"></a>1.3. 模块化设计</h3><p><code>Nginx</code> 的 <code>worker</code> 进程，包括 <strong>核心</strong> 和 <strong>功能性模块</strong>，<strong>核心模块</strong> 负责维持一个 <strong>运行循环</strong>（<code>run-loop</code>），执行网络请求处理的 <strong>不同阶段</strong> 的模块功能，比如：<strong>网络读写</strong>、<strong>存储读写</strong>、<strong>内容传输</strong>、<strong>外出过滤</strong>，以及 <strong>将请求发往上游服务器</strong> 等。而其代码的 <strong>模块化设计</strong>，也使得我们可以根据需要对 <strong>功能模块</strong> 进行适当的 <strong>选择</strong> 和 <strong>修改</strong>，编译成具有 <strong>特定功能</strong> 的服务器。</p>
+<h3 id="1-4-事件驱动模型"><a href="#1-4-事件驱动模型" class="headerlink" title="1.4. 事件驱动模型"></a>1.4. 事件驱动模型</h3><p>基于 <strong>异步及非阻塞</strong> 的 <strong>事件驱动模型</strong>，可以说是 <code>Nginx</code> 得以获得 <strong>高并发</strong>、<strong>高性能</strong> 的关键因素，同时也得益于对 <code>Linux</code>、<code>Solaris</code> 及类 <code>BSD</code> 等操作系统内核中 <strong>事件通知</strong> 及 <code>I/O</code> <strong>性能增强功能</strong> 的采用，如 <code>kqueue</code>、<code>epoll</code> 及 <code>event ports</code>。</p>
+<h3 id="1-5-代理（proxy）设计"><a href="#1-5-代理（proxy）设计" class="headerlink" title="1.5. 代理（proxy）设计"></a>1.5. 代理（proxy）设计</h3><p><strong>代理设计</strong>，可以说是 <code>Nginx</code> 深入骨髓的设计，无论是对于 <code>HTTP</code>，还是对于 <code>FastCGI</code>、<code>Memcache</code>、<code>Redis</code> 等的网络请求或响应，本质上都采用了 <strong>代理机制</strong>。所以，<code>Nginx</code> 天生就是高性能的 <strong>代理服务器</strong>。</p>
+<h2 id="2-Nginx的模块化设计"><a href="#2-Nginx的模块化设计" class="headerlink" title="2. Nginx的模块化设计"></a>2. Nginx的模块化设计</h2><p><strong>高度模块化</strong> 的设计是 <code>Nginx</code> 的架构基础。<code>Nginx</code> 服务器被分解为 <strong>多个模块</strong>，每个模块就是一个 <strong>功能模块</strong>，只负责自身的功能，模块之间严格遵循 <strong>“高内聚，低耦合”</strong> 的原则。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/16/164a050bd21be9ae?w=640&amp;h=479&amp;f=webp&amp;s=19204" alt=""></p>
+<h3 id="2-1-核心模块"><a href="#2-1-核心模块" class="headerlink" title="2.1. 核心模块"></a>2.1. 核心模块</h3><p><strong>核心模块</strong> 是 <code>Nginx</code> 服务器正常运行 <strong>必不可少</strong> 的模块，提供 <strong>错误日志记录</strong>、<strong>配置文件解析</strong>、<strong>事件驱动机制</strong>、<strong>进程管理</strong> 等核心功能。 </p>
+<h3 id="2-2-标准HTTP模块"><a href="#2-2-标准HTTP模块" class="headerlink" title="2.2. 标准HTTP模块"></a>2.2. 标准HTTP模块</h3><p>标准 <code>HTTP</code> 模块提供 <code>HTTP</code> 协议解析相关的功能，比如：<strong>端口配置</strong>、<strong>网页编码设置</strong>、<code>HTTP</code> <strong>响应头设置</strong> 等等。</p>
+<h3 id="2-3-可选HTTP模块"><a href="#2-3-可选HTTP模块" class="headerlink" title="2.3. 可选HTTP模块"></a>2.3. 可选HTTP模块</h3><p>可选 <code>HTTP</code> 模块主要用于 <strong>扩展</strong> 标准的 <code>HTTP</code> 功能，让  <code>Nginx</code> 能处理一些特殊的服务，比如：<code>Flash</code> <strong>多媒体传输</strong>、解析 <code>GeoIP</code> 请求、<strong>网络传输压缩</strong>、<strong>安全协议</strong> <code>SSL</code> 支持等。</p>
+<h3 id="2-4-邮件服务模块"><a href="#2-4-邮件服务模块" class="headerlink" title="2.4. 邮件服务模块"></a>2.4. 邮件服务模块</h3><p><strong>邮件服务模块</strong> 主要用于支持 <code>Nginx</code> 的 <strong>邮件服务</strong>，包括对 <code>POP3</code> 协议、<code>IMAP</code> 协议和 <code>SMTP</code> 协议的支持。</p>
+<h3 id="2-5-第三方模块"><a href="#2-5-第三方模块" class="headerlink" title="2.5. 第三方模块"></a>2.5. 第三方模块</h3><p><strong>第三方模块</strong> 是为了扩展 <code>Nginx</code> 服务器应用，完成开发者自定义功能，比如：<code>Json</code> 支持、<code>Lua</code> 支持等。</p>
+<h2 id="3-Nginx的请求方式处理"><a href="#3-Nginx的请求方式处理" class="headerlink" title="3. Nginx的请求方式处理"></a>3. Nginx的请求方式处理</h2><p><code>Nginx</code> 是一个 <strong>高性能</strong> 的 <code>Web</code> 服务器，能够同时处理 <strong>大量的并发请求</strong>。它结合 <strong>多进程机制</strong> 和 <strong>异步机制</strong>，异步机制使用的是 <strong>异步非阻塞方式</strong>，接下来就给大家介绍一下  <code>Nginx</code> 的 <strong>多线程机制</strong> 和 <strong>异步非阻塞机制</strong>。 </p>
+<h3 id="3-1-多进程机制"><a href="#3-1-多进程机制" class="headerlink" title="3.1. 多进程机制"></a>3.1. 多进程机制</h3><p>服务器每当收到一个客户端时，就有 <strong>服务器主进程</strong>（<code>master process</code>）生成一个 <strong>子进程</strong>（<code>worker  process</code>）出来和客户端建立连接进行交互，直到连接断开，该子进程就结束了。</p>
+<p>使用 <strong>进程</strong> 的好处是 <strong>各个进程之间相互独立</strong>，<strong>不需要加锁</strong>，减少了使用锁对性能造成影响，同时降低编程的复杂度，降低开发成本。其次，采用独立的进程，可以让 <strong>进程互相之间不会影响</strong>，如果一个进程发生异常退出时，其它进程正常工作，<code>master</code> 进程则很快启动新的 <code>worker</code> 进程，确保服务不会中断，从而将风险降到最低。</p>
+<p>缺点是操作系统生成一个 <strong>子进程</strong> 需要进行 <strong>内存复制</strong> 等操作，在 <strong>资源</strong> 和 <strong>时间</strong> 上会产生一定的开销。当有 <strong>大量请求</strong> 时，会导致 <strong>系统性能下降</strong>。</p>
+<h3 id="3-2-异步非阻塞机制"><a href="#3-2-异步非阻塞机制" class="headerlink" title="3.2. 异步非阻塞机制"></a>3.2. 异步非阻塞机制</h3><p>每个 <strong>工作进程</strong> 使用 <strong>异步非阻塞方式</strong>，可以处理 <strong>多个客户端请求</strong>。</p>
+<p>当某个 <strong>工作进程</strong> 接收到客户端的请求以后，调用 <code>IO</code> 进行处理，如果不能立即得到结果，就去 <strong>处理其他请求</strong>（即为 <strong>非阻塞</strong>）；而 <strong>客户端</strong> 在此期间也 <strong>无需等待响应</strong>，可以去处理其他事情（即为 <strong>异步</strong>）。</p>
+<p>当 <code>IO</code> 返回时，就会通知此 <strong>工作进程</strong>；该进程得到通知，暂时 <strong>挂起</strong> 当前处理的事务去 <strong>响应客户端请求</strong>。</p>
+<h2 id="4-Nginx事件驱动模型"><a href="#4-Nginx事件驱动模型" class="headerlink" title="4. Nginx事件驱动模型"></a>4. Nginx事件驱动模型</h2><p>在 <code>Nginx</code> 的 <strong>异步非阻塞机制</strong> 中，<strong>工作进程</strong> 在调用 <code>IO</code> 后，就去处理其他的请求，当 <code>IO</code> 调用返回后，会 <strong>通知</strong> 该 <strong>工作进程</strong>。对于这样的系统调用，主要使用 <code>Nginx</code> 服务器的 <strong>事件驱动模型</strong> 来实现。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/16/164a050bd23976e0?w=604&amp;h=486&amp;f=webp&amp;s=8094" alt=""></p>
+<p>如上图所示，<code>Nginx</code> 的 <strong>事件驱动模型</strong> 由 <strong>事件收集器</strong>、<strong>事件发送器</strong> 和 <strong>事件处理器</strong> 三部分基本单元组成。</p>
+<ul>
+<li><p>事件收集器：负责收集 <code>worker</code> 进程的各种 <code>IO</code> 请求；</p>
+</li>
+<li><p>事件发送器：负责将 <code>IO</code> 事件发送到 <strong>事件处理器</strong>；</p>
+</li>
+<li><p>事件处理器：负责各种事件的 <strong>响应工作</strong>。</p>
+</li>
+</ul>
+<p><strong>事件发送器</strong> 将每个请求放入一个 <strong>待处理事件列表</strong>，使用非阻塞 <code>I/O</code> 方式调用 <strong>事件处理器</strong> 来处理该请求。其处理方式称为 <strong>“多路 IO 复用方法”</strong>，常见的包括以下三种：<code>select</code> 模型、<code>poll</code> 模型、<code>epoll</code> 模型。</p>
+<h2 id="5-Nginx进程处理模型"><a href="#5-Nginx进程处理模型" class="headerlink" title="5. Nginx进程处理模型"></a>5. Nginx进程处理模型</h2><p><code>Nginx</code> 服务器使用 <code>master/worker</code> <strong>多进程模式</strong>。多线程启动和执行的流程如下：</p>
+<ol>
+<li><p><strong>主程序</strong> <code>Master process</code> 启动后，通过一个 <code>for</code> 循环来 <strong>接收</strong> 和 <strong>处理外部信号</strong>；</p>
+</li>
+<li><p><strong>主进程</strong> 通过 <code>fork()</code> 函数产生 <code>worker</code> <strong>子进程</strong>，每个 <strong>子进程</strong> 执行一个 <code>for</code> 循环来实现 <code>Nginx</code> 服务器 <strong>对事件的接收</strong> 和 <strong>处理</strong>。</p>
+</li>
+</ol>
+<p>一般推荐 <code>worker</code> <strong>进程数</strong> 与 <code>CPU</code> <strong>内核数</strong> 一致，这样一来不存在 <strong>大量的子进程</strong> 生成和管理任务，避免了进程之间 <strong>竞争</strong> <code>CPU</code> <strong>资源</strong> 和 <strong>进程切换</strong> 的开销。而且  <code>Nginx</code> 为了更好的利用 <strong>多核特性</strong>，提供了 <code>CPU</code> <strong>亲缘性</strong> 的绑定选项，我们可以将某 <strong>一个进程绑定在某一个核</strong> 上，这样就不会因为 <strong>进程的切换</strong> 带来 <code>Cache</code> 的失效。</p>
+<p>对于每个请求，有且只有一个 <strong>工作进程</strong> 对其处理。首先，每个 <code>worker</code> 进程都是从 <code>master</code> 进程 <code>fork</code> 过来。在  <code>master</code> 进程里面，先建立好需要 <code>listen</code> 的 <code>socket（listenfd）</code> 之后，然后再 <code>fork</code> 出多个 <code>worker</code> 进程。</p>
+<p>所有 <code>worker</code> 进程的 <code>listenfd</code> 会在 <strong>新连接</strong> 到来时变得 <strong>可读</strong>，为保证只有一个进程处理该连接，所有 <code>worker</code> 进程在注册 <code>listenfd</code> <strong>读事件</strong> 前 <strong>抢占</strong> <code>accept_mutex</code>，抢到 <strong>互斥锁</strong> 的那个进程 <strong>注册</strong> <code>listenfd</code> <strong>读事件</strong>，在 <strong>读事件</strong> 里调用 <code>accept</code> 接受该连接。</p>
+<p>当一个 <code>worker</code> 进程在 <code>accept</code> 这个连接之后，就开始 <strong>读取请求</strong>，<strong>解析请求</strong>，<strong>处理请求</strong>，产生数据后，再 <strong>返回给客户端</strong>，最后才 <strong>断开连接</strong>，这样一个完整的请求就是这样的了。我们可以看到，一个请求，完全由 <code>worker</code> 进程来处理，而且只在一个 <code>worker</code> 进程中处理。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/16/164a050bd00922f3?w=640&amp;h=458&amp;f=webp&amp;s=9848" alt=""></p>
+<p>在 <code>Nginx</code> 服务器的运行过程中，<strong>主进程</strong> 和 <strong>工作进程</strong> 需要进程交互。交互依赖于 <code>Socket</code> 实现的 <strong>管道</strong> 来实现。</p>
+<h3 id="5-1-主进程与工作进程交互"><a href="#5-1-主进程与工作进程交互" class="headerlink" title="5.1. 主进程与工作进程交互"></a>5.1. 主进程与工作进程交互</h3><p>这条管道与普通的管道不同，它是由 <strong>主进程</strong> 指向 <strong>工作进程</strong> 的 <strong>单向管道</strong>，包含主进程向工作进程发出的 <strong>指令</strong>，<strong>工作进程</strong> <code>ID</code> 等；同时 <strong>主进程</strong> 与外界通过 <strong>信号通信</strong>；每个 <strong>子进程</strong> 具备 <strong>接收信号</strong>，并处理相应的事件的能力。</p>
+<h3 id="5-2-工作进程与工作进程交互"><a href="#5-2-工作进程与工作进程交互" class="headerlink" title="5.2. 工作进程与工作进程交互"></a>5.2. 工作进程与工作进程交互</h3><p>这种交互是和 <strong>主进程-工作进程</strong> 交互是基本一致的，但是会通过 <strong>主进程</strong> 间接完成。<strong>工作进程</strong> 之间是 <strong>相互隔离</strong> 的，所以当工作进程 <code>W1</code> 需要向工作进程 <code>W2</code> 发指令时，首先找到 <code>W2</code> 的 <strong>进程</strong> <code>ID</code>，然后将正确的指令写入指向 <code>W2</code> 的 <strong>通道</strong>。<code>W2</code> 收到信号采取相应的措施。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>通过这篇文章，我们对 <code>Nginx</code> 服务器的 <strong>整体架构</strong> 有了一个整体的认识。包括其 <strong>模块化的设计</strong>、<strong>多进程</strong> 和 <strong>异步非阻塞</strong> 的请求处理方式、<strong>事件驱动模型</strong> 等。通过这些理论知识，才能更好地领悟  <code>Nginx</code> 的设计思想。对于我们学习 <code>Nginx</code> 来说有很大的帮助。</p>
+<hr>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/13/16494267ed546a0c?w=258&amp;h=258&amp;f=jpeg&amp;s=16109" alt="零壹技术栈"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+        <a href="https://ostenant.coding.me/2018/07/15/浅谈Nginx服务器的内部核心架构设计/#comments" class="article-comment-link">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2018/07/13/浅谈常见的七种加密算法及实现/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">浅谈常见的七种加密算法及实现</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="lv-container" data-id="city" data-uid=MTAyMC8zNzE2NC8xMzY5OA==></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="no-thumbnail">
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/高并发系统系列/">高并发系统系列</a></p>
+                            <p class="item-title"><a href="/2018/07/15/浅谈Nginx服务器的内部核心架构设计/" class="title">浅谈Nginx服务器的内部核心架构设计</a></p>
+                            <p class="item-date"><time datetime="2018-07-15T10:50:00.000Z" itemprop="datePublished">2018-07-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/加密算法系列/">加密算法系列</a></p>
+                            <p class="item-title"><a href="/2018/07/13/浅谈常见的七种加密算法及实现/" class="title">浅谈常见的七种加密算法及实现</a></p>
+                            <p class="item-date"><time datetime="2018-07-13T12:06:00.000Z" itemprop="datePublished">2018-07-13</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/消息队列系列/">消息队列系列</a></p>
+                            <p class="item-title"><a href="/2018/07/07/浅谈消息队列及常见的消息中间件/" class="title">浅谈消息队列及常见的消息中间件</a></p>
+                            <p class="item-date"><time datetime="2018-07-07T15:27:00.000Z" itemprop="datePublished">2018-07-07</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/认证与授权系列/">认证与授权系列</a></p>
+                            <p class="item-title"><a href="/2018/07/05/浅谈SAML, OAuth, OpenID和SSO, JWT和Session/" class="title">浅谈SAML, OAuth, OpenID和SSO, JWT和Session</a></p>
+                            <p class="item-date"><time datetime="2018-07-05T05:50:00.000Z" itemprop="datePublished">2018-07-05</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/分布式系列/">分布式系列</a></p>
+                            <p class="item-title"><a href="/2018/07/01/浅谈分布式存储系统的数据分布算法/" class="title">浅谈分布式存储系统的数据分布算法</a></p>
+                            <p class="item-date"><time datetime="2018-07-01T09:43:00.000Z" itemprop="datePublished">2018-07-01</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL学习系列/">MySQL学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RxJava异步框架系列/">RxJava异步框架系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Reactive编程系列/">Spring Reactive编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/任务调度框架系列/">任务调度框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/加密算法系列/">加密算法系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术知识图谱/">技术知识图谱</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/测试框架系列/">测试框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/消息队列系列/">消息队列系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/高并发系统系列/">高并发系统系列</a><span class="category-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AES/">AES</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ActiveMQ/">ActiveMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DES/">DES</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker-Compose/">Docker Compose</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Filter/">Filter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interceptor/">Interceptor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JWT/">JWT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Listener/">Listener</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MD5/">MD5</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mockito/">Mockito</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth/">OAuth</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paxos/">Paxos</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Quartz/">Quartz</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RSA/">RSA</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RabbitMQ/">RabbitMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raft/">Raft</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactive-Streams/">Reactive Streams</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactor/">Reactor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RocketMQ/">RocketMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RxJava/">RxJava</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SAML/">SAML</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SHA1/">SHA1</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-Boot/">SOFA-Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SSO/">SSO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ScheduledExecutorService/">ScheduledExecutorService</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Servlet/">Servlet</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Session/">Session</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot-2-0/">Spring Boot 2.0</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Task/">Spring Task</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-WebFlux/">Spring WebFlux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Timer/">Timer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unique-ID/">Unique ID</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一致性哈希/">一致性哈希</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/主从复制/">主从复制</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式存储/">分布式存储</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分片/">分片</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反向代理/">反向代理</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反模式/">反模式</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/定时任务/">定时任务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异步/">异步</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/负载均衡/">负载均衡</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/限流/">限流</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高性能/">高性能</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/AES/" style="font-size: 10px;">AES</a> <a href="/tags/ActiveMQ/" style="font-size: 10px;">ActiveMQ</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Android/" style="font-size: 13.33px;">Android</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/DES/" style="font-size: 10px;">DES</a> <a href="/tags/Docker/" style="font-size: 16.67px;">Docker</a> <a href="/tags/Docker-Compose/" style="font-size: 10px;">Docker Compose</a> <a href="/tags/Filter/" style="font-size: 10px;">Filter</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Interceptor/" style="font-size: 10px;">Interceptor</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 15px;">JVM</a> <a href="/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/tags/Java/" style="font-size: 18.33px;">Java</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/Listener/" style="font-size: 10px;">Listener</a> <a href="/tags/MD5/" style="font-size: 10px;">MD5</a> <a href="/tags/Mockito/" style="font-size: 10px;">Mockito</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 11.67px;">Nginx</a> <a href="/tags/OAuth/" style="font-size: 10px;">OAuth</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Paxos/" style="font-size: 10px;">Paxos</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/Quartz/" style="font-size: 11.67px;">Quartz</a> <a href="/tags/RPC/" style="font-size: 20px;">RPC</a> <a href="/tags/RSA/" style="font-size: 10px;">RSA</a> <a href="/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/tags/Raft/" style="font-size: 10px;">Raft</a> <a href="/tags/Reactive-Streams/" style="font-size: 11.67px;">Reactive Streams</a> <a href="/tags/Reactor/" style="font-size: 10px;">Reactor</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/RocketMQ/" style="font-size: 10px;">RocketMQ</a> <a href="/tags/RxJava/" style="font-size: 13.33px;">RxJava</a> <a href="/tags/SAML/" style="font-size: 10px;">SAML</a> <a href="/tags/SHA1/" style="font-size: 10px;">SHA1</a> <a href="/tags/SOFA-Boot/" style="font-size: 13.33px;">SOFA-Boot</a> <a href="/tags/SOFA-RPC/" style="font-size: 15px;">SOFA-RPC</a> <a href="/tags/SSO/" style="font-size: 10px;">SSO</a> <a href="/tags/ScheduledExecutorService/" style="font-size: 10px;">ScheduledExecutorService</a> <a href="/tags/Servlet/" style="font-size: 10px;">Servlet</a> <a href="/tags/Session/" style="font-size: 10px;">Session</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Boot-2-0/" style="font-size: 18.33px;">Spring Boot 2.0</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/Spring-Task/" style="font-size: 10px;">Spring Task</a> <a href="/tags/Spring-WebFlux/" style="font-size: 11.67px;">Spring WebFlux</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Timer/" style="font-size: 10px;">Timer</a> <a href="/tags/Unique-ID/" style="font-size: 10px;">Unique ID</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/一致性哈希/" style="font-size: 10px;">一致性哈希</a> <a href="/tags/主从复制/" style="font-size: 10px;">主从复制</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a> <a href="/tags/分布式存储/" style="font-size: 10px;">分布式存储</a> <a href="/tags/分片/" style="font-size: 10px;">分片</a> <a href="/tags/反向代理/" style="font-size: 10px;">反向代理</a> <a href="/tags/反模式/" style="font-size: 13.33px;">反模式</a> <a href="/tags/定时任务/" style="font-size: 10px;">定时任务</a> <a href="/tags/异步/" style="font-size: 16.67px;">异步</a> <a href="/tags/微服务/" style="font-size: 13.33px;">微服务</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/负载均衡/" style="font-size: 10px;">负载均衡</a> <a href="/tags/限流/" style="font-size: 10px;">限流</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a> <a href="/tags/高性能/" style="font-size: 10px;">高性能</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://ifeve.com" target="_blank">并发编程网</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://juejin.im" target="_blank">掘金</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.jianshu.com" target="_blank">简书</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com" target="_blank">Github</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.infoq.com" target="_blank">Infoq</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fas fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
+            
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+        </div>
+    </div>
+</footer>
+        
+    
+    
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+     (function(d, s) {
+         var j, e = d.getElementsByTagName(s)[0];
+
+         if (typeof LivereTower === 'function') { return; }
+
+         j = d.createElement(s);
+         j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+         j.async = true;
+
+         e.parentNode.insertBefore(j, e);
+     })(document, 'script');
+    </script>
+  <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+  <!-- City版安装代码已完成 -->
+
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
