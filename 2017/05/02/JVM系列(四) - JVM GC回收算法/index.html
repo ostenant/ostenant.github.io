@@ -5,22 +5,25 @@
     
     <title>JVM系列(四) - JVM GC回收算法 | Icarus&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="前言第二篇介绍了Java内存运行时区域，其中程序计数器、虚拟机栈、本地方法栈 三个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的内存分配和回收都具备确定性。在这几个区域内不需要过多考虑回收的问题，因为方法结束或线程结束时，内存自然就跟随着回收了。">
-<meta name="keywords" content="JVM,Java">
+    <meta name="description" content="前言前面介绍了Java内存运行时区域，其中程序计数器、虚拟机栈、本地方法栈 三个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的内存分配和回收都具备确定性。在这几个区域内不需要过多考虑回收的问题，因为方法结束或线程结束时，内存自然就跟随着回收了。">
+<meta name="keywords" content="Java,JVM">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JVM系列(四) - JVM GC回收算法">
 <meta property="og:url" content="https://ostenant.coding.me/2017/05/02/JVM系列(四) - JVM GC回收算法/index.html">
 <meta property="og:site_name" content="Icarus&#39;s Blog">
-<meta property="og:description" content="前言第二篇介绍了Java内存运行时区域，其中程序计数器、虚拟机栈、本地方法栈 三个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的内存分配和回收都具备确定性。在这几个区域内不需要过多考虑回收的问题，因为方法结束或线程结束时，内存自然就跟随着回收了。">
+<meta property="og:description" content="前言前面介绍了Java内存运行时区域，其中程序计数器、虚拟机栈、本地方法栈 三个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的内存分配和回收都具备确定性。在这几个区域内不需要过多考虑回收的问题，因为方法结束或线程结束时，内存自然就跟随着回收了。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/jpg/JVM_GC_Roots.png">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/JVM_GC_Multi_Roots.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/3818ee3cfb6575e5aed715eaa66c2d55">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/af24941b358a62a73976dfbbfc0656da">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/b815b8cb4355c11930f444d544128870">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/image/png/GC_Generation_ALL.png">
 <meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
-<meta property="og:updated_time" content="2018-06-18T01:50:42.529Z">
+<meta property="og:updated_time" content="2018-08-02T09:36:50.476Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM系列(四) - JVM GC回收算法">
-<meta name="twitter:description" content="前言第二篇介绍了Java内存运行时区域，其中程序计数器、虚拟机栈、本地方法栈 三个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的内存分配和回收都具备确定性。在这几个区域内不需要过多考虑回收的问题，因为方法结束或线程结束时，内存自然就跟随着回收了。">
+<meta name="twitter:description" content="前言前面介绍了Java内存运行时区域，其中程序计数器、虚拟机栈、本地方法栈 三个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的内存分配和回收都具备确定性。在这几个区域内不需要过多考虑回收的问题，因为方法结束或线程结束时，内存自然就跟随着回收了。">
 <meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/image/jpg/JVM_GC_Roots.png">
     
 
@@ -269,7 +272,7 @@ ga('send', 'pageview');
                         
     <div class="article-category">
     	<i class="fas fa-folder"></i>
-        <a class="article-category-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a>
+        <a class="article-category-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a>
     </div>
 
                         
@@ -287,21 +290,20 @@ ga('send', 'pageview');
         
             
             <hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>第二篇介绍了<code>Java</code>内存运行时区域，其中<strong>程序计数器</strong>、<strong>虚拟机栈</strong>、<strong>本地方法栈</strong> 三个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的<strong>内存分配和回收</strong>都具备<strong>确定性</strong>。在这几个区域内不需要过多考虑回收的问题，<strong>因为方法结束或线程结束时，内存自然就跟随着回收了</strong>。</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>前面介绍了<code>Java</code>内存运行时区域，其中<strong>程序计数器</strong>、<strong>虚拟机栈</strong>、<strong>本地方法栈</strong> 三个区域随线程而生，随线程而灭；栈中的栈帧随着方法的进入和退出而有条不紊地执行着出栈和入栈操作。每一个栈帧中分配多少内存基本上是在类结构确定下来时就已知的，因此这几个区域的<strong>内存分配和回收</strong>都具备<strong>确定性</strong>。在这几个区域内不需要过多考虑回收的问题，<strong>因为方法结束或线程结束时，内存自然就跟随着回收了</strong>。</p>
 <a id="more"></a>
-<p>而<code>Java</code><strong>堆</strong> 和 <strong>方法区</strong> 则不一样，一个接口中的多个实现类需要的内存可能不一样，一个方法中的多个分支需要的内存也可能不一样。我们只有在程序处于运行期间时才能知道会创建哪些对象，这部分<strong>内存的分配和回收</strong>都是<strong>动态的</strong>，<strong>垃圾收集器</strong> 所关注的是这部分内存。</p>
-<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><hr>
-<h2 id="一-对象生死判定"><a href="#一-对象生死判定" class="headerlink" title="(一). 对象生死判定"></a>(一). 对象生死判定</h2><p>如何判断<code>Java</code>中一个对象应该 <strong>“存活”</strong> 还是 <strong>“死去”</strong>，这是 垃圾回收器要做的第一件事。</p>
-<h3 id="1-引用计数算法"><a href="#1-引用计数算法" class="headerlink" title="1. 引用计数算法"></a>1. 引用计数算法</h3><p><code>Java</code> <strong>堆</strong> 中每个具体对象（<strong>不是引用</strong>）都有一个<strong>引用计数器</strong>。当一个对象被创建并初始化赋值后，该变量计数设置为<code>1</code>。每当有一个地方引用它时，计数器值就<strong>加1</strong>。当引用<strong>失效</strong>时，即一个对象的某个引用超过了生命周期（出作用域后）或者被设置为一个新值时，计数器值就<strong>减1</strong>。任何引用计数为<code>0</code>的对象可以被当作<strong>垃圾收集</strong>。当一个对象被垃圾收集时，它引用的任何对象计数减1。</p>
+<p><code>Java</code><strong>堆</strong> 和 <strong>方法区</strong> 则不一样，一个接口中的多个实现类需要的内存可能不一样，一个方法中的多个分支需要的内存也可能不一样。我们只有在程序处于运行期间时才能知道会创建哪些对象，这部分<strong>内存的分配和回收</strong>都是<strong>动态的</strong>，<strong>垃圾收集器</strong> 所关注的是这部分内存。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="一-对象生死判定"><a href="#一-对象生死判定" class="headerlink" title="(一). 对象生死判定"></a>(一). 对象生死判定</h2><p>如何判断<code>Java</code>中一个对象应该 <strong>“存活”</strong> 还是 <strong>“死去”</strong>，这是 垃圾回收器要做的第一件事。</p>
+<h3 id="1-引用计数算法"><a href="#1-引用计数算法" class="headerlink" title="1. 引用计数算法"></a>1. 引用计数算法</h3><p><code>Java</code> <strong>堆</strong> 中每个具体对象（<strong>不是引用</strong>）都有一个<strong>引用计数器</strong>。当一个对象被创建并初始化赋值后，该变量计数设置为<code>1</code>。每当有一个地方引用它时，计数器值就<strong>加1</strong>。当引用<strong>失效</strong>时，即一个对象的某个引用超过了生命周期（出作用域后）或者被设置为一个新值时，计数器值就<strong>减1</strong>。任何引用计数为<code>0</code>的对象可以被当作<strong>垃圾收集</strong>。当一个对象被垃圾收集时，它引用的任何对象计数减 <code>1</code>。</p>
 <ul>
 <li><strong>优点</strong>：</li>
 </ul>
-<pre><code>引用计数收集器执行简单，判定效率高，交织在程序运行中。对程序不被长时间打断的实时环境比较有利。
-</code></pre><ul>
+<p>引用计数收集器执行简单，判定效率高，交织在程序运行中。对程序不被长时间打断的实时环境比较有利。</p>
+<ul>
 <li><strong>缺点</strong>：</li>
 </ul>
-<pre><code>难以检测出对象之间的循环引用。同时，引用计数器增加了程序执行的开销。所以Java语言并没有选择这种算法进行垃圾回收。
-</code></pre><h3 id="2-可达性分析算法"><a href="#2-可达性分析算法" class="headerlink" title="2. 可达性分析算法"></a>2. 可达性分析算法</h3><p><strong>可达性分析算法</strong>也叫<strong>根搜索算法</strong>，通过一系列的称为 <code>GC Roots</code> 的对象作为起点，然后向下搜索。搜索所走过的<strong>路径</strong>称为引用链 （<code>Reference Chain</code>）， 当一个<strong>对象</strong>到 <code>GC Roots</code> 没有任何<strong>引用链</strong>相连时, 即该对象<strong>不可达</strong>，也就说明此对象是 <strong>不可用的</strong>。</p>
+<p>难以检测出对象之间的循环引用。同时，引用计数器增加了程序执行的开销。所以Java语言并没有选择这种算法进行垃圾回收。</p>
+<h3 id="2-可达性分析算法"><a href="#2-可达性分析算法" class="headerlink" title="2. 可达性分析算法"></a>2. 可达性分析算法</h3><p><strong>可达性分析算法</strong>也叫<strong>根搜索算法</strong>，通过一系列的称为 <code>GC Roots</code> 的对象作为起点，然后向下搜索。搜索所走过的<strong>路径</strong>称为引用链 （<code>Reference Chain</code>）， 当一个<strong>对象</strong>到 <code>GC Roots</code> 没有任何<strong>引用链</strong>相连时, 即该对象<strong>不可达</strong>，也就说明此对象是 <strong>不可用的</strong>。</p>
 <p>如下图所示: <code>Object5</code>、<code>Object6</code>、<code>Object7</code> 虽然互有关联, 但它们到<code>GC Roots</code>是不可达的, 因此也会被判定为可回收的对象。</p>
 <p><img src="http://ols3fdyll.bkt.clouddn.com/image/jpg/JVM_GC_Roots.png" alt=""></p>
 <p><strong>GC根对象</strong></p>
@@ -312,60 +314,56 @@ ga('send', 'pageview');
 <li><strong>方法区</strong> 中<strong>类静态属性</strong>引用的变量</li>
 <li><strong>方法区</strong> 中<strong>常量</strong>引用的变量</li>
 </ul>
-<pre><code>JVM中用到的所有现代GC算法在回收前都会先找出所有仍存活的对象。可达性分析算法是从离散数学中的图论引入的，程序把所有的引用关系看作一张图。下图展示的JVM中的内存布局可以用来很好地阐释这一概念：
-</code></pre><p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/JVM_GC_Multi_Roots.png" alt=""></p>
-<p><br></p>
-<h2 id="二-对象引用分类"><a href="#二-对象引用分类" class="headerlink" title="(二). 对象引用分类"></a>(二). 对象引用分类</h2><h4 id="1-强引用-Strong-Reference"><a href="#1-强引用-Strong-Reference" class="headerlink" title="1. 强引用(Strong Reference)"></a><strong>1. 强引用(Strong Reference)</strong></h4><p>在代码中普遍存在的，类似<code>Object obj = new Object()</code>这类引用，只要强引用还在，垃圾收集器永远不会回收掉被引用的对象。</p>
-<h4 id="2-软引用-Sofe-Reference"><a href="#2-软引用-Sofe-Reference" class="headerlink" title="2. 软引用(Sofe Reference)"></a><strong>2. 软引用(Sofe Reference)</strong></h4><p><strong>有用但并非必需</strong> 的对象，可用<code>SoftReference</code>类来实现软引用。在系统将要发生<strong>内存溢出异常</strong>之前，将会把这些对象列进回收范围之中进行<strong>二次回收</strong>。如果这次回收还没有足够的内存，才会抛出内存溢出异常。</p>
-<h4 id="3-弱引用-Weak-Reference"><a href="#3-弱引用-Weak-Reference" class="headerlink" title="3. 弱引用(Weak Reference)"></a><strong>3. 弱引用(Weak Reference)</strong></h4><p><strong>非必需</strong> 的对象，但它的<strong>强度</strong>比软引用更弱，被弱引用关联的对象<strong>只能</strong>生存到下一次垃圾收集发生之前，<code>JDK</code>提供了<code>WeakReference</code>类来实现弱引用。无论当前内存是否足够，用软引用相关联的对象都会被回收掉。</p>
-<h4 id="4-虚引用-Phantom-Reference"><a href="#4-虚引用-Phantom-Reference" class="headerlink" title="4. 虚引用(Phantom Reference)"></a><strong>4. 虚引用(Phantom Reference)</strong></h4><p>虚引用也称为幽灵引用或幻影引用，是最弱的一种引用关系，<code>JDK</code>提供了<code>PhantomReference</code>类来实现虚引用。为一个对象设置虚引用的唯一目的是：能在这个对象在<strong>垃圾回收器</strong>回收时收到一个<strong>系统通知</strong>。</p>
-<p><br></p>
+<p><code>JVM</code> 中用到的所有现代 <code>GC</code> 算法在回收前都会先找出所有仍存活的对象。<strong>可达性分析算法</strong> 是从离散数学中的图论引入的，程序把所有的引用关系看作一张图。下图展示的 <code>JVM</code> 中的内存布局可以用来很好地阐释这一概念：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/image/png/JVM_GC_Multi_Roots.png" alt=""></p>
+<h2 id="二-对象引用分类"><a href="#二-对象引用分类" class="headerlink" title="(二). 对象引用分类"></a>(二). 对象引用分类</h2><h4 id="1-强引用-Strong-Reference"><a href="#1-强引用-Strong-Reference" class="headerlink" title="1. 强引用(Strong Reference)"></a>1. 强引用(Strong Reference)</h4><p>在代码中普遍存在的，类似<code>Object obj = new Object()</code>这类引用，只要强引用还在，垃圾收集器永远不会回收掉被引用的对象。</p>
+<h4 id="2-软引用-Sofe-Reference"><a href="#2-软引用-Sofe-Reference" class="headerlink" title="2. 软引用(Sofe Reference)"></a>2. 软引用(Sofe Reference)</h4><p><strong>有用但并非必需</strong> 的对象，可用<code>SoftReference</code>类来实现软引用。在系统将要发生<strong>内存溢出异常</strong>之前，将会把这些对象列进回收范围之中进行<strong>二次回收</strong>。如果这次回收还没有足够的内存，才会抛出内存溢出异常。</p>
+<h4 id="3-弱引用-Weak-Reference"><a href="#3-弱引用-Weak-Reference" class="headerlink" title="3. 弱引用(Weak Reference)"></a>3. 弱引用(Weak Reference)</h4><p><strong>非必需</strong> 的对象，但它的<strong>强度</strong>比软引用更弱，被弱引用关联的对象<strong>只能</strong>生存到下一次垃圾收集发生之前，<code>JDK</code>提供了<code>WeakReference</code>类来实现弱引用。无论当前内存是否足够，用软引用相关联的对象都会被回收掉。</p>
+<h4 id="4-虚引用-Phantom-Reference"><a href="#4-虚引用-Phantom-Reference" class="headerlink" title="4. 虚引用(Phantom Reference)"></a>4. 虚引用(Phantom Reference)</h4><p>虚引用也称为幽灵引用或幻影引用，是最弱的一种引用关系，<code>JDK</code>提供了<code>PhantomReference</code>类来实现虚引用。为一个对象设置虚引用的唯一目的是：能在这个对象在<strong>垃圾回收器</strong>回收时收到一个<strong>系统通知</strong>。</p>
 <h2 id="三-finalize-二次标记"><a href="#三-finalize-二次标记" class="headerlink" title="(三). finalize()二次标记"></a>(三). finalize()二次标记</h2><p>一个对象是否应该在垃圾回收器在<code>GC</code>时回收，至少要经历<strong>两次标记过程</strong>。</p>
-<p>第一次标记过程，通过<strong>可达性分析算法</strong>分析对象是否与<code>GC Roots</code>可达。经过第一次标记，并且被筛选为<strong>不可达</strong>的对象会进行第二次标记。</p>
-<p>第二次标记过程，判断不可达对象是否有必要执行<code>finalize</code>方法。执行条件是当前对象的<code>finalize</code>方法被重写，并且还未被系统调用过。如果允许执行那么这个对象将会被放到一个叫<code>F-Query</code>的队列中，等待被执行。</p>
+<h3 id="第一次标记过程"><a href="#第一次标记过程" class="headerlink" title="第一次标记过程"></a>第一次标记过程</h3><p>通过 <strong>可达性分析算法</strong> 分析对象是否与<code>GC Roots</code>可达。经过第一次标记，并且被筛选为<strong>不可达</strong>的对象会进行第二次标记。</p>
+<h3 id="第二次标记过程"><a href="#第二次标记过程" class="headerlink" title="第二次标记过程"></a>第二次标记过程</h3><p>判断不可达对象是否有必要执行<code>finalize</code>方法。执行条件是当前对象的<code>finalize</code>方法被重写，并且还未被系统调用过。如果允许执行那么这个对象将会被放到一个叫<code>F-Query</code>的队列中，等待被执行。</p>
 <blockquote>
 <p><strong>注意</strong>：由于<code>finalize</code>由一个优先级比较低的<code>Finalizer</code>线程运行，所以该对象的的<code>finalize</code>方法不一定被执行，即使被执行了，也不保证<code>finalize</code>方法一定会执行完。如果对象第二次小规模标记，即<code>finalize</code>方法中拯救自己，只需要重新和引用链上的任一对象建立关联即可。</p>
 </blockquote>
-<p><br></p>
 <h2 id="四-垃圾回收算法"><a href="#四-垃圾回收算法" class="headerlink" title="(四). 垃圾回收算法"></a>(四). 垃圾回收算法</h2><p>本节具体介绍一下各种垃圾回收算法的思想：</p>
 <h3 id="1-标记-清除算法"><a href="#1-标记-清除算法" class="headerlink" title="1. 标记-清除算法"></a>1. 标记-清除算法</h3><p>标记-清除算法对<strong>根集合</strong>进行扫描，对<strong>存活</strong>的对象进行标记。标记完成后，再对整个空间内<strong>未被标记</strong>的对象扫描，进行回收。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/3818ee3cfb6575e5aed715eaa66c2d55" alt=""></p>
+<h4 id="1-1-标记阶段"><a href="#1-1-标记阶段" class="headerlink" title="1.1. 标记阶段"></a>1.1. 标记阶段</h4><p>标记阶段，通过根节点，标记所有从根节点开始的可达对象，未标记过的对象就是未被引用的垃圾对象。</p>
+<h4 id="1-2-清除阶段"><a href="#1-2-清除阶段" class="headerlink" title="1.2. 清除阶段"></a>1.2. 清除阶段</h4><p>清除阶段，清除所有未被标记的对象。</p>
 <ul>
-<li><strong>优点</strong>：</li>
+<li><p><strong>优点</strong>：实现简单，不需要进行对象进行移动。</p>
+</li>
+<li><p><strong>缺点</strong>：标记、清除过程效率低，产生大量不连续的内存碎片，提高了垃圾回收的频率。</p>
+</li>
 </ul>
-<pre><code>实现简单，不需要进行对象进行移动。
-</code></pre><ul>
-<li><strong>缺点</strong>：</li>
-</ul>
-<pre><code>标记、清除过程效率低，产生大量不连续的内存碎片，提高了垃圾回收的频率。
-</code></pre><h3 id="2-复制算法"><a href="#2-复制算法" class="headerlink" title="2. 复制算法"></a>2. 复制算法</h3><p>这种收集算法解决了标记清除算法存在的效率问题。它将内存区域划分成相同的两个<strong>内存块</strong>。每次仅使用一半的空间，<code>JVM</code>生成的新对象放在一半空间中。当一半空间用完时进行<code>GC</code>，把可到达对象复制到另一半空间，然后把使用过的内存空间一次清理掉。</p>
+<h3 id="2-复制算法"><a href="#2-复制算法" class="headerlink" title="2. 复制算法"></a>2. 复制算法</h3><p>这种收集算法解决了标记清除算法存在的效率问题。它将内存区域划分成相同的两个 <strong>内存块</strong>。每次仅使用一半的空间，<code>JVM</code>生成的新对象放在一半空间中。当一半空间用完时进行<code>GC</code>，把可到达对象复制到另一半空间，然后把使用过的内存空间一次清理掉。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/af24941b358a62a73976dfbbfc0656da" alt=""></p>
 <ul>
-<li><strong>优点</strong>：</li>
+<li><p><strong>优点</strong>：按顺序分配内存即可，实现简单、运行高效，不用考虑内存碎片。</p>
+</li>
+<li><p><strong>缺点</strong>：可用的内存大小缩小为原来的一半，对象存活率高时会频繁进行复制。</p>
+</li>
 </ul>
-<pre><code>按顺序分配内存即可，实现简单、运行高效，不用考虑内存碎片。
-</code></pre><ul>
-<li><strong>缺点</strong>：</li>
-</ul>
-<pre><code>可用的内存大小缩小为原来的一半，对象存活率高时会频繁进行复制。
-</code></pre><h3 id="3-标记-整理算法"><a href="#3-标记-整理算法" class="headerlink" title="3. 标记-整理算法"></a>3. 标记-整理算法</h3><p><strong>标记-整理算法</strong> 采用和 <strong>标记-清除算法</strong> 一样的方式进行对象的标记，但后续不直接对可回收对象进行清理，而是将所有的<strong>存活对象</strong>往一端<strong>空闲空间</strong>移动，然后清理掉端边界以外的内存空间。</p>
+<h3 id="3-标记-整理算法"><a href="#3-标记-整理算法" class="headerlink" title="3. 标记-整理算法"></a>3. 标记-整理算法</h3><p><strong>标记-整理算法</strong> 采用和 <strong>标记-清除算法</strong> 一样的方式进行对象的标记，但后续不直接对可回收对象进行清理，而是将所有的 <strong>存活对象</strong> 往一端 <strong>空闲空间</strong> 移动，然后清理掉端边界以外的内存空间。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/b815b8cb4355c11930f444d544128870" alt=""></p>
 <ul>
-<li><strong>优点</strong>：</li>
+<li><p><strong>优点</strong>：解决了标记-清理算法存在的内存碎片问题。</p>
+</li>
+<li><p><strong>缺点</strong>：仍需要进行局部对象移动，一定程度上降低了效率。</p>
+</li>
 </ul>
-<pre><code>解决了标记-清理算法存在的内存碎片问题。
-</code></pre><ul>
-<li><strong>缺点</strong>：</li>
-</ul>
-<pre><code>仍需要进行局部对象移动，一定程度上降低了效率。
-</code></pre><h3 id="4-分代收集算法"><a href="#4-分代收集算法" class="headerlink" title="4. 分代收集算法"></a>4. 分代收集算法</h3><p>当前商业虚拟机都采用<strong>分代收集</strong>的垃圾收集算法。分代收集算法，顾名思义是根据对象的<strong>存活周期</strong>将内存划分为几块。一般包括<strong>年轻代</strong>、<strong>老年代</strong> 和 <strong>永久代</strong>，如图所示：<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/GC_Generation_ALL.png" alt=""></p>
+<h3 id="4-分代收集算法"><a href="#4-分代收集算法" class="headerlink" title="4. 分代收集算法"></a>4. 分代收集算法</h3><p>当前商业虚拟机都采用<strong>分代收集</strong>的垃圾收集算法。分代收集算法，顾名思义是根据对象的<strong>存活周期</strong>将内存划分为几块。一般包括<strong>年轻代</strong>、<strong>老年代</strong> 和 <strong>永久代</strong>，如图所示：<br><img src="http://ols3fdyll.bkt.clouddn.com/image/png/GC_Generation_ALL.png" alt=""></p>
 <h4 id="新生代（Young-generation）"><a href="#新生代（Young-generation）" class="headerlink" title="新生代（Young generation）"></a>新生代（Young generation）</h4><p>绝大多数最新被创建的对象会被分配到这里，由于<strong>大部分对象</strong>在创建后会很快变得<strong>不可达</strong>，所以很多对象被创建在<strong>新生代</strong>，然后<strong>消失</strong>。对象从这个区域消失的过程我们称之为 <code>minor GC</code>。</p>
 <p><strong>新生代</strong> 中存在一个<code>Eden</code>区和两个<code>Survivor</code>区。新对象会首先分配在<code>Eden</code>中（如果新对象过大，会直接分配在老年代中）。在<code>GC</code>中，<code>Eden</code>中的对象会被移动到<code>Survivor</code>中，直至对象满足一定的年纪（定义为熬过<code>GC</code>的次数），会被移动到<strong>老年代</strong>。</p>
 <p>可以设置<strong>新生代</strong>和<strong>老年代</strong>的相对大小。这种方式的优点是新生代大小会随着整个<strong>堆</strong>大小<strong>动态扩展</strong>。参数 <code>-XX:NewRatio</code> 设置<strong>老年代</strong>与<strong>新生代</strong>的比例。例如 <code>-XX:NewRatio=8</code> 指定 <strong>老年代/新生代</strong> 为<code>8/1</code>. <strong>老年代</strong> 占堆大小的 <code>7/8</code> ，<strong>新生代</strong> 占堆大小的 <code>1/8</code>（默认即是 <code>1/8</code>）。</p>
 <p>例如：</p>
-<pre><code>-XX:NewSize=64m -XX:MaxNewSize=1024m -XX:NewRatio=8
-</code></pre><h4 id="老年代（Old-generation）"><a href="#老年代（Old-generation）" class="headerlink" title="老年代（Old generation）"></a>老年代（Old generation）</h4><p>对象没有变得不可达，并且从新生代中<strong>存活</strong>下来，会被<strong>拷贝</strong>到这里。其所占用的空间要比新生代多。也正由于其相对<strong>较大的空间</strong>，发生在<strong>老年代</strong>上的<code>GC</code>要比<strong>新生代</strong>要<strong>少得多</strong>。对象从<strong>老年代</strong>中消失的过程，可以称之为<code>major GC</code>（或者<code>full GC</code>）。</p>
-<h4 id="永久代（permanent-generation）"><a href="#永久代（permanent-generation）" class="headerlink" title="永久代（permanent generation）"></a>永久代（permanent generation）</h4><p>像一些<strong>类的层级信息</strong>，<strong>方法数据</strong> 和<strong>方法信息</strong>（如<strong>字节码</strong>，<strong>栈</strong> 和 <strong>变量大小</strong>），<strong>运行时常量池</strong>（<code>JDK7</code>之后移出<strong>永久代</strong>），已确定的<strong>符号引用</strong>和<strong>虚方法表</strong>等等。它们几乎都是<strong>静态的</strong>并且<strong>很少</strong>被<strong>卸载和回收</strong>，在<code>JDK8</code>之前的<code>HotSpot</code>虚拟机中，类的这些<strong>“永久的”</strong> 数据存放在一个叫做<strong>永久代</strong>的区域。</p>
-<p>永久代一段<strong>连续的内存空间</strong>，我们在<code>JVM</code>启动之前可以通过设置<code>-XX:MaxPermSize</code>的值来控制永久代的大小。但是<code>JDK8</code>之后取消了永久代，这些<strong>元数据</strong>被移到了一个与堆<strong>不相连</strong>的称为<strong>元空间</strong> (<code>Metaspace</code>) 的<strong>本地内存区域</strong>。</p>
-<h4 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h4><p><code>JDK8</code>堆内存一般是划分为<strong>年轻代</strong>和<strong>老年代</strong>，<strong>不同年代</strong> 根据自身特性采用<strong>不同的垃圾收集算法</strong>。</p>
-<p>对于<strong>新生代</strong>，每次<code>GC</code>时都有<strong>大量</strong>的对象死亡，只有<strong>少量</strong>对象存活。考虑到复制成本低，适合采用<strong>复制算法</strong>。因此有了<code>From Survivor</code>和<code>To Survivor</code>区域。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:NewSize=64m -XX:MaxNewSize=1024m -XX:NewRatio=8</span><br></pre></td></tr></table></figure>
+<h4 id="老年代（Old-generation）"><a href="#老年代（Old-generation）" class="headerlink" title="老年代（Old generation）"></a>老年代（Old generation）</h4><p>对象没有变得不可达，并且从新生代中<strong>存活</strong>下来，会被<strong>拷贝</strong>到这里。其所占用的空间要比新生代多。也正由于其相对<strong>较大的空间</strong>，发生在<strong>老年代</strong>上的<code>GC</code>要比<strong>新生代</strong>要<strong>少得多</strong>。对象从<strong>老年代</strong>中消失的过程，可以称之为<code>major GC</code>（或者<code>full GC</code>）。</p>
+<h4 id="永久代（permanent-generation）"><a href="#永久代（permanent-generation）" class="headerlink" title="永久代（permanent generation）"></a>永久代（permanent generation）</h4><p>像一些 <strong>类的层级信息</strong>，<strong>方法数据</strong> 和 <strong>方法信息</strong>（如 <strong>字节码</strong>，<strong>栈</strong> 和 <strong>变量大小</strong>），<strong>运行时常量池</strong>（<code>JDK7</code>之后移出 <strong>永久代</strong>），已确定的 <strong>符号引用</strong> 和 <strong>虚方法表</strong> 等等。它们几乎都是 <strong>静态的</strong> 并且 <strong>很少</strong> 被 <strong>卸载和回收</strong>，在 <code>JDK8</code> 之前的 <code>HotSpot</code> 虚拟机中，类的这些 <strong>永久的</strong> 数据存放在一个叫做 <strong>永久代</strong> 的区域。</p>
+<p><strong>永久代</strong> 是一段 <strong>连续的内存空间</strong>，我们在<code>JVM</code>启动之前可以通过设置 <code>-XX:MaxPermSize</code> 的值来控制永久代的大小。但是<code>JDK8</code>之后取消了 <strong>永久代</strong>，这些 <strong>元数据</strong> 被移到了一个与堆 <strong>不相连</strong> 的称为 <strong>元空间</strong> (<code>Metaspace</code>) 的 <strong>本地内存区域</strong>。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p><code>JDK8</code>堆内存一般是划分为 <strong>年轻代</strong> 和 <strong>老年代</strong>，<strong>不同年代</strong> 根据自身特性采用<strong>不同的垃圾收集算法</strong>。</p>
+<p>对于 <strong>新生代</strong>，每次<code>GC</code>时都有<strong>大量</strong>的对象死亡，只有 <strong>少量</strong> 对象存活。考虑到复制成本低，适合采用<strong>复制算法</strong>。因此有了<code>From Survivor</code>和<code>To Survivor</code>区域。</p>
 <p>对于<strong>老年代</strong>，因为对象<strong>存活率高</strong>，没有额外的内存空间对它进行担保。因而适合采用<strong>标记-清理算法</strong>和<strong>标记-整理算法</strong>进行回收。</p>
 <h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>周志明，深入理解Java虚拟机：JVM高级特性与最佳实践，机械工业出版社</p>
 <hr>
@@ -540,7 +538,7 @@ ga('send', 'pageview');
     <div class="widget-wrap">
         <h3 class="widget-title">分类</h3>
         <div class="widget">
-            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java虚拟机系列/">Java虚拟机系列</a><span class="category-list-count">4</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL学习系列/">MySQL学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RxJava异步框架系列/">RxJava异步框架系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Reactive编程系列/">Spring Reactive编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/任务调度框架系列/">任务调度框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/加密算法系列/">加密算法系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术知识图谱/">技术知识图谱</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/测试框架系列/">测试框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/消息队列系列/">消息队列系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/高并发系统系列/">高并发系统系列</a><span class="category-list-count">2</span></li></ul>
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL学习系列/">MySQL学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RxJava异步框架系列/">RxJava异步框架系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Reactive编程系列/">Spring Reactive编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/任务调度框架系列/">任务调度框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/加密算法系列/">加密算法系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术知识图谱/">技术知识图谱</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/测试框架系列/">测试框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/消息队列系列/">消息队列系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/高并发系统系列/">高并发系统系列</a><span class="category-list-count">2</span></li></ul>
         </div>
     </div>
 
