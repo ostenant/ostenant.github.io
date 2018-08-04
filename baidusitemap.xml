@@ -5,7 +5,7 @@
     
   <url>
     <loc>https://ostenant.coding.me/2018/08/03/JVM%E7%B3%BB%E5%88%97(%E5%85%AD)%20-%20JVM%E5%9E%83%E5%9C%BE%E5%9B%9E%E6%94%B6%E5%99%A8/</loc>
-    <lastmod>2018-08-04T02:28:26.831Z</lastmod>
+    <lastmod>2018-08-04T02:43:52.468Z</lastmod>
     <data>
         <display>
         <title>JVM系列(六) - JVM垃圾回收器</title>
@@ -121,9 +121,9 @@
         
         <tag>Docker</tag>
          
-        <tag>Nginx</tag>
-         
         <tag>Consul</tag>
+         
+        <tag>Nginx</tag>
          
         <tag>Consul-template</tag>
          
