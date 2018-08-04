@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>JVM系列(六) - JVM垃圾回收器 | Icarus&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="前言在之前的几篇博客中，我们大致介绍了，常见的 垃圾回收算法 及 JVM 中常见的分类回收算法。这些都是从算法和规范上分析 Java 中的垃圾回收，属于方法论。在 JVM 中，垃圾回收的具体实现是由 垃圾回收器（Garbage Collector）负责的。">
+<meta name="keywords" content="JVM">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM系列(六) - JVM垃圾回收器">
+<meta property="og:url" content="https://ostenant.coding.me/2018/08/03/JVM系列(六) - JVM垃圾回收器/index.html">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
+<meta property="og:description" content="前言在之前的几篇博客中，我们大致介绍了，常见的 垃圾回收算法 及 JVM 中常见的分类回收算法。这些都是从算法和规范上分析 Java 中的垃圾回收，属于方法论。在 JVM 中，垃圾回收的具体实现是由 垃圾回收器（Garbage Collector）负责的。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/GC_Root_1.jpg">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Con_Mark.jpg">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Copy.jpg">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Copy_2.jpg">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/v2-9941ceb1fed65b89f653a0b6f6894874_hd.jpg">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Garbage-Collector-set.jpg">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/parnew-and-serail-old.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/parallel-old-and-parallel-scavenge.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/concurrent-mark-sweep-garbage-collector.png">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/v2-2775cf0531dead36d56049fc36598a91_hd.jpg">
+<meta property="og:image" content="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240">
+<meta property="og:updated_time" content="2018-08-04T02:28:26.831Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JVM系列(六) - JVM垃圾回收器">
+<meta name="twitter:description" content="前言在之前的几篇博客中，我们大致介绍了，常见的 垃圾回收算法 及 JVM 中常见的分类回收算法。这些都是从算法和规范上分析 Java 中的垃圾回收，属于方法论。在 JVM 中，垃圾回收的具体实现是由 垃圾回收器（Garbage Collector）负责的。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/GC_Root_1.jpg">
+    
+
+    
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/cat.png" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fontawesome.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-brands.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-solid.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'true', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+        <meta name="google-site-verification" content="true" />
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Icarus&#39;s Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpeg" />
+                            <i class="fas fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fas fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpeg" />
+            <h2 id="name">陈林 | Icarus</h2>
+            <h3 id="title">年轻无为，卖码为生!</h3>
+            <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
+            <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                66
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                83
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/ostenant" target="_blank" title="github" class=tooltip>
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fab fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="linkedin" class=tooltip>
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fab fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-JVM系列(六) - JVM垃圾回收器" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            JVM系列(六) - JVM垃圾回收器
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2018/08/03/JVM系列(六) - JVM垃圾回收器/">
+            <time datetime="2018-08-02T22:58:00.000Z" itemprop="datePublished">2018-08-03</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/JVM/">JVM</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在之前的几篇博客中，我们大致介绍了，常见的 <strong>垃圾回收算法</strong> 及 <code>JVM</code> 中常见的分类回收算法。这些都是从算法和规范上分析 <code>Java</code> 中的垃圾回收，属于方法论。在 <code>JVM</code> 中，垃圾回收的具体实现是由 <strong>垃圾回收器</strong>（<code>Garbage Collector</code>）负责的。</p>
+<a id="more"></a>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在了解垃圾回收器之前，首先得了解一下垃圾回收器的几个名词。</p>
+<h3 id="1-吞吐量"><a href="#1-吞吐量" class="headerlink" title="1. 吞吐量"></a>1. 吞吐量</h3><p><code>CPU</code> 用于运行用户代码的时间与 <code>CPU</code> 总消耗时间的比值。比如说虚拟机总运行了 <code>100</code> 分钟，<strong>用户代码</strong> 时间 <code>99</code> 分钟，<strong>垃圾回收</strong> 时间 <code>1</code> 分钟，那么吞吐量就是 <code>99%</code>。</p>
+<blockquote>
+<p>吞吐量 = 运行用户代码时间/（运行用户代码时间 + 垃圾回收时间）</p>
+</blockquote>
+<h3 id="2-停顿时间"><a href="#2-停顿时间" class="headerlink" title="2. 停顿时间"></a>2. 停顿时间</h3><p><strong>停顿时间</strong> 指垃圾回收器正在运行时，<strong>应用程序</strong> 的 <strong>暂停时间</strong>。对于 <strong>独占回收器</strong> 而言，停顿时间可能会比较长。使用 <strong>并发回收器</strong> 时，由于垃圾回收器和应用程序 <strong>交替运行</strong>，程序的 <strong>停顿时间</strong> 会变短，但是，由于其 <strong>效率</strong> 很可能不如独占垃圾回收器，故系统的 <strong>吞吐量</strong> 可能会较低。</p>
+<h3 id="3-GC的名词"><a href="#3-GC的名词" class="headerlink" title="3. GC的名词"></a>3. GC的名词</h3><h4 id="3-1-新生代GC（Minor-GC）"><a href="#3-1-新生代GC（Minor-GC）" class="headerlink" title="3.1. 新生代GC（Minor GC）"></a>3.1. 新生代GC（Minor GC）</h4><p>指发生在 <strong>新生代</strong> 的垃圾回收动作，因为 <code>Java</code> 对象大多都具备 <strong>朝生夕死</strong> 的特性，所以 <code>Minor GC</code> 通常 <strong>非常频繁</strong>，一般回收速度也比较快。</p>
+<h4 id="3-2-老年代GC（Major-GC）"><a href="#3-2-老年代GC（Major-GC）" class="headerlink" title="3.2. 老年代GC（Major GC）"></a>3.2. 老年代GC（Major GC）</h4><p>指发生在 <strong>老年代</strong> 的垃圾回收动作，出现了 <code>Major GC</code>，经常会伴随至少一次的 <code>Minor GC</code>（发生这种情况，那么 <strong>整个堆</strong> 都 <code>GC</code> 一遍，通常称为 <code>Full GC</code>）。<code>Major GC</code> 的速度一般会比 <code>Minor GC</code> 慢 <code>10</code> 倍以上。</p>
+<h3 id="4-并发与并行"><a href="#4-并发与并行" class="headerlink" title="4. 并发与并行"></a>4. 并发与并行</h3><h4 id="4-1-串行（Parallel）"><a href="#4-1-串行（Parallel）" class="headerlink" title="4.1. 串行（Parallel）"></a>4.1. 串行（Parallel）</h4><p><strong>单线程</strong> 进行垃圾回收工作，但此时 <strong>用户线程</strong> 仍然处于 <strong>等待状态</strong>。</p>
+<h4 id="4-2-并发（Concurrent）"><a href="#4-2-并发（Concurrent）" class="headerlink" title="4.2. 并发（Concurrent）"></a>4.2. 并发（Concurrent）</h4><p>这里的并发指 <strong>用户线程</strong> 与 <strong>垃圾回收线程</strong> 交替执行。</p>
+<h4 id="4-3-并行（Parallel）"><a href="#4-3-并行（Parallel）" class="headerlink" title="4.3. 并行（Parallel）"></a>4.3. 并行（Parallel）</h4><p>这里的并行指 <strong>用户线程</strong> 和多条 <strong>垃圾回收线程</strong> 分别在不同 <code>CPU</code> 上同时工作。</p>
+<h2 id="垃圾回收算法"><a href="#垃圾回收算法" class="headerlink" title="垃圾回收算法"></a>垃圾回收算法</h2><h3 id="1-根搜索算法"><a href="#1-根搜索算法" class="headerlink" title="1. 根搜索算法"></a>1. 根搜索算法</h3><p><strong>根搜索算法</strong> 是从 <strong>离散数学</strong> 中的图论引入的，程序把所有引用关系看作一张图，从一个节点 <code>GC ROOT</code> 开始，寻找对应的 <strong>引用节点</strong>，找到这个节点后，继续寻找 <strong>这个节点</strong> 的 <strong>引用节点</strong>。当所有的引用节点寻找完毕后，<strong>剩余的节点</strong> 则被认为是 <strong>没有被引用到</strong> 的节点，即 <strong>无用</strong> 的节点。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/GC_Root_1.jpg" alt=""></p>
+<p>上图 <strong>红色</strong> 为无用的节点，可以被 <strong>回收</strong>。目前 <code>Java</code> 中可以作为 <code>GC ROOT</code> 的对象有：</p>
+<ol>
+<li><p><strong>虚拟机栈</strong> 中引用的对象（本地变量表）；</p>
+</li>
+<li><p><strong>方法区</strong> 中 <strong>静态变量</strong> 引用的对象；</p>
+</li>
+<li><p><strong>方法区</strong> 中 <strong>常量</strong> 引用的对象；</p>
+</li>
+<li><p><strong>本地方法栈</strong> 中引用的对象（<code>Native</code> 对象）。</p>
+</li>
+</ol>
+<blockquote>
+<p>基本所有 <code>GC</code> 算法都引用 <strong>根搜索算法</strong> 这种概念。</p>
+</blockquote>
+<h3 id="2-标记-清除算法"><a href="#2-标记-清除算法" class="headerlink" title="2. 标记 - 清除算法"></a>2. 标记 - 清除算法</h3><p><strong>标记-清除算法</strong> 从 <strong>根集合</strong> 进行扫描，对 <strong>存活的对象</strong> 进行 <strong>标记</strong>。标记完毕后，再扫描整个空间中 <strong>未被标记</strong> 的对象进行 <strong>直接回收</strong>，如下图所示：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Con_Mark.jpg" alt=""></p>
+<p><strong>标记-清除算法</strong> 不需要进行 <strong>对象的移动</strong>，并且仅对 <strong>不存活</strong> 的对象进行处理，在 <strong>存活</strong> 的对象 <strong>比较多</strong> 的情况下 <strong>极为高效</strong>。但由于 <strong>标记-清除算法</strong> 直接回收不存活的对象，并没有对还存活的对象进行 <strong>整理</strong>，因此会导致 <strong>内存碎片</strong>。</p>
+<h3 id="3-复制算法"><a href="#3-复制算法" class="headerlink" title="3. 复制算法"></a>3. 复制算法</h3><p><strong>复制算法</strong> 将内存划分为 <strong>两个区间</strong>，使用此算法时，所有 <strong>动态分配</strong> 的对象都只能分配在 <strong>其中一个</strong> 区间（<strong>活动区间</strong>），而 <strong>另外一个</strong> 区间（<strong>空间区间</strong>）则是 <strong>空闲</strong> 的。</p>
+<p><strong>复制算法</strong> 同样从 <strong>根集合</strong> 扫描，将 <strong>存活</strong> 的对象 <strong>复制</strong> 到 <strong>空闲区间</strong>。当扫描完毕活动区间后，会的将 <strong>活动区间</strong> 一次性全部 <strong>回收</strong>。此时原本的 <strong>空闲区间</strong> 变成了 <strong>活动区间</strong>。下次 <code>GC</code> 时候又会重复刚才的操作，以此循环。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Copy.jpg" alt=""></p>
+<p><strong>复制算法</strong> 在存活对象 <strong>比较少</strong> 的时候，极为高效，但是带来的成本是 <strong>牺牲一半的内存空间</strong> 用于进行 <strong>对象的移动</strong>。所以 <strong>复制算法</strong> 的使用场景，必须是对象的 <strong>存活率非常低</strong> 才行。最重要的是，我们需要克服 <code>50%</code> 的 <strong>内存浪费</strong>。</p>
+<h3 id="4-标记-整理算法"><a href="#4-标记-整理算法" class="headerlink" title="4. 标记 - 整理算法"></a>4. 标记 - 整理算法</h3><p><strong>标记-整理算法</strong> 采用 <strong>标记-清除算法</strong> 一样的方式进行对象的 <strong>标记</strong>，但在回收 <strong>不存活的对象</strong> 占用的空间后，会将所有 <strong>存活的对象</strong> 往 左端空闲空间 <strong>移动</strong>，并更新对应的指针。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Copy_2.jpg" alt=""></p>
+<p><strong>标记-整理</strong> 是在 <strong>标记-清除</strong> 之上，又进行了 <strong>对象的移动排序整理</strong>，因此 <strong>成本更高</strong>，但却解决了 <strong>内存碎片</strong> 的问题。</p>
+<blockquote>
+<p><code>JVM</code> 为了 <strong>优化内存</strong> 的回收，使用了 <strong>分代回收</strong> 的方式。对于 <strong>新生代内存</strong> 的回收（<code>Minor GC</code>）主要采用 <strong>复制算法</strong>。而对于 <strong>老年代内存</strong> 的回收（<code>Major GC</code>），大多采用 <strong>标记-整理算法</strong>。</p>
+</blockquote>
+<h2 id="垃圾回收器"><a href="#垃圾回收器" class="headerlink" title="垃圾回收器"></a>垃圾回收器</h2><h3 id="1-垃圾回收器分类标准"><a href="#1-垃圾回收器分类标准" class="headerlink" title="1. 垃圾回收器分类标准"></a>1. 垃圾回收器分类标准</h3><p><img src="http://ols3fdyll.bkt.clouddn.com/v2-9941ceb1fed65b89f653a0b6f6894874_hd.jpg" alt=""></p>
+<h3 id="2-七种垃圾回收器概述"><a href="#2-七种垃圾回收器概述" class="headerlink" title="2. 七种垃圾回收器概述"></a>2. 七种垃圾回收器概述</h3><p>在 <code>JVM</code> 中，具体实现有 <code>Serial</code>、<code>ParNew</code>、<code>Parallel Scavenge</code>、<code>CMS</code>、<code>Serial Old（MSC）</code>、<code>Parallel Old</code>、<code>G1</code> 等。在下图中，你可以看到 <strong>不同垃圾回收器</strong> 适合于 <strong>不同的内存区域</strong>，如果两个垃圾回收器之间 <strong>存在连线</strong>，那么表示两者可以 <strong>配合使用</strong>。</p>
+<p>如果当 <strong>垃圾回收器</strong> 进行垃圾清理时，必须 <strong>暂停</strong> 其他所有的 <strong>工作线程</strong>，直到它完全收集结束。我们称这种需要暂停工作线程才能进行清理的策略为 <code>Stop-the-World</code>。以上回收器中，   <code>Serial</code>、<code>ParNew</code>、<code>Parallel Scavenge</code>、<code>Serial Old</code>、<code>Parallel Old</code> 均采用的是 <code>Stop-the-World</code> 的策略。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Garbage-Collector-set.jpg" alt=""></p>
+<p>图中有 <code>7</code> 种不同的 <strong>垃圾回收器</strong>，它们分别用于不同分代的垃圾回收。</p>
+<ul>
+<li><p><strong>新生代回收器</strong>：Serial、ParNew、Parallel Scavenge</p>
+</li>
+<li><p><strong>老年代回收器</strong>：Serial Old、Parallel Old、CMS</p>
+</li>
+<li><p><strong>整堆回收器</strong>：G1</p>
+</li>
+</ul>
+<p>两个 <strong>垃圾回收器</strong> 之间有连线表示它们可以 <strong>搭配使用</strong>，可选的搭配方案如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">新生代</th>
+<th style="text-align:left">老年代</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Serial</td>
+<td style="text-align:left">Serial Old</td>
+</tr>
+<tr>
+<td style="text-align:left">Serial</td>
+<td style="text-align:left">CMS</td>
+</tr>
+<tr>
+<td style="text-align:left">ParNew</td>
+<td style="text-align:left">Serial Old</td>
+</tr>
+<tr>
+<td style="text-align:left">ParNew</td>
+<td style="text-align:left">CMS</td>
+</tr>
+<tr>
+<td style="text-align:left">Parallel Scavenge</td>
+<td style="text-align:left">Serial Old</td>
+</tr>
+<tr>
+<td style="text-align:left">Parallel Scavenge</td>
+<td style="text-align:left">Parallel Old</td>
+</tr>
+<tr>
+<td style="text-align:left">G1</td>
+<td style="text-align:left">G1</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-单线程垃圾回收器"><a href="#3-单线程垃圾回收器" class="headerlink" title="3. 单线程垃圾回收器"></a>3. 单线程垃圾回收器</h3><h4 id="3-1-Serial（-XX-UseSerialGC）"><a href="#3-1-Serial（-XX-UseSerialGC）" class="headerlink" title="3.1. Serial（-XX:+UseSerialGC）"></a>3.1. Serial（-XX:+UseSerialGC）</h4><p><code>Serial</code> 回收器是最基本的 <strong>新生代</strong> 垃圾回收器，是 <strong>单线程</strong> 的垃圾回收器。由于垃圾清理时，<code>Serial</code> <strong>回收器</strong> 不存在 <strong>线程间的切换</strong>，因此，特别是在单 <code>CPU</code> 的环境下，它的 <strong>垃圾清除效率</strong> 比较高。对于 <code>Client</code> 运行模式的程序，选择 <code>Serial</code> 回收器是一个不错的选择。</p>
+<p><code>Serial</code> <strong>新生代回收器</strong> 采用的是 <strong>复制算法</strong>。</p>
+<h4 id="3-2-Serial-Old（-XX-UseSerialGC）"><a href="#3-2-Serial-Old（-XX-UseSerialGC）" class="headerlink" title="3.2. Serial Old（-XX:+UseSerialGC）"></a>3.2. Serial Old（-XX:+UseSerialGC）</h4><p><code>Serial Old</code> 回收器是 <code>Serial</code> 回收器的 <strong>老生代版本</strong>，属于 <strong>单线程回收器</strong>，它使用 <strong>标记-整理</strong> 算法。对于 <code>Server</code> 模式下的虚拟机，在 <code>JDK1.5</code> 及其以前，它常与 <code>Parallel Scavenge</code> 回收器配合使用，达到较好的 <strong>吞吐量</strong>，另外它也是 <code>CMS</code> 回收器在 <code>Concurrent Mode Failure</code> 时的 <strong>后备方案</strong>。</p>
+<p><code>Serial</code> 回收器和 <code>Serial Old</code> 回收器的执行效果如下：</p>
+<blockquote>
+<p><code>Serial Old</code> <strong>老年代回收器</strong> 采用的是 <strong>标记 - 整理算法</strong>。</p>
+</blockquote>
+<h3 id="4-多线程垃圾回收器（吞吐量优先）"><a href="#4-多线程垃圾回收器（吞吐量优先）" class="headerlink" title="4. 多线程垃圾回收器（吞吐量优先）"></a>4. 多线程垃圾回收器（吞吐量优先）</h3><h4 id="4-1-ParNew（-XX-UseParNewGC）"><a href="#4-1-ParNew（-XX-UseParNewGC）" class="headerlink" title="4.1. ParNew（-XX:+UseParNewGC）"></a>4.1. ParNew（-XX:+UseParNewGC）</h4><p><code>ParNew</code> 回收器是在 <code>Serial</code> 回收器的基础上演化而来的，属于 <code>Serial</code> 回收器的 <strong>多线程版本</strong>，同样运行在 <strong>新生代区域</strong>。在实现上，两者共用很多代码。在不同运行环境下，根据 <code>CPU</code> 核数，开启 <strong>不同的线程数</strong>，从而达到 <strong>最优</strong> 的垃圾回收效果。对于那些 <code>Server</code> 模式的应用程序，如果考虑采用 <code>CMS</code> 作为 <strong>老生代回收器</strong> 时，<code>ParNew</code> 回收器是一个不错的选择。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/parnew-and-serail-old.png" alt=""></p>
+<blockquote>
+<p><code>ParNew</code> <strong>新生代回收器</strong> 采用的是 <strong>复制算法</strong>。</p>
+</blockquote>
+<h4 id="4-2-Parallel-Scavenge（-XX-UseParallelGC）"><a href="#4-2-Parallel-Scavenge（-XX-UseParallelGC）" class="headerlink" title="4.2. Parallel Scavenge（-XX:+UseParallelGC）"></a>4.2. Parallel Scavenge（-XX:+UseParallelGC）</h4><p>和 <code>ParNew</code> 回收一样，<code>Parallel Scavenge</code> 回收器也是运行在 <strong>新生代区域</strong>，属于 <strong>多线程</strong> 的回收器。但不同的是，<code>ParNew</code> 回收器是通过控制 <strong>垃圾回收</strong> 的 <strong>线程数</strong> 来进行参数调整，而 <code>Parallel Scavenge</code> 回收器更关心的是 <strong>程序运行的吞吐量</strong>。即一段时间内，<strong>用户代码</strong> 运行时间占 <strong>总运行时间</strong> 的百分比。</p>
+<blockquote>
+<p><code>Parallel Scavenge</code> <strong>新生代回收器</strong> 采用的是 <strong>复制算法</strong>。</p>
+</blockquote>
+<h4 id="4-3-Parallel-Old（-XX-UseParallelOldGC）"><a href="#4-3-Parallel-Old（-XX-UseParallelOldGC）" class="headerlink" title="4.3. Parallel Old（-XX:+UseParallelOldGC）"></a>4.3. Parallel Old（-XX:+UseParallelOldGC）</h4><p><code>Parallel Old</code> 回收器是 <code>Parallel Scavenge</code> 回收器的 <strong>老生代版本</strong>，属于 <strong>多线程回收器</strong>，采用 <strong>标记-整理算法</strong>。<code>Parallel Old</code> 回收器和 <code>Parallel Scavenge</code> 回收器同样考虑了 <strong>吞吐量优先</strong> 这一指标，非常适合那些 <strong>注重吞吐量</strong> 和 <code>CPU</code> <strong>资源敏感</strong> 的场合。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/parallel-old-and-parallel-scavenge.png" alt=""></p>
+<blockquote>
+<p><code>Parallel Old</code> <strong>老年代回收器</strong> 采用的是 <strong>标记 - 整理算法</strong>。</p>
+</blockquote>
+<h3 id="5-其他的回收器（停顿时间优先）"><a href="#5-其他的回收器（停顿时间优先）" class="headerlink" title="5. 其他的回收器（停顿时间优先）"></a>5. 其他的回收器（停顿时间优先）</h3><h4 id="5-1-CMS（-XX-UseConcMarkSweepGC）"><a href="#5-1-CMS（-XX-UseConcMarkSweepGC）" class="headerlink" title="5.1. CMS（-XX:+UseConcMarkSweepGC）"></a>5.1. CMS（-XX:+UseConcMarkSweepGC）</h4><p><code>CMS（Concurrent Mark Sweep）</code> 回收器是在 <strong>最短回收停顿时间</strong> 为前提的回收器，属于 <strong>多线程回收器</strong>，采用 <strong>标记-清除算法</strong>。</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/concurrent-mark-sweep-garbage-collector.png" alt=""></p>
+<p>相比之前的回收器，<code>CMS</code> 回收器的运作过程比较复杂，分为四步：</p>
+<ol>
+<li><strong>初始标记（CMS initial mark）</strong></li>
+</ol>
+<p><strong>初始标记</strong> 仅仅是标记 <code>GC Roots</code> 内 <strong>直接关联</strong> 的对象。这个阶段 <strong>速度很快</strong>，需要 <code>Stop the World</code>。</p>
+<ol start="2">
+<li><strong>并发标记（CMS concurrent mark）</strong></li>
+</ol>
+<p><strong>并发标记</strong> 进行的是 <code>GC Tracing</code>，从 <code>GC Roots</code> 开始对堆进行 <strong>可达性分析</strong>，找出 <strong>存活对象</strong>。</p>
+<ol start="3">
+<li><strong>重新标记（CMS remark）</strong></li>
+</ol>
+<p><strong>重新标记</strong> 阶段为了 <strong>修正</strong> 并发期间由于 <strong>用户进行运作</strong> 导致的 <strong>标记变动</strong> 的那一部分对象的 <strong>标记记录</strong>。这个阶段的 <strong>停顿时间</strong> 一般会比 <strong>初始标记阶段</strong> 稍长一些，但远比 <strong>并发标记</strong> 的时间短，也需要 <code>Stop The World</code>。</p>
+<ol start="4">
+<li><strong>并发清除（CMS concurrent sweep）</strong></li>
+</ol>
+<p><strong>并发清除</strong> 阶段会清除垃圾对象。</p>
+<blockquote>
+<p><strong>初始标记</strong>（<code>CMS initial mark</code>）和 <strong>重新标记</strong>（<code>CMS remark</code>）会导致 <strong>用户线程</strong> 卡顿，<code>Stop the World</code> 现象发生。</p>
+</blockquote>
+<p>在整个过程中，<code>CMS</code> 回收器的 <strong>内存回收</strong> 基本上和 <strong>用户线程</strong> 并发执行，如下所示：</p>
+<p>由于 <code>CMS</code> 回收器 <strong>并发收集</strong>、<strong>停顿低</strong>，因此有些地方成为 <strong>并发低停顿回收器</strong>（<code>Concurrent Low Pause Sweep Collector</code>）。</p>
+<p><code>CMS</code> 回收器的缺点：</p>
+<ol>
+<li><strong>CMS回收器对CPU资源非常依赖</strong></li>
+</ol>
+<p><code>CMS</code> 回收器过分依赖于 <strong>多线程环境</strong>，默认情况下，开启的 <strong>线程数</strong> 为<code>（CPU 的数量 + 3）/ 4</code>，当 <code>CPU</code> 数量少于 <code>4</code> 个时，<code>CMS</code> 对 <strong>用户查询</strong> 的影响将会很大，因为他们要分出一半的运算能力去 <strong>执行回收器线程</strong>；</p>
+<ol start="2">
+<li><strong>CMS回收器无法清除浮动垃圾</strong></li>
+</ol>
+<p>由于 <code>CMS</code> 回收器 <strong>清除已标记的垃圾</strong> （处于最后一个阶段）时，<strong>用户线程</strong> 还在运行，因此会有新的垃圾产生。但是这部分垃圾 <strong>未被标记</strong>，在下一次 <code>GC</code> 才能清除，因此被成为 <strong>浮动垃圾</strong>。</p>
+<p>由于 <strong>内存回收</strong> 和 <strong>用户线程</strong> 是同时进行的，内存在被 <strong>回收</strong> 的同时，也在被 <strong>分配</strong>。当 <strong>老生代</strong> 中的内存使用超过一定的比例时，系统将会进行 <strong>垃圾回收</strong>；当 <strong>剩余内存</strong> 不能满足程序运行要求时，系统将会出现 <code>Concurrent Mode Failure</code>，临时采用 <code>Serial Old</code> 算法进行 <strong>清除</strong>，此时的 <strong>性能</strong> 将会降低。</p>
+<ol start="3">
+<li><strong>垃圾收集结束后残余大量空间碎片</strong></li>
+</ol>
+<p><code>CMS</code> 回收器采用的 <strong>标记清除算法</strong>，本身存在垃圾收集结束后残余 <strong>大量空间碎片</strong> 的缺点。<code>CMS</code> 配合适当的 <strong>内存整理策略</strong>，在一定程度上可以解决这个问题。</p>
+<h4 id="5-2-G1回收器（垃圾区域Region优先）"><a href="#5-2-G1回收器（垃圾区域Region优先）" class="headerlink" title="5.2. G1回收器（垃圾区域Region优先）"></a>5.2. G1回收器（垃圾区域Region优先）</h4><p><code>G1</code> 是 <code>JDK 1.7</code> 中正式投入使用的用于取代 <code>CMS</code> 的 <strong>压缩回收器</strong>。它虽然没有在物理上隔断 <strong>新生代</strong> 与 <strong>老生代</strong>，但是仍然属于 <strong>分代垃圾回收器</strong>。<code>G1</code> 仍然会区分 <strong>年轻代</strong> 与 <strong>老年代</strong>，年轻代依然分有 <code>Eden</code> 区与 <code>Survivor</code> 区。</p>
+<p><code>G1</code> 首先将 <strong>堆</strong> 分为 <strong>大小相等</strong> 的  <code>Region</code>，避免 <strong>全区域</strong> 的垃圾回收。然后追踪每个 <code>Region</code> 垃圾 <strong>堆积的价值大小</strong>，在后台维护一个 <strong>优先列表</strong>，根据允许的回收时间优先回收价值最大的 <code>Region</code>。同时 <code>G1</code>采用 <code>Remembered Set</code> 来存放 <code>Region</code> 之间的 <strong>对象引用</strong> ，其他回收器中的 <strong>新生代</strong> 与 <strong>老年代</strong> 之间的对象引用，从而避免 <strong>全堆扫描</strong>。<code>G1</code> 的分区示例如下图所示：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/v2-2775cf0531dead36d56049fc36598a91_hd.jpg" alt=""></p>
+<p>这种使用 <code>Region</code> 划分 <strong>内存空间</strong> 以及有 <strong>优先级</strong> 的区域回收方式，保证 <code>G1</code> 回收器在有限的时间内可以获得尽可能 <strong>高的回收效率</strong>。</p>
+<p><code>G1</code> 和 <code>CMS</code> 运作过程有很多相似之处，整个过程也分为 <code>4</code> 个步骤：</p>
+<ol>
+<li><strong>初始标记（CMS initial mark）</strong></li>
+</ol>
+<p><strong>初始标记</strong> 仅仅是标记 <code>GC Roots</code> 内 <strong>直接关联</strong> 的对象。这个阶段 <strong>速度很快</strong>，需要 <code>Stop the World</code>。</p>
+<ol start="2">
+<li><strong>并发标记（CMS concurrent mark）</strong></li>
+</ol>
+<p><strong>并发标记</strong> 进行的是 <code>GC Tracing</code>，从 <code>GC Roots</code> 开始对堆进行 <strong>可达性分析</strong>，找出 <strong>存活对象</strong>。</p>
+<ol start="3">
+<li><strong>重新标记（CMS remark）</strong></li>
+</ol>
+<p><strong>重新标记</strong> 阶段为了 <strong>修正</strong> 并发期间由于 <strong>用户进行运作</strong> 导致的 <strong>标记变动</strong> 的那一部分对象的 <strong>标记记录</strong>。这个阶段的 <strong>停顿时间</strong> 一般会比 <strong>初始标记阶段</strong> 稍长一些，但远比 <strong>并发标记</strong> 的时间短，也需要 <code>Stop The World</code>。</p>
+<ol start="4">
+<li><strong>筛选回收</strong></li>
+</ol>
+<p>首先对各个 <code>Region</code> 的 <strong>回收价值</strong> 和 <strong>成本</strong> 进行排序，根据用户所期望的 <code>GC</code> <strong>停顿时间</strong> 来制定回收计划。这个阶段可以与用户程序一起 <strong>并发执行</strong>，但是因为只回收一部分 <code>Region</code>，时间是用户可控制的，而且停顿 <strong>用户线程</strong> 将大幅提高回收效率。</p>
+<blockquote>
+<p>与其它 <code>GC</code> 回收相比，<code>G1</code> 具备如下 <code>4</code> 个特点：</p>
+</blockquote>
+<ul>
+<li><strong>并行与并发</strong></li>
+</ul>
+<p>使用多个 <code>CPU</code> 来缩短 <code>Stop-the-World</code> 的 <strong>停顿时间</strong>，部分其他回收器需要停顿 <code>Java</code> 线程执行的 <code>GC</code> 动作，<code>G1</code> 回收器仍然可以通过 <strong>并发的方式</strong> 让 <code>Java</code> 程序继续执行。</p>
+<ul>
+<li><strong>分代回收</strong></li>
+</ul>
+<p>与其他回收器一样，<strong>分代概念</strong> 在 <code>G1</code> 中依然得以保留。虽然 <code>G1</code> 可以不需要 <strong>其他回收器配合</strong> 就能独立管理 <strong>整个GC堆</strong>，但它能够采用 <strong>不同的策略</strong> 去处理 <strong>新创建的对象</strong> 和 <strong>已经存活</strong> 一段时间、<strong>熬过多次</strong> <code>GC</code> 的旧对象，以获取更好的回收效果。<strong>新生代</strong> 和 <strong>老年代</strong> 不再是 <strong>物理隔离</strong>，是多个 <strong>大小相等</strong> 的独立 <code>Region</code>。</p>
+<ul>
+<li><strong>空间整合</strong></li>
+</ul>
+<p>与 <code>CMS</code> 的 <strong>标记—清理</strong> 算法不同，<code>G1</code> 从 <strong>整体</strong> 来看是基于 <strong>标记—整理</strong> 算法实现的回收器。从 <strong>局部</strong>（两个 <code>Region</code> 之间）上来看是基于 <strong>复制算法</strong> 实现的。</p>
+<p>但无论如何，这 <strong>两种算法</strong> 都意味着 <code>G1</code> 运作期间 <strong>不会产生内存空间碎片</strong>，回收后能提供规整的可用内存。这种特性有利于程序长时间运行，<strong>分配大对象</strong> 时不会因为无法找到 <strong>连续内存空间</strong> 而提前触发 <strong>下一次</strong> <code>GC</code>。</p>
+<ul>
+<li><strong>可预测的停顿</strong></li>
+</ul>
+<p>这是 <code>G1</code> 相对于 <code>CMS</code> 的另一大优势，<strong>降低停顿时间</strong> 是 <code>G1</code> 和 <code>CMS</code> 共同的关注点。<code>G1</code> 除了追求 <strong>低停顿</strong> 外，还能建立 <strong>可预测</strong> 的 <strong>停顿时间模型</strong>，能让使用者明确指定在一个 <strong>长度</strong> 为 <code>M</code> 毫秒的 <strong>时间片段</strong> 内，消耗在 <strong>垃圾回收</strong> 上的时间不得超过 <code>N</code> 毫秒。（后台维护的 <strong>优先列表</strong>，优先回收 <strong>价值大</strong> 的 <code>Region</code>）。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>周志明，深入理解Java虚拟机：JVM高级特性与最佳实践，机械工业出版社</p>
+<hr>
+<p>欢迎关注技术公众号：零壹技术栈</p>
+<p><img src="http://upload-images.jianshu.io/upload_images/10548396-035e78bdc34c7525?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="零壹技术栈"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+        <a href="https://ostenant.coding.me/2018/08/03/JVM系列(六) - JVM垃圾回收器/#comments" class="article-comment-link">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2018/07/15/浅谈Nginx服务器的内部核心架构设计/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">浅谈Nginx服务器的内部核心架构设计</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="lv-container" data-id="city" data-uid=MTAyMC8zNzE2NC8xMzY5OA==></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="no-thumbnail">
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a></p>
+                            <p class="item-title"><a href="/2018/08/03/JVM系列(六) - JVM垃圾回收器/" class="title">JVM系列(六) - JVM垃圾回收器</a></p>
+                            <p class="item-date"><time datetime="2018-08-02T22:58:00.000Z" itemprop="datePublished">2018-08-03</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/高并发系统系列/">高并发系统系列</a></p>
+                            <p class="item-title"><a href="/2018/07/15/浅谈Nginx服务器的内部核心架构设计/" class="title">浅谈Nginx服务器的内部核心架构设计</a></p>
+                            <p class="item-date"><time datetime="2018-07-15T10:50:00.000Z" itemprop="datePublished">2018-07-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/加密算法系列/">加密算法系列</a></p>
+                            <p class="item-title"><a href="/2018/07/13/浅谈常见的七种加密算法及实现/" class="title">浅谈常见的七种加密算法及实现</a></p>
+                            <p class="item-date"><time datetime="2018-07-13T12:06:00.000Z" itemprop="datePublished">2018-07-13</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/消息队列系列/">消息队列系列</a></p>
+                            <p class="item-title"><a href="/2018/07/07/浅谈消息队列及常见的消息中间件/" class="title">浅谈消息队列及常见的消息中间件</a></p>
+                            <p class="item-date"><time datetime="2018-07-07T15:27:00.000Z" itemprop="datePublished">2018-07-07</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/认证与授权系列/">认证与授权系列</a></p>
+                            <p class="item-title"><a href="/2018/07/05/浅谈SAML, OAuth, OpenID和SSO, JWT和Session/" class="title">浅谈SAML, OAuth, OpenID和SSO, JWT和Session</a></p>
+                            <p class="item-date"><time datetime="2018-07-05T05:50:00.000Z" itemprop="datePublished">2018-07-05</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL学习系列/">MySQL学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RxJava异步框架系列/">RxJava异步框架系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Reactive编程系列/">Spring Reactive编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/任务调度框架系列/">任务调度框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/加密算法系列/">加密算法系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术知识图谱/">技术知识图谱</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/测试框架系列/">测试框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/消息队列系列/">消息队列系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/高并发系统系列/">高并发系统系列</a><span class="category-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AES/">AES</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ActiveMQ/">ActiveMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DES/">DES</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker-Compose/">Docker Compose</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Filter/">Filter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interceptor/">Interceptor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JWT/">JWT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Listener/">Listener</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MD5/">MD5</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mockito/">Mockito</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth/">OAuth</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paxos/">Paxos</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Quartz/">Quartz</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RSA/">RSA</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RabbitMQ/">RabbitMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raft/">Raft</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactive-Streams/">Reactive Streams</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactor/">Reactor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RocketMQ/">RocketMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RxJava/">RxJava</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SAML/">SAML</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SHA1/">SHA1</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-Boot/">SOFA-Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SSO/">SSO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ScheduledExecutorService/">ScheduledExecutorService</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Servlet/">Servlet</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Session/">Session</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot-2-0/">Spring Boot 2.0</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Task/">Spring Task</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-WebFlux/">Spring WebFlux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Timer/">Timer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unique-ID/">Unique ID</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一致性哈希/">一致性哈希</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/主从复制/">主从复制</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式存储/">分布式存储</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分片/">分片</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反向代理/">反向代理</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反模式/">反模式</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/定时任务/">定时任务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异步/">异步</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/负载均衡/">负载均衡</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/限流/">限流</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高性能/">高性能</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/AES/" style="font-size: 10px;">AES</a> <a href="/tags/ActiveMQ/" style="font-size: 10px;">ActiveMQ</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Android/" style="font-size: 13.33px;">Android</a> <a href="/tags/Apache/" style="font-size: 13.33px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.67px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/DES/" style="font-size: 10px;">DES</a> <a href="/tags/Docker/" style="font-size: 16.67px;">Docker</a> <a href="/tags/Docker-Compose/" style="font-size: 10px;">Docker Compose</a> <a href="/tags/Filter/" style="font-size: 10px;">Filter</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Interceptor/" style="font-size: 10px;">Interceptor</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.67px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 16.67px;">JVM</a> <a href="/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/tags/Java/" style="font-size: 18.33px;">Java</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/Listener/" style="font-size: 10px;">Listener</a> <a href="/tags/MD5/" style="font-size: 10px;">MD5</a> <a href="/tags/Mockito/" style="font-size: 10px;">Mockito</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NIO/" style="font-size: 15px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 11.67px;">Nginx</a> <a href="/tags/OAuth/" style="font-size: 10px;">OAuth</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Paxos/" style="font-size: 10px;">Paxos</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/Quartz/" style="font-size: 11.67px;">Quartz</a> <a href="/tags/RPC/" style="font-size: 20px;">RPC</a> <a href="/tags/RSA/" style="font-size: 10px;">RSA</a> <a href="/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/tags/Raft/" style="font-size: 10px;">Raft</a> <a href="/tags/Reactive-Streams/" style="font-size: 11.67px;">Reactive Streams</a> <a href="/tags/Reactor/" style="font-size: 10px;">Reactor</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/RocketMQ/" style="font-size: 10px;">RocketMQ</a> <a href="/tags/RxJava/" style="font-size: 13.33px;">RxJava</a> <a href="/tags/SAML/" style="font-size: 10px;">SAML</a> <a href="/tags/SHA1/" style="font-size: 10px;">SHA1</a> <a href="/tags/SOFA-Boot/" style="font-size: 13.33px;">SOFA-Boot</a> <a href="/tags/SOFA-RPC/" style="font-size: 15px;">SOFA-RPC</a> <a href="/tags/SSO/" style="font-size: 10px;">SSO</a> <a href="/tags/ScheduledExecutorService/" style="font-size: 10px;">ScheduledExecutorService</a> <a href="/tags/Servlet/" style="font-size: 10px;">Servlet</a> <a href="/tags/Session/" style="font-size: 10px;">Session</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Boot-2-0/" style="font-size: 18.33px;">Spring Boot 2.0</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.67px;">Spring Cloud</a> <a href="/tags/Spring-Task/" style="font-size: 10px;">Spring Task</a> <a href="/tags/Spring-WebFlux/" style="font-size: 11.67px;">Spring WebFlux</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 16.67px;">Thrift</a> <a href="/tags/Timer/" style="font-size: 10px;">Timer</a> <a href="/tags/Unique-ID/" style="font-size: 10px;">Unique ID</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/一致性哈希/" style="font-size: 10px;">一致性哈希</a> <a href="/tags/主从复制/" style="font-size: 10px;">主从复制</a> <a href="/tags/分布式/" style="font-size: 15px;">分布式</a> <a href="/tags/分布式存储/" style="font-size: 10px;">分布式存储</a> <a href="/tags/分片/" style="font-size: 10px;">分片</a> <a href="/tags/反向代理/" style="font-size: 10px;">反向代理</a> <a href="/tags/反模式/" style="font-size: 13.33px;">反模式</a> <a href="/tags/定时任务/" style="font-size: 10px;">定时任务</a> <a href="/tags/异步/" style="font-size: 16.67px;">异步</a> <a href="/tags/微服务/" style="font-size: 13.33px;">微服务</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/负载均衡/" style="font-size: 10px;">负载均衡</a> <a href="/tags/限流/" style="font-size: 10px;">限流</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a> <a href="/tags/高性能/" style="font-size: 10px;">高性能</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://ifeve.com" target="_blank">并发编程网</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://juejin.im" target="_blank">掘金</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.jianshu.com" target="_blank">简书</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com" target="_blank">Github</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.infoq.com" target="_blank">Infoq</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fas fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
+            
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+        </div>
+    </div>
+</footer>
+        
+    
+    
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+     (function(d, s) {
+         var j, e = d.getElementsByTagName(s)[0];
+
+         if (typeof LivereTower === 'function') { return; }
+
+         j = d.createElement(s);
+         j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+         j.async = true;
+
+         e.parentNode.insertBefore(j, e);
+     })(document, 'script');
+    </script>
+  <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+  <!-- City版安装代码已完成 -->
+
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
