@@ -5,22 +5,23 @@
     
     <title>JVM系列(七) - JVM线上监控工具 | Icarus&#39;s Blog</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-    <meta name="description" content="前言通过上一篇的 JVM 垃圾回收知识，我们了解了 JVM 具体的 垃圾回收算法 和几种 垃圾回收器。理论是指导实践的工具，有了理论指导，定位问题的时候，知识和经验是关键基础，数据可以为我们提供依据。">
+    <meta name="description" content="前言通过上一篇的 JVM 垃圾回收知识，我们了解了 JVM 具体的 垃圾回收算法 和几种 垃圾回收器。理论是指导实践的工具，有了理论指导，定位问题的时候，知识和经验是关键基础，数据可以为我们提供依据。">
 <meta name="keywords" content="JVM">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JVM系列(七) - JVM线上监控工具">
 <meta property="og:url" content="https://ostenant.coding.me/2018/08/06/JVM系列(七) - JVM线上监控工具/index.html">
 <meta property="og:site_name" content="Icarus&#39;s Blog">
-<meta property="og:description" content="前言通过上一篇的 JVM 垃圾回收知识，我们了解了 JVM 具体的 垃圾回收算法 和几种 垃圾回收器。理论是指导实践的工具，有了理论指导，定位问题的时候，知识和经验是关键基础，数据可以为我们提供依据。">
+<meta property="og:description" content="前言通过上一篇的 JVM 垃圾回收知识，我们了解了 JVM 具体的 垃圾回收算法 和几种 垃圾回收器。理论是指导实践的工具，有了理论指导，定位问题的时候，知识和经验是关键基础，数据可以为我们提供依据。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/jhat_array.png">
-<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/jhat_myclass.png">
-<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/jhat_other_query.png">
-<meta property="og:updated_time" content="2018-08-12T09:52:11.519Z">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/12/1652e8d753092849?w=2880&h=1696&f=png&s=769053">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/12/1652e8d752efb04c?w=2880&h=1726&f=png&s=769036">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/12/1652e8d752fbdf18?w=2880&h=468&f=png&s=120137">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/4/16502c7bd1fd0856?w=258&h=258&f=jpeg&s=16109">
+<meta property="og:updated_time" content="2018-08-13T10:02:51.220Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM系列(七) - JVM线上监控工具">
-<meta name="twitter:description" content="前言通过上一篇的 JVM 垃圾回收知识，我们了解了 JVM 具体的 垃圾回收算法 和几种 垃圾回收器。理论是指导实践的工具，有了理论指导，定位问题的时候，知识和经验是关键基础，数据可以为我们提供依据。">
-<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/jhat_array.png">
+<meta name="twitter:description" content="前言通过上一篇的 JVM 垃圾回收知识，我们了解了 JVM 具体的 垃圾回收算法 和几种 垃圾回收器。理论是指导实践的工具，有了理论指导，定位问题的时候，知识和经验是关键基础，数据可以为我们提供依据。">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2018/8/12/1652e8d753092849?w=2880&h=1696&f=png&s=769053">
     
 
     
@@ -286,7 +287,7 @@ ga('send', 'pageview');
         
             
             <hr>
-<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>通过上一篇的 <code>JVM</code> 垃圾回收知识，我们了解了 <code>JVM</code> 具体的 <strong>垃圾回收算法</strong> 和几种 <strong>垃圾回收器</strong>。理论是指导实践的工具，有了理论指导，定位问题的时候，知识和经验是关键基础，数据可以为我们提供依据。</p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>通过上一篇的 <code>JVM</code> 垃圾回收知识，我们了解了 <code>JVM</code> 具体的 <strong>垃圾回收算法</strong> 和几种 <strong>垃圾回收器</strong>。理论是指导实践的工具，有了理论指导，定位问题的时候，知识和经验是关键基础，数据可以为我们提供依据。</p>
 <a id="more"></a>
 <p>在线上我们经常会遇见如下几个问题：</p>
 <ul>
@@ -309,6 +310,50 @@ ga('send', 'pageview');
 <li>-m: 输出传入 <code>main</code> 方法的 <strong>参数</strong>；</li>
 <li>-v: 输出传入 <code>JVM</code> 的参数。</li>
 </ul>
+<h3 id="2-jinfo配置信息查看工具"><a href="#2-jinfo配置信息查看工具" class="headerlink" title="2. jinfo配置信息查看工具"></a>2. jinfo配置信息查看工具</h3><p><code>jinfo</code>（<code>JVM Configuration info</code>）这个命令作用是实时查看和调整 <strong>虚拟机运行参数</strong>。之前的 <code>jps -v</code> 命令只能查看到显示 <strong>指定的参数</strong>，如果想要查看 <strong>未显示</strong> 的参数的值就要使用 <code>jinfo</code> 命令。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Usage:</span><br><span class="line">    jinfo [option] &lt;pid&gt;</span><br><span class="line">        (to connect to running process)</span><br><span class="line">    jinfo [option] &lt;executable &lt;core&gt;</span><br><span class="line">        (to connect to a core file)</span><br><span class="line">    jinfo [option] [server_id@]&lt;remote server IP or hostname&gt;</span><br><span class="line">        (to connect to remote debug server)</span><br></pre></td></tr></table></figure>
+<p>参数含义如下：</p>
+<ul>
+<li>pid：本地 <code>jvm</code> 服务的进程 <code>ID</code>；</li>
+<li>executable core：打印 <strong>堆栈跟踪</strong> 的核心文件；</li>
+<li>remote server IP/hostname：远程 <code>debug</code> 服务的 <strong>主机名</strong> 或 <code>IP</code> 地址；</li>
+<li>server id：远程 <code>debug</code> 服务的 <strong>进程</strong> <code>ID</code>。</li>
+</ul>
+<p>参数选项说明如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">参数含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">flag</td>
+<td style="text-align:left">输出指定 <code>args</code> 参数的值</td>
+</tr>
+<tr>
+<td style="text-align:left">flags</td>
+<td style="text-align:left">不需要 <code>args</code> 参数，输出所有 <code>JVM</code> 参数的值</td>
+</tr>
+<tr>
+<td style="text-align:left">sysprops</td>
+<td style="text-align:left">输出系统属性，等同于 <code>System.getProperties()</code></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>查看正在运行的 <code>jvm</code> 进程的 <strong>扩展参数</strong>。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">$ jinfo -flags 31983 </span><br><span class="line">Attaching to process ID 31983, please <span class="built_in">wait</span>… </span><br><span class="line">Debugger attached successfully. </span><br><span class="line">Server compiler detected. </span><br><span class="line">JVM version is 25.91-b14 </span><br><span class="line">Non-default VM flags: -XX:CICompilerCount=3 -XX:InitialHeapSize=20971520 -XX:MaxHeapFreeRatio=90 -XX:MaxHeapSize=20971520 -XX:MaxNewSize=2097152 -XX:MinHeapDeltaBytes=524288 -XX:NewSize=2097152 -XX:OldSize=18874368 -XX:+PrintGC -XX:+PrintGCDetails -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseFastUnorderedTimeStamps -XX:+UseParallelGC </span><br><span class="line">Command line: -Xmx20m -Xms20m -Xmn2m -javaagent:/opt/idea-IU-181.4668.68/lib/idea_rt.jar=34989:/opt/idea-IU-181.4668.68/bin -Dfile.encoding=UTF-8</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看正在运行的 <code>jvm</code> 进程的所有 <strong>参数信息</strong>。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line">$ jinfo 31983</span><br><span class="line">Attaching to process ID 31983, please <span class="built_in">wait</span>...</span><br><span class="line">Debugger attached successfully.</span><br><span class="line">Server compiler detected.</span><br><span class="line">JVM version is 25.91-b14</span><br><span class="line">Java System Properties:</span><br><span class="line"></span><br><span class="line">java.runtime.name = Java(TM) SE Runtime Environment</span><br><span class="line">java.vm.version = 25.91-b14</span><br><span class="line">sun.boot.library.path = /opt/jdk1.8.0_91/jre/lib/amd64</span><br><span class="line">java.vendor.url = http://java.oracle.com/</span><br><span class="line">java.vm.vendor = Oracle Corporation</span><br><span class="line">path.separator = :</span><br><span class="line">file.encoding.pkg = sun.io</span><br><span class="line">java.vm.name = Java HotSpot(TM) 64-Bit Server VM</span><br><span class="line">sun.os.patch.level = unknown</span><br><span class="line">sun.java.launcher = SUN_STANDARD</span><br><span class="line">user.country = CN</span><br><span class="line">user.dir = /home/linchen/projects</span><br><span class="line">java.vm.specification.name = Java Virtual Machine Specification</span><br><span class="line">java.runtime.version = 1.8.0_91-b14</span><br><span class="line">java.awt.graphicsenv = sun.awt.X11GraphicsEnvironment</span><br><span class="line">os.arch = amd64</span><br><span class="line">java.endorsed.dirs = /opt/jdk1.8.0_91/jre/lib/endorsed</span><br><span class="line">java.io.tmpdir = /tmp</span><br><span class="line">line.separator = </span><br><span class="line"></span><br><span class="line">java.vm.specification.vendor = Oracle Corporation</span><br><span class="line">os.name = Linux</span><br><span class="line">sun.jnu.encoding = UTF-8</span><br><span class="line">java.library.path = /usr/java/packages/lib/amd64:/usr/lib64:/lib64:/lib:/usr/lib</span><br><span class="line">java.specification.name = Java Platform API Specification</span><br><span class="line">java.class.version = 52.0</span><br><span class="line">sun.management.compiler = HotSpot 64-Bit Tiered Compilers</span><br><span class="line">os.version = 4.15.0-24-generic</span><br><span class="line">user.home = /home/linchen</span><br><span class="line">user.timezone = </span><br><span class="line">java.awt.printerjob = sun.print.PSPrinterJob</span><br><span class="line">file.encoding = UTF-8</span><br><span class="line">java.specification.version = 1.8</span><br><span class="line">user.name = linchen</span><br><span class="line">java.class.path = /opt/jdk1.8.0_91/jre/lib/charsets.jar:/opt/jdk1.8.0_91/jre/lib/deploy.jar:/opt/jdk1.8.0_91/jre/lib/ext/cldrdata.jar:/opt/jdk1.8.0_91/jre/lib/ext/dnsns.jar:/opt/jdk1.8.0_91/jre/lib/ext/jaccess.jar:/opt/jdk1.8.0_91/jre/lib/ext/jfxrt.jar:/opt/jdk1.8.0_91/jre/lib/ext/localedata.jar:/opt/jdk1.8.0_91/jre/lib/ext/nashorn.jar:/opt/jdk1.8.0_91/jre/lib/ext/sunec.jar:/opt/jdk1.8.0_91/jre/lib/ext/sunjce_provider.jar:/opt/jdk1.8.0_91/jre/lib/ext/sunpkcs11.jar:/opt/jdk1.8.0_91/jre/lib/ext/zipfs.jar:/opt/jdk1.8.0_91/jre/lib/javaws.jar:/opt/jdk1.8.0_91/jre/lib/jce.jar:/opt/jdk1.8.0_91/jre/lib/jfr.jar:/opt/jdk1.8.0_91/jre/lib/jfxswt.jar:/opt/jdk1.8.0_91/jre/lib/jsse.jar:/opt/jdk1.8.0_91/jre/lib/management-agent.jar:/opt/jdk1.8.0_91/jre/lib/plugin.jar:/opt/jdk1.8.0_91/jre/lib/resources.jar:/opt/jdk1.8.0_91/jre/lib/rt.jar:/home/linchen/IdeaProjects/core_java/target/classes:/home/linchen/.m2/repository/io/netty/netty-all/4.1.7.Final/netty-all-4.1.7.Final.jar:/home/linchen/.m2/repository/junit/junit/4.12/junit-4.12.jar:/home/linchen/.m2/repository/org/hamcrest/hamcrest-core/1.3/hamcrest-core-1.3.jar:/home/linchen/.m2/repository/com/lmax/disruptor/3.3.0/disruptor-3.3.0.jar:/home/linchen/.m2/repository/com/rabbitmq/amqp-client/5.3.0/amqp-client-5.3.0.jar:/home/linchen/.m2/repository/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar:/opt/idea-IU-181.4668.68/lib/idea_rt.jar</span><br><span class="line">java.vm.specification.version = 1.8</span><br><span class="line">sun.arch.data.model = 64</span><br><span class="line">sun.java.command = com.own.learn.jvm.JinfoTest</span><br><span class="line">java.home = /opt/jdk1.8.0_91/jre</span><br><span class="line">user.language = zh</span><br><span class="line">java.specification.vendor = Oracle Corporation</span><br><span class="line">awt.toolkit = sun.awt.X11.XToolkit</span><br><span class="line">java.vm.info = mixed mode</span><br><span class="line">java.version = 1.8.0_91</span><br><span class="line">java.ext.dirs = /opt/jdk1.8.0_91/jre/lib/ext:/usr/java/packages/lib/ext</span><br><span class="line">sun.boot.class.path = /opt/jdk1.8.0_91/jre/lib/resources.jar:/opt/jdk1.8.0_91/jre/lib/rt.jar:/opt/jdk1.8.0_91/jre/lib/sunrsasign.jar:/opt/jdk1.8.0_91/jre/lib/jsse.jar:/opt/jdk1.8.0_91/jre/lib/jce.jar:/opt/jdk1.8.0_91/jre/lib/charsets.jar:/opt/jdk1.8.0_91/jre/lib/jfr.jar:/opt/jdk1.8.0_91/jre/classes</span><br><span class="line">java.vendor = Oracle Corporation</span><br><span class="line">file.separator = /</span><br><span class="line">java.vendor.url.bug = http://bugreport.sun.com/bugreport/</span><br><span class="line">sun.io.unicode.encoding = UnicodeLittle</span><br><span class="line">sun.cpu.endian = little</span><br><span class="line">sun.desktop = gnome</span><br><span class="line">sun.cpu.isalist = </span><br><span class="line"></span><br><span class="line">VM Flags:</span><br><span class="line">Non-default VM flags: -XX:CICompilerCount=3 -XX:InitialHeapSize=20971520 -XX:MaxHeapFreeRatio=90 -XX:MaxHeapSize=20971520 -XX:MaxNewSize=2097152 -XX:MinHeapDeltaBytes=524288 -XX:NewSize=2097152 -XX:OldSize=18874368 -XX:+PrintGC -XX:+PrintGCDetails -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:+UseFastUnorderedTimeStamps -XX:+UseParallelGC </span><br><span class="line">Command line:  -Xmx20m -Xms20m -Xmn2m -javaagent:/opt/idea-IU-181.4668.68/lib/idea_rt.jar=34989:/opt/idea-IU-181.4668.68/bin -Dfile.encoding=UTF-8</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看正在运行的 <code>jvm</code> 进程的 <strong>环境变量信息</strong>。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">$ jinfo -sysprops 31983 </span><br><span class="line">Attaching to process ID 31983, please <span class="built_in">wait</span>… </span><br><span class="line">Debugger attached successfully. </span><br><span class="line">Server compiler detected. </span><br><span class="line">JVM version is 25.91-b14 </span><br><span class="line">java.runtime.name = Java(TM) SE Runtime Environment </span><br><span class="line">java.vm.version = 25.91-b14 </span><br><span class="line">sun.boot.library.path = /opt/jdk1.8.0_91/jre/lib/amd64 </span><br><span class="line">java.vendor.url = http://java.oracle.com/ </span><br><span class="line">java.vm.vendor = Oracle Corporation </span><br><span class="line">path.separator = : </span><br><span class="line">file.encoding.pkg = sun.io </span><br><span class="line">java.vm.name = Java HotSpot(TM) 64-Bit Server VM </span><br><span class="line">sun.os.patch.level = unknown </span><br><span class="line">sun.java.launcher = SUN_STANDARD </span><br><span class="line">user.country = CN </span><br><span class="line">user.dir = /home/linchen/projects </span><br><span class="line">java.vm.specification.name = Java Virtual Machine Specification </span><br><span class="line">java.runtime.version = 1.8.0_91-b14 </span><br><span class="line">java.awt.graphicsenv = sun.awt.X11GraphicsEnvironment </span><br><span class="line">os.arch = amd64 </span><br><span class="line">java.endorsed.dirs = /opt/jdk1.8.0_91/jre/lib/endorsed </span><br><span class="line">java.io.tmpdir = /tmp </span><br><span class="line">line.separator =</span><br></pre></td></tr></table></figure>
 <h3 id="2-jstat信息统计监控工具"><a href="#2-jstat信息统计监控工具" class="headerlink" title="2. jstat信息统计监控工具"></a>2. jstat信息统计监控工具</h3><p><code>jstat</code> 是用于识别 <strong>虚拟机</strong> 各种 <strong>运行状态信息</strong> 的命令行工具。它可以显示 <strong>本地</strong> 或者 <strong>远程虚拟机</strong> 进程中的 <strong>类装载</strong>、<strong>内存</strong>、<strong>垃圾收集</strong>、<code>jit</code> <strong>编译</strong> 等运行数据，它是 <strong>线上</strong> 定位 <code>jvm</code> <strong>性能</strong> 的首选工具。</p>
 <p><code>jstat</code> 工具提供如下的 <code>jvm</code> 监控功能：</p>
 <ol>
@@ -327,33 +372,33 @@ ga('send', 'pageview');
 </ul>
 </li>
 <li>vmid: Virtual Machine ID（进程的 <code>pid</code>）。</li>
-<li>lines: <strong>表头</strong> 与 <strong>表头</strong> 的间隔行数。</li>
+<li>lines: <strong>表头</strong> 与 <strong>表头</strong> 的间隔行数。</li>
 <li>interval: 执行每次的 <strong>间隔时间</strong>，单位为 <strong>毫秒</strong>。</li>
 <li>count: 用于指定输出记录的 <strong>次数</strong>，缺省则会一直打印。</li>
 </ul>
 <p>参数选项说明如下：</p>
 <ul>
-<li>-class: 显示 <strong>类加载</strong> <code>ClassLoad</code> 的相关信息；</li>
-<li>-compiler: 显示 <code>JIT</code> <strong>编译</strong> 的相关信息；</li>
-<li>-gc: 显示和 <code>gc</code> 相关的 <strong>堆信息</strong>；</li>
-<li>-gccapacity: 显示 <strong>各个代</strong> 的 <strong>容量</strong> 以及 <strong>使用情况</strong>；</li>
-<li>-gcmetacapacity: 显示 <strong>元空间</strong> <code>metaspace</code> 的大小；</li>
-<li>-gcnew: 显示 <strong>新生代</strong> 信息；</li>
-<li>-gcnewcapacity: 显示 <strong>新生代大小</strong> 和 <strong>使用情况</strong>；</li>
-<li>-gcold: 显示 <strong>老年代</strong> 和 <strong>永久代</strong> 的信息；</li>
-<li>-gcoldcapacity: 显示 <strong>老年代</strong> 的大小；</li>
-<li>-gcutil: 显示 <strong>垃圾回收信息</strong>；</li>
-<li>-gccause: 显示 <strong>垃圾回收</strong> 的相关信息（同 <code>-gcutil</code>），同时显示 <strong>最后一次</strong> 或 <strong>当前</strong> 正在发生的垃圾回收的 <strong>诱因</strong>；</li>
-<li>-printcompilation: 输出 <code>JIT</code> <strong>编译</strong> 的方法信息；</li>
+<li>class: 显示 <strong>类加载</strong> <code>ClassLoad</code> 的相关信息；</li>
+<li>compiler: 显示 <code>JIT</code> <strong>编译</strong> 的相关信息；</li>
+<li>gc: 显示和 <code>gc</code> 相关的 <strong>堆信息</strong>；</li>
+<li>gccapacity: 显示 <strong>各个代</strong> 的 <strong>容量</strong> 以及 <strong>使用情况</strong>；</li>
+<li>gcmetacapacity: 显示 <strong>元空间</strong> <code>metaspace</code> 的大小；</li>
+<li>gcnew: 显示 <strong>新生代</strong> 信息；</li>
+<li>gcnewcapacity: 显示 <strong>新生代大小</strong> 和 <strong>使用情况</strong>；</li>
+<li>gcold: 显示 <strong>老年代</strong> 和 <strong>永久代</strong> 的信息；</li>
+<li>gcoldcapacity: 显示 <strong>老年代</strong> 的大小；</li>
+<li>gcutil: 显示 <strong>垃圾回收信息</strong>；</li>
+<li>gccause: 显示 <strong>垃圾回收</strong> 的相关信息（同 <code>-gcutil</code>），同时显示 <strong>最后一次</strong> 或 <strong>当前</strong> 正在发生的垃圾回收的 <strong>诱因</strong>；</li>
+<li>printcompilation: 输出 <code>JIT</code> <strong>编译</strong> 的方法信息；</li>
 </ul>
 <h4 id="2-1-class"><a href="#2-1-class" class="headerlink" title="2.1. class"></a>2.1. class</h4><p>显示和监视 <strong>类装载</strong>、<strong>卸载数量</strong>、<strong>总空间</strong> 以及 <strong>耗费的时间</strong>。</p>
-<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -class 8615</span><br><span class="line">Loaded  Bytes     Unloaded  Bytes      Time   </span><br><span class="line">  7271 13325.8        1      0.9       2.98</span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -class 8615</span><br><span class="line">Loaded  Bytes     Unloaded  Bytes      Time</span><br><span class="line">  7271 13325.8        1      0.9       2.98</span><br></pre></td></tr></table></figure>
 <p>参数列表及含义如下：</p>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">参数</th>
-<th style="text-align:left">参数含义</th>
+<th style="text-align:left">参数含义</th>
 </tr>
 </thead>
 <tbody>
@@ -379,14 +424,14 @@ ga('send', 'pageview');
 </tr>
 </tbody>
 </table>
-<h4 id="2-2-compiler"><a href="#2-2-compiler" class="headerlink" title="2.2. compiler"></a>2.2. compiler</h4><p>显示虚拟机 <strong>实时编译</strong>（<code>JIT</code>）的 <strong>次数</strong> 和 <strong>耗时</strong> 等信息。</p>
+<h4 id="2-2-compiler"><a href="#2-2-compiler" class="headerlink" title="2.2. compiler"></a>2.2. compiler</h4><p>显示虚拟机 <strong>实时编译</strong>（<code>JIT</code>）的 <strong>次数</strong> 和 <strong>耗时</strong> 等信息。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -compiler 8615</span><br><span class="line">Compiled   Failed  Invalid  Time     FailedType   FailedMethod</span><br><span class="line">  3886        0       0     1.29          0</span><br></pre></td></tr></table></figure>
 <p>参数列表及含义如下：</p>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">参数</th>
-<th style="text-align:left">参数含义</th>
+<th style="text-align:left">参数含义</th>
 </tr>
 </thead>
 <tbody>
@@ -576,14 +621,14 @@ ga('send', 'pageview');
 </tr>
 </tbody>
 </table>
-<h4 id="2-5-gcmetacapacity"><a href="#2-5-gcmetacapacity" class="headerlink" title="2.5. gcmetacapacity"></a>2.5. gcmetacapacity</h4><p>显示 <strong>元空间</strong>（<code>metaspace</code>）中 <strong>对象</strong> 的信息及其占用量。</p>
+<h4 id="2-5-gcmetacapacity"><a href="#2-5-gcmetacapacity" class="headerlink" title="2.5. gcmetacapacity"></a>2.5. gcmetacapacity</h4><p>显示 <strong>元空间</strong>（<code>metaspace</code>）中 <strong>对象</strong> 的信息及其占用量。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gcmetacapacity 8615</span><br><span class="line">MCMN       MCMX        MC       CCSMN      CCSMX       CCSC     YGC   FGC    FGCT     GCT   </span><br><span class="line">0.0      1079296.0   35456.0     0.0     1048576.0    4992.0     5     2    0.075    0.131</span><br></pre></td></tr></table></figure>
 <p>参数列表及含义如下：</p>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">参数</th>
-<th style="text-align:left">参数含义</th>
+<th style="text-align:left">参数含义</th>
 </tr>
 </thead>
 <tbody>
@@ -636,7 +681,7 @@ ga('send', 'pageview');
 <thead>
 <tr>
 <th style="text-align:left">参数</th>
-<th style="text-align:left">参数含义</th>
+<th style="text-align:left">参数含义</th>
 </tr>
 </thead>
 <tbody>
@@ -693,7 +738,7 @@ ga('send', 'pageview');
 <thead>
 <tr>
 <th style="text-align:left">参数</th>
-<th style="text-align:left">参数含义</th>
+<th style="text-align:left">参数含义</th>
 </tr>
 </thead>
 <tbody>
@@ -739,7 +784,7 @@ ga('send', 'pageview');
 </tr>
 <tr>
 <td style="text-align:left">FGC</td>
-<td style="text-align:left">从应用程序启动到采样时 <strong>老年代</strong> 中 <code>gc</code> 次数</td>
+<td style="text-align:left">从应用程序启动到采样时 <strong>老年代</strong> 中 <code>gc</code> 次数</td>
 </tr>
 </tbody>
 </table>
@@ -750,17 +795,17 @@ ga('send', 'pageview');
 <thead>
 <tr>
 <th style="text-align:left">参数</th>
-<th style="text-align:left">参数含义</th>
+<th style="text-align:left">参数含义</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left">MC</td>
-<td style="text-align:left"><strong>元空间</strong>（<code>metaspace</code>）的容量</td>
+<td style="text-align:left"><strong>元空间</strong>（<code>metaspace</code>）的容量</td>
 </tr>
 <tr>
 <td style="text-align:left">MU</td>
-<td style="text-align:left"><strong>元空间</strong>（<code>metaspace</code>）目前已使用空间</td>
+<td style="text-align:left"><strong>元空间</strong>（<code>metaspace</code>）目前已使用空间</td>
 </tr>
 <tr>
 <td style="text-align:left">CCSC</td>
@@ -803,7 +848,7 @@ ga('send', 'pageview');
 <thead>
 <tr>
 <th style="text-align:left">参数</th>
-<th style="text-align:left">参数含义</th>
+<th style="text-align:left">参数含义</th>
 </tr>
 </thead>
 <tbody>
@@ -841,14 +886,14 @@ ga('send', 'pageview');
 </tr>
 </tbody>
 </table>
-<h4 id="2-10-gcutil"><a href="#2-10-gcutil" class="headerlink" title="2.10. gcutil"></a>2.10. gcutil</h4><p>显示 <strong>垃圾回收</strong>（<code>gc</code>）过程中的信息，包括各个 <strong>内存的使用占比</strong>，垃圾回收 <strong>时间</strong> 和回收 <strong>次数</strong>。</p>
+<h4 id="2-10-gcutil"><a href="#2-10-gcutil" class="headerlink" title="2.10. gcutil"></a>2.10. gcutil</h4><p>显示 <strong>垃圾回收</strong>（<code>gc</code>）过程中的信息，包括各个 <strong>内存的使用占比</strong>，垃圾回收 <strong>时间</strong> 和回收 <strong>次数</strong>。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">$ jstat -gcutil 8615</span><br><span class="line">   S0     S1     E      O      M     CCS     YGC     YGCT    FGC    FGCT     GCT   </span><br><span class="line">  0.00   0.00  50.13  14.57  95.70  91.79      5    0.056     2    0.075    0.131</span><br></pre></td></tr></table></figure>
 <p>参数列表及含义如下：</p>
 <table>
 <thead>
 <tr>
 <th style="text-align:left">参数</th>
-<th style="text-align:left">参数含义</th>
+<th style="text-align:left">参数含义</th>
 </tr>
 </thead>
 <tbody>
@@ -896,7 +941,7 @@ ga('send', 'pageview');
 </table>
 <h3 id="3-jmap堆内存统计工具"><a href="#3-jmap堆内存统计工具" class="headerlink" title="3. jmap堆内存统计工具"></a>3. jmap堆内存统计工具</h3><p><code>jmap</code> (<code>JVM Memory Map</code>) 命令用来查看 <strong>堆内存</strong> 使用状况，一般结合 <code>jhat</code> 使用，用于生成 <code>heap dump</code> 文件。<code>jmap</code> 不仅能生成 <code>dump</code> 文件，还可以查询 <code>finalize</code> <strong>执行队列</strong>、<code>Java</code> <strong>堆</strong> 和 <strong>元空间</strong> <code>metaspace</code> 的详细信息，如当前 <strong>使用率</strong>、当前使用的是哪种 <strong>收集器</strong> 等等。</p>
 <blockquote>
-<p>如果不使用这个命令，还可以使用 <code>-XX:+HeapDumpOnOutOfMemoryError</code> 参数来让虚拟机出现 <code>OOM</code> 的时候，自动生成 <code>dump</code> 文件。</p>
+<p>如果不使用这个命令，还可以使用 <code>-XX:+HeapDumpOnOutOfMemoryError</code> 参数来让虚拟机出现 <code>OOM</code> 的时候，自动生成 <code>dump</code> 文件。</p>
 </blockquote>
 <p>命令格式如下：</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Usage:</span><br><span class="line">    jmap [option] &lt;pid&gt;</span><br><span class="line">        (to connect to running process)</span><br><span class="line">    jmap [option] &lt;executable &lt;core&gt;</span><br><span class="line">        (to connect to a core file)</span><br><span class="line">    jmap [option] [server_id@]&lt;remote server IP or hostname&gt;</span><br><span class="line">        (to connect to remote debug server)</span><br></pre></td></tr></table></figure>
@@ -908,18 +953,44 @@ ga('send', 'pageview');
 <li>server id：远程 <code>debug</code> 服务的 <strong>进程</strong> <code>ID</code>。</li>
 </ul>
 <p>参数选项说明如下：</p>
-<ul>
-<li>-heap：显示 <strong>堆</strong> 中的摘要信息；</li>
-<li>-histo：显示 <strong>堆</strong> 中对象的统计信息；</li>
-<li>-histo[:live]：只显示 <strong>堆</strong> 中 <strong>存活对象</strong> 的统计信息；</li>
-<li>-clstats：显示 <strong>类加载</strong> 的统计信息；</li>
-<li>-finalizerinfo：显示在 <code>F-Queue</code> <strong>队列</strong> 等待 <code>Finalizer</code> 线程执行 <code>finalizer</code> 方法的对象；</li>
-<li>-dump：导出内存转储快照。</li>
-</ul>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">参数</th>
+<th style="text-align:left">参数含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">heap</td>
+<td style="text-align:left">显示 <strong>堆</strong> 中的摘要信息</td>
+</tr>
+<tr>
+<td style="text-align:left">histo</td>
+<td style="text-align:left">显示 <strong>堆</strong> 中对象的统计信息</td>
+</tr>
+<tr>
+<td style="text-align:left">histo[:live]</td>
+<td style="text-align:left">只显示 <strong>堆</strong> 中 <strong>存活对象</strong> 的统计信息</td>
+</tr>
+<tr>
+<td style="text-align:left">clstats</td>
+<td style="text-align:left">显示 <strong>类加载</strong> 的统计信息</td>
+</tr>
+<tr>
+<td style="text-align:left">finalizerinfo</td>
+<td style="text-align:left">显示在 <code>F-Queue</code> <strong>队列</strong> 等待 <code>Finalizer</code> 线程执行 <code>finalizer</code> 方法的对象</td>
+</tr>
+<tr>
+<td style="text-align:left">dump</td>
+<td style="text-align:left">导出内存转储快照</td>
+</tr>
+</tbody>
+</table>
 <blockquote>
-<p>注意：<code>dump</code> 内存快照分析基本上包含了 <code>histo</code>、<code>clstats</code>、<code>finalizerinfo</code> 等功能。</p>
+<p>注意：<code>dump</code> 内存快照分析基本上包含了 <code>histo</code>、<code>clstats</code>、<code>finalizerinfo</code> 等功能。</p>
 </blockquote>
-<h3 id="3-1-heap"><a href="#3-1-heap" class="headerlink" title="3.1. heap"></a>3.1. heap</h3><p>显示 <strong>堆</strong> 中的摘要信息。包括 <strong>堆内存</strong> 的使用情况，正在使用的 <code>GC</code> <strong>算法</strong>、<strong>堆配置参数</strong> 和 <strong>各代中堆内存</strong> 使用情况。可以用此来判断内存目前的 <strong>使用情况</strong> 以及 <strong>垃圾回收</strong> 情况。</p>
+<h5 id="3-1-heap"><a href="#3-1-heap" class="headerlink" title="3.1. heap"></a>3.1. heap</h5><p>显示 <strong>堆</strong> 中的摘要信息。包括 <strong>堆内存</strong> 的使用情况，正在使用的 <code>GC</code> <strong>算法</strong>、<strong>堆配置参数</strong> 和 <strong>各代中堆内存</strong> 使用情况。可以用此来判断内存目前的 <strong>使用情况</strong> 以及 <strong>垃圾回收</strong> 情况。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line">$ jmap -heap 11368</span><br><span class="line">Attaching to process ID 11368, please <span class="built_in">wait</span>...</span><br><span class="line">Debugger attached successfully.</span><br><span class="line">Server compiler detected.</span><br><span class="line">JVM version is 25.101-b13</span><br><span class="line"></span><br><span class="line">using thread-local object allocation.</span><br><span class="line">Parallel GC with 2 thread(s)</span><br><span class="line"></span><br><span class="line">Heap Configuration:</span><br><span class="line">   MinHeapFreeRatio         = 0</span><br><span class="line">   MaxHeapFreeRatio         = 100</span><br><span class="line">   MaxHeapSize              = 2684354560 (2560.0MB)</span><br><span class="line">   NewSize                  = 1073741824 (1024.0MB)</span><br><span class="line">   MaxNewSize               = 1073741824 (1024.0MB)</span><br><span class="line">   OldSize                  = 1610612736 (1536.0MB)</span><br><span class="line">   NewRatio                 = 2</span><br><span class="line">   SurvivorRatio            = 8</span><br><span class="line">   MetaspaceSize            = 21807104 (20.796875MB)</span><br><span class="line">   CompressedClassSpaceSize = 1073741824 (1024.0MB)</span><br><span class="line">   MaxMetaspaceSize         = 17592186044415 MB</span><br><span class="line">   G1HeapRegionSize         = 0 (0.0MB)</span><br><span class="line"></span><br><span class="line">Heap Usage:</span><br><span class="line">PS Young Generation</span><br><span class="line">Eden Space:</span><br><span class="line">   capacity = 852492288 (813.0MB)</span><br><span class="line">   used     = 420427144 (400.95056915283203MB)</span><br><span class="line">   free     = 432065144 (412.04943084716797MB)</span><br><span class="line">   49.31741317993014% used</span><br><span class="line">From Space:</span><br><span class="line">   capacity = 113770496 (108.5MB)</span><br><span class="line">   used     = 2299712 (2.19317626953125MB)</span><br><span class="line">   free     = 111470784 (106.30682373046875MB)</span><br><span class="line">   2.021360617079493% used</span><br><span class="line">To Space:</span><br><span class="line">   capacity = 107479040 (102.5MB)</span><br><span class="line">   used     = 0 (0.0MB)</span><br><span class="line">   free     = 107479040 (102.5MB)</span><br><span class="line">   0.0% used</span><br><span class="line">PS Old Generation</span><br><span class="line">   capacity = 1610612736 (1536.0MB)</span><br><span class="line">   used     = 50883368 (48.526161193847656MB)</span><br><span class="line">   free     = 1559729368 (1487.4738388061523MB)</span><br><span class="line">   3.1592552860577903% used</span><br><span class="line"></span><br><span class="line">27595 interned Strings occupying 3138384 bytes.</span><br></pre></td></tr></table></figure>
 <p>这里主要对 <code>heap configuration</code> 的参数列表说明一下：</p>
 <table>
@@ -989,13 +1060,13 @@ ga('send', 'pageview');
 <tr>
 <td style="text-align:left">G1HeapRegionSize</td>
 <td style="text-align:left">-XX:G1HeapRegionSize</td>
-<td style="text-align:left">使用G1垃圾回收器时单个Region的大小，取值为1M至32M</td>
+<td style="text-align:left">使用G1垃圾回收器时单个Region的大小，取值为1M至32M</td>
 </tr>
 </tbody>
 </table>
 <h4 id="3-2-histo"><a href="#3-2-histo" class="headerlink" title="3.2. histo"></a>3.2. histo</h4><p>打印堆的 <strong>对象统计</strong>，包括 <strong>对象实例数</strong>、<strong>内存大小</strong> 等等。因为在 <code>histo:live</code> 前会进行 <code>full gc</code>，如果带上 <code>live</code> 则只统计 <strong>活对象</strong>。不加 <code>live</code> 的堆大小要大于加 <code>live</code> 堆的大小。</p>
 <figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">$ jmap -histo:live 12498</span><br><span class="line"> num     <span class="comment">#instances         #bytes  class name</span></span><br><span class="line">----------------------------------------------</span><br><span class="line">   1:         50358        7890344  [C</span><br><span class="line">   2:         22887        2014056  java.lang.reflect.Method</span><br><span class="line">   3:          3151        1485512  [B</span><br><span class="line">   4:         49267        1182408  java.lang.String</span><br><span class="line">   5:          7836         871384  java.lang.Class</span><br><span class="line">   6:         24149         772768  java.util.concurrent.ConcurrentHashMap<span class="variable">$Node</span></span><br><span class="line">   7:         20785         482256  [Ljava.lang.Class;</span><br><span class="line">   8:          8357         435248  [Ljava.lang.Object;</span><br><span class="line">   9:         10035         401400  java.util.LinkedHashMap<span class="variable">$Entry</span></span><br><span class="line">  10:          4803         369488  [Ljava.util.HashMap<span class="variable">$Node</span>;</span><br><span class="line">  11:         10763         344416  java.util.HashMap<span class="variable">$Node</span></span><br><span class="line">  12:          5205         291480  java.util.LinkedHashMap</span><br><span class="line">  13:          3055         219960  java.lang.reflect.Field</span><br><span class="line">  14:           120         193408  [Ljava.util.concurrent.ConcurrentHashMap<span class="variable">$Node</span>;</span><br><span class="line">  15:         11224         179584  java.lang.Object</span><br><span class="line">  16:          1988         146152  [Ljava.lang.reflect.Method;</span><br><span class="line">  17:          3036         145728  org.aspectj.weaver.reflect.ShadowMatchImpl</span><br><span class="line">  18:          1771         141680  java.lang.reflect.Constructor</span><br><span class="line">  19:          4903         117672  org.springframework.core.MethodClassKey</span><br><span class="line">  20:          3263         104416  java.lang.ref.WeakReference</span><br><span class="line">  21:          2507         100280  java.lang.ref.SoftReference</span><br><span class="line">  22:          2523          97600  [I</span><br><span class="line">  23:          3036          97152  org.aspectj.weaver.patterns.ExposedState</span><br><span class="line">  24:          2072          95280  [Ljava.lang.String;</span><br><span class="line">  25:           954          91584  org.springframework.beans.GenericTypeAwarePropertyDescriptor</span><br><span class="line">  26:          1633          91448  java.lang.Class<span class="variable">$ReflectionData</span></span><br><span class="line">  27:          3142          90520  [Z</span><br><span class="line">  28:          1671          80208  java.util.HashMap</span><br><span class="line">  29:          3244          77856  java.util.ArrayList</span><br><span class="line">  30:          3037          72880  [Lorg.aspectj.weaver.ast.Var;</span><br><span class="line">  31:          1809          72360  java.util.WeakHashMap<span class="variable">$Entry</span></span><br><span class="line">  32:          1967          62944  java.util.LinkedList</span><br></pre></td></tr></table></figure>
-<p>其中，<code>class name</code> 是 <strong>对象类型</strong>，对象 <strong>缩写类型</strong> 与 <strong>真实类型</strong> 的对应说明如下：</p>
+<p>其中，<code>class name</code> 是 <strong>对象类型</strong>，对象 <strong>缩写类型</strong> 与 <strong>真实类型</strong> 的对应说明如下：</p>
 <table>
 <thead>
 <tr>
@@ -1115,7 +1186,7 @@ ga('send', 'pageview');
 <tr>
 <td style="text-align:left">baseline</td>
 <td style="text-align:left">—</td>
-<td style="text-align:left">指定一个 <strong>基准堆转储</strong>。在两个heap dumps中有相同object ID的对象时，会被标记为不是新的，其他对象被标记为新的。在比较两个不同的堆转储时很有用</td>
+<td style="text-align:left">指定一个 <strong>基准堆转储</strong>。在两个heap dumps中有相同object ID的对象时，会被标记为不是新的，其他对象被标记为新的。在比较两个不同的堆转储时很有用</td>
 </tr>
 <tr>
 <td style="text-align:left">debug</td>
@@ -1141,23 +1212,23 @@ ga('send', 'pageview');
 <ul>
 <li>打开浏览器，输入 <code>http://localhost:7000</code>，查看 <code>jhat</code> 的分析报表页面：</li>
 </ul>
-<p><img src="http://ols3fdyll.bkt.clouddn.com/jhat_array.png" alt=""></p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/12/1652e8d753092849?w=2880&amp;h=1696&amp;f=png&amp;s=769053" alt=""></p>
 <ul>
 <li>可以按照 <strong>包名称</strong> 查看项目模块中的具体 <strong>对象示例</strong>：</li>
 </ul>
-<p><img src="http://ols3fdyll.bkt.clouddn.com/jhat_myclass.png" alt=""></p>
-<p>除此之外，报表分析的最后一页，还提供了一些扩展查询：</p>
-<p><img src="http://ols3fdyll.bkt.clouddn.com/jhat_other_query.png" alt=""></p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/12/1652e8d752efb04c?w=2880&amp;h=1726&amp;f=png&amp;s=769036" alt=""></p>
+<p>除此之外，报表分析的最后一页，还提供了一些扩展查询：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/12/1652e8d752fbdf18?w=2880&amp;h=468&amp;f=png&amp;s=120137" alt=""></p>
 <ul>
 <li>显示所有的 <code>Root</code> 集合；</li>
-<li>显示所有 <code>class</code> 的当前 <strong>对象实例数量</strong>（包含 <code>JVM</code> 平台相关类）；</li>
-<li>显示所有 <code>class</code> 的当前 <strong>对象实例数量</strong>（除去 <code>JVM</code> 平台相关类）；</li>
-<li>显示 <strong>堆内存</strong> 中实例对象的 <strong>统计直方图</strong>（和直接使用 <code>jmap</code> 没有区别）；</li>
+<li>显示所有 <code>class</code> 的当前 <strong>对象实例数量</strong>（包含 <code>JVM</code> 平台相关类）；</li>
+<li>显示所有 <code>class</code> 的当前 <strong>对象实例数量</strong>（除去 <code>JVM</code> 平台相关类）；</li>
+<li>显示 <strong>堆内存</strong> 中实例对象的 <strong>统计直方图</strong>（和直接使用 <code>jmap</code> 没有区别）；</li>
 <li>显示 <code>finalizer</code> 虚拟机 <strong>二次回收</strong> 的信息摘要；</li>
 <li>执行 <code>jhat</code> 提供的 <strong>对象查询语言</strong>（<code>OQL</code>）获取指定对象的实例信息。</li>
 </ul>
 <blockquote>
-<p>注意：<code>jhat</code> 支持根据某些条件来 <strong>过滤</strong> 或 <strong>查询</strong> 堆的对象。可以在 <code>jhat</code> 的 <code>html</code> 页面中执行 <code>OQL</code> 语句，来查询符合条件的对象。<code>OQL</code> `具体的语法可以直接访问 <a href="http://localhost:7000/oqlhelp。" target="_blank" rel="noopener">http://localhost:7000/oqlhelp。</a></p>
+<p>注意：<code>jhat</code> 支持根据某些条件来 <strong>过滤</strong> 或 <strong>查询</strong> 堆的对象。可以在 <code>jhat</code> 的 <code>html</code> 页面中执行 <code>OQL</code> 语句，来查询符合条件的对象。<code>OQL</code> `具体的语法可以直接访问 <a href="http://localhost:7000/oqlhelp。" target="_blank" rel="noopener">http://localhost:7000/oqlhelp。</a></p>
 </blockquote>
 <p>在具体排查时，需要结合代码，观察是否 <strong>大量应该被回收</strong> 的对象 <strong>一直被引用</strong>，或者是否有 <strong>占用内存特别大</strong> 的对象 <strong>无法被回收</strong>。</p>
 <h3 id="5-jstack堆栈跟踪工具"><a href="#5-jstack堆栈跟踪工具" class="headerlink" title="5. jstack堆栈跟踪工具"></a>5. jstack堆栈跟踪工具</h3><p><code>jstack</code> 用于生成 <code>java</code> 虚拟机当前时刻的 <strong>线程快照</strong>。<strong>线程快照</strong> 是当前 <code>java</code> 虚拟机内 <strong>每一条线程</strong> 正在执行的 <strong>方法堆栈</strong> 的 <strong>集合</strong>。生成线程快照的主要目的是定位线程出现 <strong>长时间停顿</strong> 的原因，如 <strong>线程间死锁</strong>、<strong>死循环</strong>、<strong>请求外部资源</strong> 导致的 <strong>长时间等待</strong> 等等。</p>
@@ -1197,7 +1268,61 @@ ga('send', 'pageview');
 <blockquote>
 <p>注意：在实际运行中，往往一次 <code>dump</code> 的信息，还不足以确认问题。建议产生三次 <code>dump</code> 信息，如果每次 <code>dump</code> 都指向同一个问题，才能确定问题的典型性。</p>
 </blockquote>
-<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1>
+<h4 id="5-1-系统线程状态"><a href="#5-1-系统线程状态" class="headerlink" title="5.1. 系统线程状态"></a>5.1. 系统线程状态</h4><p>在 <code>dump</code> 文件里，值得关注的 <strong>线程状态</strong> 有：</p>
+<ol>
+<li>死锁：Deadlock（重点关注）</li>
+<li>执行中：Runnable</li>
+<li>等待资源：Waiting on condition（重点关注） </li>
+<li>等待获取监视器：Waiting on monitor entry（重点关注）</li>
+<li>暂停：Suspended</li>
+<li>对象等待中：Object.wait() 或 TIMED_WAITING</li>
+<li>阻塞：Blocked（重点关注）  </li>
+<li>停止：Parked</li>
+</ol>
+<p>具体的含义如下所示：</p>
+<p><strong>(a). Deadlock</strong></p>
+<blockquote>
+<p><strong>死锁线程</strong>，一般指多个线程调用期间发生 <strong>资源的相互占用</strong>，导致一直等待无法释放的情况。</p>
+</blockquote>
+<p><strong>(b). Runnable</strong></p>
+<blockquote>
+<p>一般指该线程正在 <strong>执行状态</strong> 中，该线程占用了 <strong>资源</strong>，正在 <strong>处理某个请求</strong>。有可能正在传递 <code>SQL</code> 到数据库执行，有可能在对某个文件操作，有可能进行数据类型等转换。</p>
+</blockquote>
+<p><strong>(c). Waiting on condition</strong></p>
+<blockquote>
+<p>该状态在线程等待 <strong>某个条件</strong> 的发生。具体是什么原因，可以结合 <code>stacktrace</code> 来分析。线程处于这种 <strong>等待状态</strong>，一旦有数据准备好读之后，线程会重新激活，读取并处理数据。</p>
+</blockquote>
+<p>线程正处于等待资源或等待某个条件的发生，具体的原因需要结合下面堆栈信息进行分析。</p>
+<ul>
+<li><p>如果 <strong>堆栈信息</strong> 明确是 <strong>应用代码</strong>，则证明该线程正在 <strong>等待资源</strong>。一般是大量 <strong>读取某种资源</strong> 且该资源采用了 <strong>资源锁</strong> 的情况下，线程进入 <strong>等待状态</strong>。</p>
+</li>
+<li><p>如果发现有 <strong>大量的线程</strong> 都正处于这种状态，并且堆栈信息中得知正在 <strong>等待网络读写</strong>，这是因为 <strong>网络阻塞</strong> 导致 <strong>线程无法执行</strong>，很有可能是一个 <strong>网络瓶颈</strong> 的征兆：</p>
+<ul>
+<li>网络非常 <strong>繁忙</strong>，几乎消耗了所有的带宽，仍然有大量数据等待网络读写；</li>
+<li>网络可能是 <strong>空闲的</strong>，但由于 <strong>路由</strong> 或 <strong>防火墙</strong> 等原因，导致包无法正常到达。</li>
+</ul>
+</li>
+<li><p>还有一种常见的情况是该线程在 <code>sleep</code>，等待 <code>sleep</code> 的时间到了，将被唤醒。</p>
+</li>
+</ul>
+<p><strong>(d). Locked</strong></p>
+<blockquote>
+<p><strong>线程阻塞</strong>，是指当前线程执行过程中，所需要的资源 <strong>长时间等待</strong> 却 <strong>一直未能获取到</strong>，被容器的线程管理器标识为 <strong>阻塞状态</strong>，可以理解为 <strong>等待资源超时</strong> 的线程。</p>
+</blockquote>
+<p><strong>(e). Waiting for monitor entry 和 in Object.wait()</strong></p>
+<blockquote>
+<p><code>Monitor</code> 是 <code>Java</code> 中实现线程之间的 <strong>互斥与协作</strong> 的主要手段，它可以看成是 <strong>对象</strong> 或者 <code>Class</code> 的 <strong>锁</strong>。每一个对象都有一个 <code>monitor</code>。</p>
+</blockquote>
+<h4 id="5-1-死锁示例"><a href="#5-1-死锁示例" class="headerlink" title="5.1. 死锁示例"></a>5.1. 死锁示例</h4><p>下面给出一个 <strong>死锁</strong> 的案例，在 <code>IntLock</code> 中定义了两个静态的 <strong>可重入锁</strong> 实例，在主方法中声明了 <strong>两个线程</strong> 对 <strong>两把锁</strong> 进行资源竞争。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DeadLockRunner</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        IntLock r1 = <span class="keyword">new</span> IntLock(<span class="number">1</span>);</span><br><span class="line">        IntLock r2 = <span class="keyword">new</span> IntLock(<span class="number">2</span>);</span><br><span class="line">        Thread t1 = <span class="keyword">new</span> Thread(r1);</span><br><span class="line">        Thread t2 = <span class="keyword">new</span> Thread(r2);</span><br><span class="line">        t1.start();</span><br><span class="line">        t2.start();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">IntLock</span> <span class="keyword">implements</span> <span class="title">Runnable</span> </span>&#123;</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> ReentrantLock lock1 = <span class="keyword">new</span> ReentrantLock();</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">static</span> ReentrantLock lock2 = <span class="keyword">new</span> ReentrantLock();</span><br><span class="line">        <span class="keyword">private</span> <span class="keyword">int</span> lock;</span><br><span class="line"></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="title">IntLock</span><span class="params">(<span class="keyword">int</span> lock)</span> </span>&#123;</span><br><span class="line">            <span class="keyword">this</span>.lock = lock;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (lock == <span class="number">1</span>) &#123;</span><br><span class="line">                    lock1.lock();</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        Thread.sleep(<span class="number">500</span>);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    lock2.lock();</span><br><span class="line">                &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    lock2.lock();</span><br><span class="line"></span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        Thread.sleep(<span class="number">500</span>);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line"></span><br><span class="line">                    lock1.lock();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                <span class="keyword">if</span> (lock1.isHeldByCurrentThread()) &#123;</span><br><span class="line">                    lock1.unlock();</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (lock2.isHeldByCurrentThread()) &#123;</span><br><span class="line">                    lock2.unlock();</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="5-2-dump日志分析"><a href="#5-2-dump日志分析" class="headerlink" title="5.2. dump日志分析"></a>5.2. dump日志分析</h4><p>启动 <code>DeadLockRunner</code> 的 <code>main()</code> 方法，使用 <code>jps</code> 查看阻塞的 <code>jvm</code> 进程的 <code>id</code>，然后使用 <code>jstack</code> 查看 <strong>线程堆栈信息</strong>，可以发现两个线程相互 <strong>竞争资源</strong>，<strong>出现死锁</strong>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line">$ jstack -l 15584</span><br><span class="line">2018-08-12 20:35:40</span><br><span class="line">Full thread dump Java HotSpot(TM) 64-Bit Server VM (25.172-b11 mixed mode):</span><br><span class="line"></span><br><span class="line">// 省略...</span><br><span class="line"></span><br><span class="line">Found one Java-level deadlock:</span><br><span class="line">=============================</span><br><span class="line"><span class="string">"Thread-1"</span>:</span><br><span class="line">  waiting <span class="keyword">for</span> ownable synchronizer 0x000000076ad61180, (a java.util.concurrent.locks.ReentrantLock<span class="variable">$NonfairSync</span>),</span><br><span class="line">  <span class="built_in">which</span> is held by <span class="string">"Thread-0"</span></span><br><span class="line"><span class="string">"Thread-0"</span>:</span><br><span class="line">  waiting <span class="keyword">for</span> ownable synchronizer 0x000000076ad611b0, (a java.util.concurrent.locks.ReentrantLock<span class="variable">$NonfairSync</span>),</span><br><span class="line">  <span class="built_in">which</span> is held by <span class="string">"Thread-1"</span></span><br><span class="line"></span><br><span class="line">Java stack information <span class="keyword">for</span> the threads listed above:</span><br><span class="line">===================================================</span><br><span class="line"><span class="string">"Thread-1"</span>:</span><br><span class="line">	at sun.misc.Unsafe.park(Native Method)</span><br><span class="line">	- parking to <span class="built_in">wait</span> <span class="keyword">for</span>  &lt;0x000000076ad61180&gt; (a java.util.concurrent.locks.ReentrantLock<span class="variable">$NonfairSync</span>)</span><br><span class="line">	at java.util.concurrent.locks.LockSupport.park(LockSupport.java:175)</span><br><span class="line">	at java.util.concurrent.locks.AbstractQueuedSynchronizer.parkAndCheckInterrupt(AbstractQueuedSynchronizer.java:836)</span><br><span class="line">	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireQueued(AbstractQueuedSynchronizer.java:870)</span><br><span class="line">	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(AbstractQueuedSynchronizer.java:1199)</span><br><span class="line">	at java.util.concurrent.locks.ReentrantLock<span class="variable">$NonfairSync</span>.lock(ReentrantLock.java:209)</span><br><span class="line">	at java.util.concurrent.locks.ReentrantLock.lock(ReentrantLock.java:285)</span><br><span class="line">	at io.ostenant.deadlock.DeadLockRunner<span class="variable">$IntLock</span>.run(DeadLockRunner.java:47)</span><br><span class="line">	at java.lang.Thread.run(Thread.java:748)</span><br><span class="line"><span class="string">"Thread-0"</span>:</span><br><span class="line">	at sun.misc.Unsafe.park(Native Method)</span><br><span class="line">	- parking to <span class="built_in">wait</span> <span class="keyword">for</span>  &lt;0x000000076ad611b0&gt; (a java.util.concurrent.locks.ReentrantLock<span class="variable">$NonfairSync</span>)</span><br><span class="line">	at java.util.concurrent.locks.LockSupport.park(LockSupport.java:175)</span><br><span class="line">	at java.util.concurrent.locks.AbstractQueuedSynchronizer.parkAndCheckInterrupt(AbstractQueuedSynchronizer.java:836)</span><br><span class="line">	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquireQueued(AbstractQueuedSynchronizer.java:870)</span><br><span class="line">	at java.util.concurrent.locks.AbstractQueuedSynchronizer.acquire(AbstractQueuedSynchronizer.java:1199)</span><br><span class="line">	at java.util.concurrent.locks.ReentrantLock<span class="variable">$NonfairSync</span>.lock(ReentrantLock.java:209)</span><br><span class="line">	at java.util.concurrent.locks.ReentrantLock.lock(ReentrantLock.java:285)</span><br><span class="line">	at io.ostenant.deadlock.DeadLockRunner<span class="variable">$IntLock</span>.run(DeadLockRunner.java:37)</span><br><span class="line">	at java.lang.Thread.run(Thread.java:748)</span><br><span class="line"></span><br><span class="line">Found 1 deadlock.</span><br></pre></td></tr></table></figure>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>周志明，深入理解Java虚拟机：JVM高级特性与最佳实践，机械工业出版社</p>
+<hr>
+<p>欢迎关注技术公众号：零壹技术栈</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/4/16502c7bd1fd0856?w=258&amp;h=258&amp;f=jpeg&amp;s=16109" alt="零壹技术栈"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
         
         </div>
         <footer class="article-footer">
