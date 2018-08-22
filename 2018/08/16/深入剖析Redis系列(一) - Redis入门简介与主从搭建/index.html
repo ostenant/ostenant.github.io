@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>深入剖析Redis系列(一) - Redis入门简介与主从搭建 | Icarus&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="前言Redis 是一种基于 键值对 的 NoSQL 数据库。与很多键值对数据库不同，Redis 提供了丰富的 值数据存储结构，包括 string(字符串)、hash(哈希)、list(列表)、set(集合)、zset(有序集合)、bitmap(位图)等等。">
+<meta name="keywords" content="Redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="深入剖析Redis系列(一) - Redis入门简介与主从搭建">
+<meta property="og:url" content="https://ostenant.coding.me/2018/08/16/深入剖析Redis系列(一) - Redis入门简介与主从搭建/index.html">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
+<meta property="og:description" content="前言Redis 是一种基于 键值对 的 NoSQL 数据库。与很多键值对数据库不同，Redis 提供了丰富的 值数据存储结构，包括 string(字符串)、hash(哈希)、list(列表)、set(集合)、zset(有序集合)、bitmap(位图)等等。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/redis_black.png">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5dcc40392?w=258&h=258&f=jpeg&s=16109">
+<meta property="og:updated_time" content="2018-08-22T11:34:11.828Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="深入剖析Redis系列(一) - Redis入门简介与主从搭建">
+<meta name="twitter:description" content="前言Redis 是一种基于 键值对 的 NoSQL 数据库。与很多键值对数据库不同，Redis 提供了丰富的 值数据存储结构，包括 string(字符串)、hash(哈希)、list(列表)、set(集合)、zset(有序集合)、bitmap(位图)等等。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/redis_black.png">
+    
+
+    
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/cat.png" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fontawesome.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-brands.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-solid.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'true', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+        <meta name="google-site-verification" content="true" />
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Icarus&#39;s Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpeg" />
+                            <i class="fas fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fas fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpeg" />
+            <h2 id="name">陈林 | Icarus</h2>
+            <h3 id="title">年轻无为，卖码为生!</h3>
+            <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
+            <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                69
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                85
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/ostenant" target="_blank" title="github" class=tooltip>
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fab fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="linkedin" class=tooltip>
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fab fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-深入剖析Redis系列(一) - Redis入门简介与主从搭建" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            深入剖析Redis系列(一) - Redis入门简介与主从搭建
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2018/08/16/深入剖析Redis系列(一) - Redis入门简介与主从搭建/">
+            <time datetime="2018-08-16T05:36:00.000Z" itemprop="datePublished">2018-08-16</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/Redis学习系列/">Redis学习系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/Redis/">Redis</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <hr>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p><code>Redis</code> 是一种基于 <strong>键值对</strong> 的 <code>NoSQL</code> 数据库。与很多键值对数据库不同，<code>Redis</code> 提供了丰富的 <strong>值数据存储结构</strong>，包括 <code>string</code>(<strong>字符串</strong>)、<code>hash</code>(<strong>哈希</strong>)、<code>list</code>(<strong>列表</strong>)、<code>set</code>(<strong>集合</strong>)、<code>zset</code>(<strong>有序集合</strong>)、<code>bitmap</code>(<strong>位图</strong>)等等。</p>
+<a id="more"></a>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/redis_black.png" alt=""></p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><p><code>Redis</code> 是一个使用 <code>ANSI C</code> 编写的开源、支持 <strong>网络</strong>、基于 <strong>内存</strong>、<strong>单线程模型</strong>、<strong>可选持久性</strong> 的 <strong>键值对存储数据库</strong>。</p>
+<h2 id="1-Redis的特性"><a href="#1-Redis的特性" class="headerlink" title="1. Redis的特性"></a>1. Redis的特性</h2><ol>
+<li><p>速度快，最快可达到 <code>10w QPS</code>（基于 <strong>内存</strong>，<code>C</code> 语言，<strong>单线程</strong> 架构）；</p>
+</li>
+<li><p>基于 <strong>键值对</strong> (<code>key/value</code>) 的数据结构服务器。全称 <code>Remote Dictionary Server</code>。包括 <code>string</code>(<strong>字符串</strong>)、<code>hash</code>(<strong>哈希</strong>)、<code>list</code>(<strong>列表</strong>)、<code>set</code>(<strong>集合</strong>)、<code>zset</code>(<strong>有序集合</strong>)、<code>bitmap</code>(<strong>位图</strong>)。同时在 <strong>字符串</strong> 的基础上演变出 <strong>位图</strong>（<code>BitMaps</code>）和 <code>HyperLogLog</code> 两种数据结构。<code>3.2</code> 版本中加入 <code>GEO</code>（<strong>地理信息位置</strong>）。</p>
+</li>
+<li><p>丰富的功能。例如：<strong>键过期</strong>（缓存），<strong>发布订阅</strong>（消息队列）， <code>Lua</code> 脚本（自己实现 <code>Redis</code> 命令），<strong>事务</strong>，<strong>流水线</strong>（<code>Pipeline</code>，用于减少网络开销）。</p>
+</li>
+<li><p>简单稳定。无外部库依赖，单线程模型。</p>
+</li>
+<li><p>客户端语言多。</p>
+</li>
+<li><p><strong>持久化</strong>（支持两种 <strong>持久化</strong> 方式 <code>RDB</code> 和 <code>AOF</code>）。</p>
+</li>
+<li><p><strong>主从复制</strong>（分布式的基础）。</p>
+</li>
+<li><p><strong>高可用</strong>（<code>Redis Sentinel</code>），<strong>分布式</strong>（<code>Redis Cluster</code>）和 <strong>水平扩容</strong>。</p>
+</li>
+</ol>
+<h2 id="2-Redis的应用场景"><a href="#2-Redis的应用场景" class="headerlink" title="2. Redis的应用场景"></a>2. Redis的应用场景</h2><h3 id="2-1-缓存"><a href="#2-1-缓存" class="headerlink" title="2.1. 缓存"></a>2.1. 缓存</h3><p>合理的使用 <strong>缓存</strong> 能够明显加快访问的速度，同时降低数据源的压力。这也是 <code>Redis</code> 最常用的功能。<code>Redis</code> 提供了 <strong>键值过期时间</strong>（<code>EXPIRE key seconds</code>）设置，并且也提供了灵活控制 <strong>最大内存</strong> 和 <strong>内存溢出</strong> 后的 <strong>淘汰策略</strong>。</p>
+<h3 id="2-2-排行榜"><a href="#2-2-排行榜" class="headerlink" title="2.2. 排行榜"></a>2.2. 排行榜</h3><p>每个网站都有自己的排行榜，例如按照 <strong>热度排名</strong> 的排行榜，<strong>发布时间</strong> 的排行榜，<strong>答题排行榜</strong> 等等。<code>Redis</code> 提供了 <strong>列表</strong>（<code>list</code>）和 <strong>有序集合</strong>（<code>zset</code>）数据结构，合理的使用这些数据结构，可以很方便的构建各种排行榜系统。</p>
+<h3 id="2-3-计数器"><a href="#2-3-计数器" class="headerlink" title="2.3. 计数器"></a>2.3. 计数器</h3><p><strong>计数器</strong> 在网站应用中非常重要。例如：<strong>点赞数</strong>加 <code>1</code>，<strong>浏览数</strong> 加 <code>1</code>。还有常用的 <strong>限流操作</strong>，限制每个用户每秒 <strong>访问系统的次数</strong> 等等。<code>Redis</code> 支持 <strong>计数功能</strong>（<code>INCR key</code>），而且计数的 <strong>性能</strong> 也非常好，计数的同时也可以设置 <strong>超时时间</strong>，这样就可以 <strong>实现限流</strong>。</p>
+<h3 id="2-4-社交网络"><a href="#2-4-社交网络" class="headerlink" title="2.4. 社交网络"></a>2.4. 社交网络</h3><p>赞/踩，粉丝，共同好友/喜好，推送，下拉刷新等是社交网站必备的功能。由于社交网站 <strong>访问量通常比较大</strong>，而且 <strong>传统的数据库</strong> 不太适合保存这类数据，<code>Redis</code> 提供的 <strong>数据结构</strong> 可以相对比较容易实现这些功能。</p>
+<h3 id="2-5-消息队列"><a href="#2-5-消息队列" class="headerlink" title="2.5. 消息队列"></a>2.5. 消息队列</h3><p><code>Redis</code> 提供的 <strong>发布订阅</strong>（<code>PUB/SUB</code>）和 <strong>阻塞队列</strong> 的功能，虽然和专业的消息队列比，还 <strong>不够强大</strong>，但对于一般的消息队列功能基本满足。</p>
+<h2 id="3-Redis的安装配置"><a href="#3-Redis的安装配置" class="headerlink" title="3. Redis的安装配置"></a>3. Redis的安装配置</h2><p>下面介绍一下 <code>Redis</code> 的安装流程。我会按照如下的顺序，逐步搭建出 <strong>高可用</strong> 的 <code>Redis</code> 缓存服务器集群。</p>
+<ul>
+<li><code>Redis</code> <strong>单机服务器</strong> 搭建</li>
+<li><code>Redis</code> <strong>主从复制</strong> 搭建</li>
+<li><code>Redis-Sentinel</code> <strong>高可用</strong> 搭建</li>
+</ul>
+<h3 id="3-1-Redis单机服务器安装"><a href="#3-1-Redis单机服务器安装" class="headerlink" title="3.1. Redis单机服务器安装"></a>3.1. Redis单机服务器安装</h3><h4 id="3-1-1-下载并解压"><a href="#3-1-1-下载并解压" class="headerlink" title="3.1.1. 下载并解压"></a>3.1.1. 下载并解压</h4><p>首先从 <code>Redis</code> 官网下载 <code>Redis</code> 源代码并解压，这里使用的是 <strong>最新稳定版本</strong> <code>4.0.11</code>。依次执行如下命令：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/</span><br><span class="line">wget http://download.redis.io/releases/redis-4.0.11.tar.gz</span><br><span class="line">tar -zxvf redis-4.0.2.tar.gz</span><br></pre></td></tr></table></figure>
+<h4 id="3-1-2-编译并安装"><a href="#3-1-2-编译并安装" class="headerlink" title="3.1.2. 编译并安装"></a>3.1.2. 编译并安装</h4><p>下载并解压完毕后，则对 <strong>源码包</strong> 进行 <strong>编译安装</strong>，这里 <code>Redis</code> 安装路径为 <code>/usr/local/redis</code>。</p>
+<blockquote>
+<p><strong>注意</strong>：<code>make install PREFIX</code>=目标安装路径</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> /usr/<span class="built_in">local</span>/redis-4.0.11</span><br><span class="line">make install PREFIX=/usr/<span class="built_in">local</span>/redis</span><br></pre></td></tr></table></figure>
+<p>安装完成时，<code>/usr/local/redis/bin</code> 目录下会生成的几个可执行的文件。</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">可执行文件</th>
+<th style="text-align:left">作用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">redis-server</td>
+<td style="text-align:left">启动 redis 服务</td>
+</tr>
+<tr>
+<td style="text-align:left">redis-cli    redis</td>
+<td style="text-align:left">命令行客户端</td>
+</tr>
+<tr>
+<td style="text-align:left">redis-benchmark</td>
+<td style="text-align:left">redis 基准测试工具</td>
+</tr>
+<tr>
+<td style="text-align:left">redis-check-aof</td>
+<td style="text-align:left">redis AOF 持久化文件检测和修复工具</td>
+</tr>
+<tr>
+<td style="text-align:left">redis-check-dump</td>
+<td style="text-align:left">redis RDB 持久化文件检测和修复工具</td>
+</tr>
+<tr>
+<td style="text-align:left">redis-sentinel</td>
+<td style="text-align:left">启动 redis sentinel</td>
+</tr>
+</tbody>
+</table>
+<p>复制 <code>Redis</code> 相关命令到 <code>/usr/local/bin</code> 目录下，这样就可以直接执行这些命令，不用写全路径。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">cd</span> /usr/<span class="built_in">local</span>/redis/bin/</span><br><span class="line">$ sudo sudo cp redis-cli redis-server redis-sentinel /usr/<span class="built_in">local</span>/bin</span><br></pre></td></tr></table></figure>
+<h4 id="3-1-3-修改Redis配置文件"><a href="#3-1-3-修改Redis配置文件" class="headerlink" title="3.1.3. 修改Redis配置文件"></a>3.1.3. 修改Redis配置文件</h4><p>安装完成之后将 <code>Redis</code> 配置文件拷贝到 <code>/usr/local</code> 下，<code>redis.conf</code> 是 <code>Redis</code> 的配置文件，<code>redis.conf</code> 在 <code>Redis</code> 源码目录，<code>port</code> 默认是 <code>6379</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo cp /usr/<span class="built_in">local</span>/redis-4.0.11/redis.conf /usr/<span class="built_in">local</span>/</span><br></pre></td></tr></table></figure>
+<p><code>Redis</code> 配置文件主要参数解析参考：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># redis进程是否以守护进程的方式运行，yes为是，no为否(不以守护进程的方式运行会占用一个终端)。</span></span><br><span class="line">daemonize no</span><br><span class="line"><span class="comment"># 指定redis进程的PID文件存放位置</span></span><br><span class="line">pidfile /var/run/redis.pid</span><br><span class="line"><span class="comment"># redis进程的端口号</span></span><br><span class="line">port 6379</span><br><span class="line"><span class="comment"># 绑定的主机地址</span></span><br><span class="line"><span class="built_in">bind</span> 127.0.0.1</span><br><span class="line"><span class="comment"># 客户端闲置多长时间后关闭连接，默认此参数为0即关闭此功能</span></span><br><span class="line">timeout 300</span><br><span class="line"><span class="comment"># redis日志级别，可用的级别有debug.verbose.notice.warning</span></span><br><span class="line">loglevel verbose</span><br><span class="line"><span class="comment"># log文件输出位置，如果进程以守护进程的方式运行，此处又将输出文件设置为stdout的话，就会将日志信息输出到/dev/null里面去了</span></span><br><span class="line">logfile stdout</span><br><span class="line"><span class="comment"># 设置数据库的数量，默认为0可以使用select &lt;dbid&gt;命令在连接上指定数据库id</span></span><br><span class="line">databases 16</span><br><span class="line"><span class="comment"># 指定在多少时间内刷新次数达到多少的时候会将数据同步到数据文件</span></span><br><span class="line">save &lt;seconds&gt; &lt;changes&gt;</span><br><span class="line"><span class="comment"># 指定存储至本地数据库时是否压缩文件，默认为yes即启用存储</span></span><br><span class="line">rdbcompression yes</span><br><span class="line"><span class="comment"># 指定本地数据库文件名</span></span><br><span class="line">dbfilename dump.db</span><br><span class="line"><span class="comment"># 指定本地数据问就按存放位置</span></span><br><span class="line">dir ./</span><br><span class="line"><span class="comment"># 指定当本机为slave服务时，设置master服务的IP地址及端口，在redis启动的时候他会自动跟master进行数据同步</span></span><br><span class="line">slaveof &lt;masterip&gt; &lt;masterport&gt;</span><br><span class="line"><span class="comment"># 当master设置了密码保护时，slave服务连接master的密码</span></span><br><span class="line">masterauth &lt;master-password&gt;</span><br><span class="line"><span class="comment"># 设置redis连接密码，如果配置了连接密码，客户端在连接redis是需要通过AUTH&lt;password&gt;命令提供密码，默认关闭</span></span><br><span class="line">requirepass footbared</span><br><span class="line"><span class="comment"># 设置同一时间最大客户连接数，默认无限制。redis可以同时连接的客户端数为redis程序可以打开的最大文件描述符，如果设置 maxclients 0，表示不作限制。当客户端连接数到达限制时，Redis会关闭新的连接并向客户端返回 max number of clients reached 错误信息</span></span><br><span class="line">maxclients 128</span><br><span class="line"><span class="comment"># 指定Redis最大内存限制，Redis在启动时会把数据加载到内存中，达到最大内存后，Redis会先尝试清除已到期或即将到期的Key。当此方法处理后，仍然到达最大内存设置，将无法再进行写入操作，但仍然可以进行读取操作。Redis新的vm机制，会把Key存放内存，Value会存放在swap区</span></span><br><span class="line">maxmemory&lt;bytes&gt;</span><br><span class="line"><span class="comment"># 指定是否在每次更新操作后进行日志记录，Redis在默认情况下是异步的把数据写入磁盘，如果不开启，可能会在断电时导致一段时间内的数据丢失。因为redis本身同步数据文件是按上面save条件来同步的，所以有的数据会在一段时间内只存在于内存中。默认为no。</span></span><br><span class="line">appendonly no</span><br><span class="line"><span class="comment"># 指定跟新日志文件名默认为appendonly.aof</span></span><br><span class="line">appendfilename appendonly.aof</span><br><span class="line"><span class="comment"># 指定更新日志的条件，有三个可选参数 - no：表示等操作系统进行数据缓存同步到磁盘(快)，always：表示每次更新操作后手动调用fsync()将数据写到磁盘(慢，安全)， everysec：表示每秒同步一次(折衷，默认值)；</span></span><br><span class="line">appendfsync everysec</span><br></pre></td></tr></table></figure>
+<ul>
+<li>设置后台启动</li>
+</ul>
+<p>由于 <code>Redis</code> 默认是 <strong>前台启动</strong>，不建议使用。修改 <code>Redis</code> 配置文件，把 <code>daemonize no</code> 改为 <code>daemonize yes</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">daemonize yes</span><br></pre></td></tr></table></figure>
+<ul>
+<li>设置远程访问</li>
+</ul>
+<p><code>Redis</code> 默认只允许 <strong>本机访问</strong>，把 <code>bind</code> 修改为 <code>bind 0.0.0.0</code> 此设置会变成 <strong>允许所有远程访问</strong>。如果想指定限制访问，可设置对应的 <code>IP</code>。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">bind</span> 0.0.0.0</span><br></pre></td></tr></table></figure>
+<ul>
+<li>配置 <code>Redis</code> 日志记录</li>
+</ul>
+<p>找到 <code>logfile</code> 配置，默认是：<code>logfile &quot;&quot;</code>，改为自定义日志文件路径。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">logfile /var/<span class="built_in">log</span>/redis_6379.log</span><br></pre></td></tr></table></figure>
+<ul>
+<li>设置 <code>Redis</code> 请求密码</li>
+</ul>
+<p>把 <code>requirepass</code> 修改为 <code>123456</code>，修改之后重启下服务</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">requirepass <span class="string">"123456"</span></span><br></pre></td></tr></table></figure>
+<p>有了密码之后，进入客户端，就得这样访问：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ redis-cli -h 127.0.0.1 -p 6379 -a 123456</span><br></pre></td></tr></table></figure>
+<h4 id="3-1-4-Redis的常用命令"><a href="#3-1-4-Redis的常用命令" class="headerlink" title="3.1.4. Redis的常用命令"></a>3.1.4. Redis的常用命令</h4><ul>
+<li>启动命令</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ redis-server /usr/<span class="built_in">local</span>/redis.conf</span><br></pre></td></tr></table></figure>
+<ul>
+<li>关闭命令</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ redis-cli -h 127.0.0.1 -p 6379 shutdown</span><br></pre></td></tr></table></figure>
+<ul>
+<li>查看是否启动</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ ps -ef | grep redis</span><br></pre></td></tr></table></figure>
+<ul>
+<li>进入客户端</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ redis-cli</span><br></pre></td></tr></table></figure>
+<ul>
+<li>关闭客户端</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ redis-cli shutdown</span><br></pre></td></tr></table></figure>
+<blockquote>
+<p><strong>注意</strong>：不建议使用 <code>kill -9</code>，这种方式不但不会做持久化操作，还会造成缓冲区等资源不能优雅关闭。极端情况下造成 <code>AOF</code> 和 <strong>复制丢失数据</strong> 的情况。<code>shutdown</code> 还有一个参数，代表是否在关闭 <code>redis</code> 前，生成 <strong>持久化文件</strong>，命令为 <code>redis-cli shutdown nosave|save</code>。</p>
+</blockquote>
+<ul>
+<li>设置为开机自动启动</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ <span class="built_in">echo</span> <span class="string">"redis-server /usr/local/redis.conf"</span> &gt;&gt; /etc/rc.local</span><br></pre></td></tr></table></figure>
+<ul>
+<li>开放防火墙端口</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 添加规则</span></span><br><span class="line">iptables -I INPUT -p tcp -m tcp --dport 6379 -j ACCEPT</span><br><span class="line"><span class="comment"># 保存规则</span></span><br><span class="line">service iptables save</span><br><span class="line"><span class="comment"># 重启iptables</span></span><br><span class="line">service iptables restart</span><br></pre></td></tr></table></figure>
+<h4 id="3-1-5-注册Redis为系统服务"><a href="#3-1-5-注册Redis为系统服务" class="headerlink" title="3.1.5. 注册Redis为系统服务"></a>3.1.5. 注册Redis为系统服务</h4><p>在 <code>/etc/init.d</code> 目录下添加 <code>Redis</code> 服务的 <strong>启动</strong>，<strong>暂停</strong> 和 <strong>重启</strong> 脚本：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ sudo /etc/init.d/redis</span><br></pre></td></tr></table></figure>
+<p>脚本的内容如下：</p>
+<figure class="highlight sh"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#!/bin/sh  </span></span><br><span class="line"><span class="comment">#  </span></span><br><span class="line"><span class="comment"># redis - this script starts and stops the redis-server daemon  </span></span><br><span class="line"><span class="comment">#  </span></span><br><span class="line"><span class="comment"># chkconfig:   - 85 15  </span></span><br><span class="line"><span class="comment"># description:  Redis is a persistent key-value database  </span></span><br><span class="line"><span class="comment"># processname: redis-server  </span></span><br><span class="line"><span class="comment"># config:      /usr/local/redis/bin/redis-server</span></span><br><span class="line"><span class="comment"># config:      /etc/redis.conf  </span></span><br><span class="line"><span class="comment"># Source function library.  </span></span><br><span class="line">. /etc/rc.d/init.d/<span class="built_in">functions</span>  </span><br><span class="line"><span class="comment"># Source networking configuration.  </span></span><br><span class="line">. /etc/sysconfig/network  </span><br><span class="line"><span class="comment"># Check that networking is up.  </span></span><br><span class="line">[ <span class="string">"<span class="variable">$NETWORKING</span>"</span> = <span class="string">"no"</span> ] &amp;&amp; <span class="built_in">exit</span> 0  </span><br><span class="line">redis=<span class="string">"/usr/local/redis/bin/redis-server"</span> </span><br><span class="line">prog=$(basename <span class="variable">$redis</span>)  </span><br><span class="line">REDIS_CONF_FILE=<span class="string">"/etc/redis.conf"</span> </span><br><span class="line">[ -f /etc/sysconfig/redis ] &amp;&amp; . /etc/sysconfig/redis  </span><br><span class="line">lockfile=/var/lock/subsys/redis  </span><br><span class="line"><span class="function"><span class="title">start</span></span>() &#123;  </span><br><span class="line">    [ -x <span class="variable">$redis</span> ] || <span class="built_in">exit</span> 5  </span><br><span class="line">    [ -f <span class="variable">$REDIS_CONF_FILE</span> ] || <span class="built_in">exit</span> 6  </span><br><span class="line">    <span class="built_in">echo</span> -n $<span class="string">"Starting <span class="variable">$prog</span>: "</span>  </span><br><span class="line">    daemon <span class="variable">$redis</span> <span class="variable">$REDIS_CONF_FILE</span>  </span><br><span class="line">    retval=$?  </span><br><span class="line">    <span class="built_in">echo</span>  </span><br><span class="line">    [ <span class="variable">$retval</span> -eq 0 ] &amp;&amp; touch <span class="variable">$lockfile</span>  </span><br><span class="line">    <span class="built_in">return</span> <span class="variable">$retval</span>  </span><br><span class="line">&#125;  </span><br><span class="line"><span class="function"><span class="title">stop</span></span>() &#123;  </span><br><span class="line">    <span class="built_in">echo</span> -n $<span class="string">"Stopping <span class="variable">$prog</span>: "</span>  </span><br><span class="line">    killproc <span class="variable">$prog</span> -QUIT  </span><br><span class="line">    retval=$?  </span><br><span class="line">    <span class="built_in">echo</span>  </span><br><span class="line">    [ <span class="variable">$retval</span> -eq 0 ] &amp;&amp; rm -f <span class="variable">$lockfile</span>  </span><br><span class="line">    <span class="built_in">return</span> <span class="variable">$retval</span>  </span><br><span class="line">&#125;  </span><br><span class="line"><span class="function"><span class="title">restart</span></span>() &#123;  </span><br><span class="line">    stop  </span><br><span class="line">    start  </span><br><span class="line">&#125;  </span><br><span class="line"><span class="function"><span class="title">reload</span></span>() &#123;  </span><br><span class="line">    <span class="built_in">echo</span> -n $<span class="string">"Reloading <span class="variable">$prog</span>: "</span>  </span><br><span class="line">    killproc <span class="variable">$redis</span> -HUP  </span><br><span class="line">    RETVAL=$?  </span><br><span class="line">    <span class="built_in">echo</span>  </span><br><span class="line">&#125;  </span><br><span class="line"><span class="function"><span class="title">force_reload</span></span>() &#123;  </span><br><span class="line">    restart  </span><br><span class="line">&#125;  </span><br><span class="line"><span class="function"><span class="title">rh_status</span></span>() &#123;  </span><br><span class="line">    status <span class="variable">$prog</span>  </span><br><span class="line">&#125;  </span><br><span class="line"><span class="function"><span class="title">rh_status_q</span></span>() &#123;  </span><br><span class="line">    rh_status &gt;/dev/null 2&gt;&amp;1  </span><br><span class="line">&#125;  </span><br><span class="line"><span class="keyword">case</span> <span class="string">"<span class="variable">$1</span>"</span> <span class="keyword">in</span>  </span><br><span class="line">    start)  </span><br><span class="line">        rh_status_q &amp;&amp; <span class="built_in">exit</span> 0  </span><br><span class="line">        <span class="variable">$1</span>  </span><br><span class="line">        ;;  </span><br><span class="line">    stop)  </span><br><span class="line">        rh_status_q || <span class="built_in">exit</span> 0  </span><br><span class="line">        <span class="variable">$1</span>  </span><br><span class="line">        ;;  </span><br><span class="line">    restart|configtest)  </span><br><span class="line">        <span class="variable">$1</span>  </span><br><span class="line">        ;;  </span><br><span class="line">    reload)  </span><br><span class="line">        rh_status_q || <span class="built_in">exit</span> 7  </span><br><span class="line">        <span class="variable">$1</span>  </span><br><span class="line">        ;;  </span><br><span class="line">    force-reload)  </span><br><span class="line">        force_reload  </span><br><span class="line">        ;;  </span><br><span class="line">    status)  </span><br><span class="line">        rh_status  </span><br><span class="line">        ;;  </span><br><span class="line">    condrestart|try-restart)  </span><br><span class="line">        rh_status_q || <span class="built_in">exit</span> 0  </span><br><span class="line">    ;;  </span><br><span class="line">    *)  </span><br><span class="line">        <span class="built_in">echo</span> $<span class="string">"Usage: <span class="variable">$0</span> &#123;start|stop|status|restart|condrestart|try-restart|reload|orce-reload&#125;"</span>  </span><br><span class="line">        <span class="built_in">exit</span> 2  </span><br><span class="line"><span class="keyword">esac</span></span><br></pre></td></tr></table></figure>
+<p>赋予脚本文件可执行权限：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ chmod 755 /etc/init.d/redis</span><br></pre></td></tr></table></figure>
+<p>启动、停止和重启 <code>redis</code> 服务：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">service redis start</span><br><span class="line">service redis stop</span><br><span class="line">service redis restart</span><br></pre></td></tr></table></figure>
+<h3 id="3-2-Redis主从复制集群安装"><a href="#3-2-Redis主从复制集群安装" class="headerlink" title="3.2. Redis主从复制集群安装"></a>3.2. Redis主从复制集群安装</h3><h4 id="3-2-1-Redis-Server配置说明"><a href="#3-2-1-Redis-Server配置说明" class="headerlink" title="3.2.1. Redis-Server配置说明"></a>3.2.1. Redis-Server配置说明</h4><table>
+<thead>
+<tr>
+<th style="text-align:left">角色</th>
+<th style="text-align:left">IP地址</th>
+<th style="text-align:left">端口号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Redis Master</td>
+<td style="text-align:left">10.206.20.231</td>
+<td style="text-align:left">16379</td>
+</tr>
+<tr>
+<td style="text-align:left">Redis Slave</td>
+<td style="text-align:left">10.206.20.231</td>
+<td style="text-align:left">26379</td>
+</tr>
+</tbody>
+</table>
+<h4 id="3-2-2-Redis主从架构配置"><a href="#3-2-2-Redis主从架构配置" class="headerlink" title="3.2.2. Redis主从架构配置"></a>3.2.2. Redis主从架构配置</h4><ul>
+<li>编辑 <strong>从机</strong> 的 <code>Redis</code> 配置文件，找到 <code>210</code> 行（大概）- <code>#slaveof &lt;masterip&gt; &lt;masterport&gt;</code><br>。去掉该注释，填写 <strong>主服务器</strong> 的 <code>IP</code> 和 <strong>端口</strong>。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slaveof 10.206.20.231 16379</span><br></pre></td></tr></table></figure>
+<ul>
+<li>如果 <strong>主服务器</strong> 设置了密码，还需要找到 <code>masterauth &lt;master-password&gt;</code> 这一行，去掉注释，改为 <code>masterauth</code> 的主机密码。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">masterauth 123456</span><br></pre></td></tr></table></figure>
+<ul>
+<li>配置完成后重启 <strong>从服务器</strong> 的 <code>Redis</code> 服务。</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ service redis restart</span><br></pre></td></tr></table></figure>
+<ul>
+<li>重启完成之后，进入 <strong>主服务器</strong> 的 <code>redis-cli</code> 模式下，命令为 <code>redis-cli -h 127.0.0.1 -p 16379 -a 123456</code>。输入 <code>INFO replication</code> 查询到 <strong>当前主机</strong> 的 <code>Redis</code> 的状态，连接上 <strong>主服务器</strong> 的 <strong>从服务器</strong>。</li>
+</ul>
+<p><code>Redis</code> <strong>主服务器</strong> 的配置文件：</p>
+<ul>
+<li>redis.conf</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">daemonize yes</span><br><span class="line">pidfile /var/run/redis-16379.pid</span><br><span class="line">logfile /var/<span class="built_in">log</span>/redis/redis-16379.log</span><br><span class="line">port 16379</span><br><span class="line"><span class="built_in">bind</span> 0.0.0.0</span><br><span class="line">timeout 300</span><br><span class="line">databases 16</span><br><span class="line">dbfilename dump-16379.db</span><br><span class="line">dir ./redis-workdir</span><br><span class="line">masterauth 123456</span><br><span class="line">requirepass 123456</span><br></pre></td></tr></table></figure>
+<p><code>Redis</code> <strong>从服务器</strong> 的配置文件：</p>
+<ul>
+<li>redis.conf</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">daemonize yes</span><br><span class="line">pidfile /var/run/redis-26379.pid</span><br><span class="line">logfile /var/<span class="built_in">log</span>/redis/redis-26379.log</span><br><span class="line">port 26379</span><br><span class="line"><span class="built_in">bind</span> 0.0.0.0</span><br><span class="line">timeout 300</span><br><span class="line">databases 16</span><br><span class="line">dbfilename dump-26379.db</span><br><span class="line">dir ./redis-workdir</span><br><span class="line">masterauth 123456</span><br><span class="line">requirepass 123456</span><br><span class="line">slaveof 127.0.0.1 16379</span><br></pre></td></tr></table></figure>
+<p><code>Redis</code> <strong>主服务器</strong> 的状态如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># Replication</span><br><span class="line">role:master</span><br><span class="line">connected_slaves:1</span><br><span class="line">slave0:ip=10.206.20.231,port=16379,state=online,offset=28,lag=1</span><br><span class="line">master_replid:625ae9f362643da5337835beaeabfdca426198c7</span><br><span class="line">master_replid2:0000000000000000000000000000000000000000</span><br><span class="line">master_repl_offset:28</span><br><span class="line">second_repl_offset:-1</span><br><span class="line">repl_backlog_active:1</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:1</span><br><span class="line">repl_backlog_histlen:28</span><br></pre></td></tr></table></figure>
+<p><code>Redis</code> <strong>从服务器</strong> 的状态如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"># Replication</span><br><span class="line">role:slave</span><br><span class="line">master_host:10.206.20.231</span><br><span class="line">master_port:26379</span><br><span class="line">master_link_status:up</span><br><span class="line">master_last_io_seconds_ago:3</span><br><span class="line">master_sync_in_progress:0</span><br><span class="line">slave_repl_offset:210</span><br><span class="line">slave_priority:100</span><br><span class="line">slave_read_only:1</span><br><span class="line">connected_slaves:0</span><br><span class="line">master_replid:625ae9f362643da5337835beaeabfdca426198c7</span><br><span class="line">master_replid2:0000000000000000000000000000000000000000</span><br><span class="line">master_repl_offset:210</span><br><span class="line">second_repl_offset:-1</span><br><span class="line">repl_backlog_active:1</span><br><span class="line">repl_backlog_size:1048576</span><br><span class="line">repl_backlog_first_byte_offset:1</span><br><span class="line">repl_backlog_histlen:210</span><br></pre></td></tr></table></figure>
+<h4 id="3-2-3-Redis主从配置验证"><a href="#3-2-3-Redis主从配置验证" class="headerlink" title="3.2.3. Redis主从配置验证"></a>3.2.3. Redis主从配置验证</h4><p>上面完成了基本的 <strong>主从配置</strong>，可以简单的测试一下效果：</p>
+<ul>
+<li>进入 <strong>主服务器</strong> 的 <code>redis-cli</code> 模式，然后 <code>set</code> 一个值，比如：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; <span class="built_in">set</span> master_port <span class="string">"16379"</span></span><br><span class="line">OK</span><br></pre></td></tr></table></figure>
+<ul>
+<li>切换进入 <strong>从服务器</strong> 的 <code>redis-cli</code> 的模式，查询刚刚设置的值看是否存在：</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&gt; get master_port</span><br><span class="line"><span class="string">"16379"</span></span><br></pre></td></tr></table></figure>
+<p>此时，我们可以发现是可以获取到值的，<code>Redis</code> 的 <strong>主从模式</strong> 正常工作。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>本文简单的说明了 <code>Redis</code> 的相关 <strong>特性</strong> 和 <strong>应用场景</strong>，详细地给出 <code>Redis</code> 单服务器的 <strong>编译</strong>，<strong>安装</strong>，<strong>配置</strong> 和 <strong>启动</strong>，进一步引入了 <code>Redis</code> <strong>主从复制</strong> 的相关原理和详细配置。关于 <code>Redis</code> 的 <strong>高可用机制</strong> 和 <strong>集群搭建</strong>，下文将给出详细的说明。</p>
+<h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>《Redis 开发与运维》</p>
+<hr>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5dcc40392?w=258&amp;h=258&amp;f=jpeg&amp;s=16109" alt="零壹技术栈"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+        <a href="https://ostenant.coding.me/2018/08/16/深入剖析Redis系列(一) - Redis入门简介与主从搭建/#comments" class="article-comment-link">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2018/08/17/深入剖析Redis系列(二) - Redis哨兵模式与高可用集群/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">上一篇</strong>
+            <div class="article-nav-title">
+                
+                    深入剖析Redis系列(二) - Redis哨兵模式与高可用集群
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2018/08/06/JVM系列(七) - JVM线上监控工具/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">JVM系列(七) - JVM线上监控工具</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="lv-container" data-id="city" data-uid=MTAyMC8zNzE2NC8xMzY5OA==></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="no-thumbnail">
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Redis学习系列/">Redis学习系列</a></p>
+                            <p class="item-title"><a href="/2018/08/17/深入剖析Redis系列(二) - Redis哨兵模式与高可用集群/" class="title">深入剖析Redis系列(二) - Redis哨兵模式与高可用集群</a></p>
+                            <p class="item-date"><time datetime="2018-08-17T15:02:00.000Z" itemprop="datePublished">2018-08-17</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Redis学习系列/">Redis学习系列</a></p>
+                            <p class="item-title"><a href="/2018/08/16/深入剖析Redis系列(一) - Redis入门简介与主从搭建/" class="title">深入剖析Redis系列(一) - Redis入门简介与主从搭建</a></p>
+                            <p class="item-date"><time datetime="2018-08-16T05:36:00.000Z" itemprop="datePublished">2018-08-16</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a></p>
+                            <p class="item-title"><a href="/2018/08/06/JVM系列(七) - JVM线上监控工具/" class="title">JVM系列(七) - JVM线上监控工具</a></p>
+                            <p class="item-date"><time datetime="2018-08-06T07:21:00.000Z" itemprop="datePublished">2018-08-06</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a></p>
+                            <p class="item-title"><a href="/2018/08/03/JVM系列(六) - JVM垃圾回收器/" class="title">JVM系列(六) - JVM垃圾回收器</a></p>
+                            <p class="item-date"><time datetime="2018-08-02T22:58:00.000Z" itemprop="datePublished">2018-08-03</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/高并发系统系列/">高并发系统系列</a></p>
+                            <p class="item-title"><a href="/2018/07/15/浅谈Nginx服务器的内部核心架构设计/" class="title">浅谈Nginx服务器的内部核心架构设计</a></p>
+                            <p class="item-date"><time datetime="2018-07-15T10:50:00.000Z" itemprop="datePublished">2018-07-15</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程基础系列/">Java编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL学习系列/">MySQL学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Redis学习系列/">Redis学习系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RxJava异步框架系列/">RxJava异步框架系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Reactive编程系列/">Spring Reactive编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/任务调度框架系列/">任务调度框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/加密算法系列/">加密算法系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术知识图谱/">技术知识图谱</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/测试框架系列/">测试框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/消息队列系列/">消息队列系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/高并发系统系列/">高并发系统系列</a><span class="category-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">4</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AES/">AES</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ActiveMQ/">ActiveMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DES/">DES</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker-Compose/">Docker Compose</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Filter/">Filter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interceptor/">Interceptor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JWT/">JWT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Listener/">Listener</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MD5/">MD5</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mockito/">Mockito</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth/">OAuth</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paxos/">Paxos</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Quartz/">Quartz</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RSA/">RSA</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RabbitMQ/">RabbitMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raft/">Raft</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactive-Streams/">Reactive Streams</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactor/">Reactor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/">Redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis-Sentinel/">Redis Sentinel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RocketMQ/">RocketMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RxJava/">RxJava</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SAML/">SAML</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SHA1/">SHA1</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-Boot/">SOFA-Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SSO/">SSO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ScheduledExecutorService/">ScheduledExecutorService</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Servlet/">Servlet</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Session/">Session</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot-2-0/">Spring Boot 2.0</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Task/">Spring Task</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-WebFlux/">Spring WebFlux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Timer/">Timer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unique-ID/">Unique ID</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一致性哈希/">一致性哈希</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/主从复制/">主从复制</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式存储/">分布式存储</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分片/">分片</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反向代理/">反向代理</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反模式/">反模式</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/定时任务/">定时任务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异步/">异步</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/负载均衡/">负载均衡</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/限流/">限流</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高性能/">高性能</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/AES/" style="font-size: 10px;">AES</a> <a href="/tags/ActiveMQ/" style="font-size: 10px;">ActiveMQ</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Android/" style="font-size: 12.86px;">Android</a> <a href="/tags/Apache/" style="font-size: 12.86px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.43px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/DES/" style="font-size: 10px;">DES</a> <a href="/tags/Docker/" style="font-size: 15.71px;">Docker</a> <a href="/tags/Docker-Compose/" style="font-size: 10px;">Docker Compose</a> <a href="/tags/Filter/" style="font-size: 10px;">Filter</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Interceptor/" style="font-size: 10px;">Interceptor</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.43px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 17.14px;">JVM</a> <a href="/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/tags/Java/" style="font-size: 18.57px;">Java</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/Listener/" style="font-size: 10px;">Listener</a> <a href="/tags/MD5/" style="font-size: 10px;">MD5</a> <a href="/tags/Mockito/" style="font-size: 10px;">Mockito</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NIO/" style="font-size: 14.29px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 11.43px;">Nginx</a> <a href="/tags/OAuth/" style="font-size: 10px;">OAuth</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Paxos/" style="font-size: 10px;">Paxos</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/Quartz/" style="font-size: 11.43px;">Quartz</a> <a href="/tags/RPC/" style="font-size: 20px;">RPC</a> <a href="/tags/RSA/" style="font-size: 10px;">RSA</a> <a href="/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/tags/Raft/" style="font-size: 10px;">Raft</a> <a href="/tags/Reactive-Streams/" style="font-size: 11.43px;">Reactive Streams</a> <a href="/tags/Reactor/" style="font-size: 10px;">Reactor</a> <a href="/tags/Redis/" style="font-size: 11.43px;">Redis</a> <a href="/tags/Redis-Sentinel/" style="font-size: 10px;">Redis Sentinel</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/RocketMQ/" style="font-size: 10px;">RocketMQ</a> <a href="/tags/RxJava/" style="font-size: 12.86px;">RxJava</a> <a href="/tags/SAML/" style="font-size: 10px;">SAML</a> <a href="/tags/SHA1/" style="font-size: 10px;">SHA1</a> <a href="/tags/SOFA-Boot/" style="font-size: 12.86px;">SOFA-Boot</a> <a href="/tags/SOFA-RPC/" style="font-size: 14.29px;">SOFA-RPC</a> <a href="/tags/SSO/" style="font-size: 10px;">SSO</a> <a href="/tags/ScheduledExecutorService/" style="font-size: 10px;">ScheduledExecutorService</a> <a href="/tags/Servlet/" style="font-size: 10px;">Servlet</a> <a href="/tags/Session/" style="font-size: 10px;">Session</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Boot-2-0/" style="font-size: 18.57px;">Spring Boot 2.0</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.43px;">Spring Cloud</a> <a href="/tags/Spring-Task/" style="font-size: 10px;">Spring Task</a> <a href="/tags/Spring-WebFlux/" style="font-size: 11.43px;">Spring WebFlux</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 15.71px;">Thrift</a> <a href="/tags/Timer/" style="font-size: 10px;">Timer</a> <a href="/tags/Unique-ID/" style="font-size: 10px;">Unique ID</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/一致性哈希/" style="font-size: 10px;">一致性哈希</a> <a href="/tags/主从复制/" style="font-size: 10px;">主从复制</a> <a href="/tags/分布式/" style="font-size: 14.29px;">分布式</a> <a href="/tags/分布式存储/" style="font-size: 10px;">分布式存储</a> <a href="/tags/分片/" style="font-size: 10px;">分片</a> <a href="/tags/反向代理/" style="font-size: 10px;">反向代理</a> <a href="/tags/反模式/" style="font-size: 12.86px;">反模式</a> <a href="/tags/定时任务/" style="font-size: 10px;">定时任务</a> <a href="/tags/异步/" style="font-size: 15.71px;">异步</a> <a href="/tags/微服务/" style="font-size: 12.86px;">微服务</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/负载均衡/" style="font-size: 10px;">负载均衡</a> <a href="/tags/限流/" style="font-size: 10px;">限流</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a> <a href="/tags/高性能/" style="font-size: 10px;">高性能</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://ifeve.com" target="_blank">并发编程网</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://juejin.im" target="_blank">掘金</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.jianshu.com" target="_blank">简书</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com" target="_blank">Github</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.infoq.com" target="_blank">Infoq</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fas fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
+            
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+        </div>
+    </div>
+</footer>
+        
+    
+    
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+     (function(d, s) {
+         var j, e = d.getElementsByTagName(s)[0];
+
+         if (typeof LivereTower === 'function') { return; }
+
+         j = d.createElement(s);
+         j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+         j.async = true;
+
+         e.parentNode.insertBefore(j, e);
+     })(document, 'script');
+    </script>
+  <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+  <!-- City版安装代码已完成 -->
+
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
