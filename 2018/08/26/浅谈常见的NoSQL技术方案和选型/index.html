@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang=zh>
+<head>
+    <meta charset="utf-8">
+    
+    <title>浅谈常见的NoSQL技术方案和选型 | Icarus&#39;s Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="前言在互联网和大数据的背景下，越来越多的网站、应用系统需要支撑 海量数据存储、高并发请求、高可用、高可扩展性 等特性要求。传统的 关系型数据库 已经难以应对类似的需求，各种各样的 NoSQL（Not Only SQL）数据库因此而产生。">
+<meta name="keywords" content="NoSQL,列存储,行存储,全文搜索,K-V数据库,文档数据库,图形数据库">
+<meta property="og:type" content="article">
+<meta property="og:title" content="浅谈常见的NoSQL技术方案和选型">
+<meta property="og:url" content="https://ostenant.coding.me/2018/08/26/浅谈常见的NoSQL技术方案和选型/index.html">
+<meta property="og:site_name" content="Icarus&#39;s Blog">
+<meta property="og:description" content="前言在互联网和大数据的背景下，越来越多的网站、应用系统需要支撑 海量数据存储、高并发请求、高可用、高可扩展性 等特性要求。传统的 关系型数据库 已经难以应对类似的需求，各种各样的 NoSQL（Not Only SQL）数据库因此而产生。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Nosql_logo.png">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6c029cd0c?w=1240&h=875&f=webp&s=60352">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6c29793cc?w=445&h=113&f=webp&s=4274">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6c03c405b?w=542&h=247&f=webp&s=6922">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6c05cfd1a?w=1240&h=861&f=webp&s=46642">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6c2af193f?w=565&h=335&f=webp&s=24188">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6c2ae24e6?w=244&h=206&f=webp&s=3554">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb7057638ef?w=287&h=145&f=gif&s=11172">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6ecdbbf58?w=480&h=270&f=jpeg&s=4613">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb70c8ca0d6?w=240&h=240&f=webp&s=2774">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb7089207ca?w=800&h=278&f=webp&s=6392">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb70ccd60c5?w=200&h=200&f=webp&s=3940">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb7102ea703?w=1099&h=543&f=webp&s=33952">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb7195de6f2?w=1127&h=802&f=webp&s=64732">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb725ff5017?w=756&h=913&f=webp&s=27434">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb8f5156b19?w=1123&h=960&f=webp&s=60268">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb73448bae5?w=311&h=290&f=webp&s=6684">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb739f37d12?w=270&h=159&f=webp&s=3332">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb7404ebf4e?w=225&h=100&f=png&s=2522">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb7456a98e7?w=280&h=264&f=webp&s=4700">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb8f5397bed?w=549&h=348&f=webp&s=11260">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb8f5435b5f?w=1240&h=443&f=webp&s=21196">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5dcc40392?w=258&h=258&f=jpeg&s=16109">
+<meta property="og:updated_time" content="2018-08-28T10:21:07.446Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="浅谈常见的NoSQL技术方案和选型">
+<meta name="twitter:description" content="前言在互联网和大数据的背景下，越来越多的网站、应用系统需要支撑 海量数据存储、高并发请求、高可用、高可扩展性 等特性要求。传统的 关系型数据库 已经难以应对类似的需求，各种各样的 NoSQL（Not Only SQL）数据库因此而产生。">
+<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/Nosql_logo.png">
+    
+
+    
+        <link rel="alternate" href="/" title="Icarus&#39;s Blog" type="application/atom+xml" />
+    
+
+    
+        <link rel="icon" href="/css/images/cat.png" />
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fontawesome.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-brands.min.css">
+    <link rel="stylesheet" href="/libs/font-awesome5/css/fa-solid.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+        <script type="text/javascript">
+(function(i,s,o,g,r,a,m) {i['GoogleAnalyticsObject']=r;i[r]=i[r]||function() {
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'true', 'auto');
+ga('send', 'pageview');
+
+</script>
+    
+    
+        <meta name="google-site-verification" content="true" />
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Icarus&#39;s Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">主页</a>
+                
+                    <a class="main-nav-link" href="/archives">归档</a>
+                
+                    <a class="main-nav-link" href="/categories">分类</a>
+                
+                    <a class="main-nav-link" href="/tags">标签</a>
+                
+                    <a class="main-nav-link" href="/wechat">公众号</a>
+                
+                    <a class="main-nav-link" href="/about">关于我</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.jpeg" />
+                            <i class="fas fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="想要查找什么..." />
+            <span class="ins-close ins-selectable"><i class="fas fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: '文章',
+            PAGES: '页面',
+            CATEGORIES: '分类',
+            TAGS: '标签',
+            UNTITLED: '(未命名)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">主页</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">归档</a></td>
+                
+                    <td><a class="main-nav-link" href="/categories">分类</a></td>
+                
+                    <td><a class="main-nav-link" href="/tags">标签</a></td>
+                
+                    <td><a class="main-nav-link" href="/wechat">公众号</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">关于我</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="搜索" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile" class="profile-fixed">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.jpeg" />
+            <h2 id="name">陈林 | Icarus</h2>
+            <h3 id="title">年轻无为，卖码为生!</h3>
+            <span id="location"><i class="fas fa-map-marker-alt" style="padding-right: 5px"></i>中国, 成都</span>
+            <a id="follow" target="_blank" href="http://github.com/ostenant">关注我</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                70
+                <span>文章</span>
+            </div>
+            <div class="article-info-block">
+                92
+                <span>标签</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/ostenant" target="_blank" title="github" class=tooltip>
+                            <i class="fab fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fab fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fab fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="linkedin" class=tooltip>
+                            <i class="fab fa-linkedin"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fab fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-浅谈常见的NoSQL技术方案和选型" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            浅谈常见的NoSQL技术方案和选型
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fas fa-calendar-alt"></i>
+        <a href="/2018/08/26/浅谈常见的NoSQL技术方案和选型/">
+            <time datetime="2018-08-26T15:19:00.000Z" itemprop="datePublished">2018-08-26</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fas fa-folder"></i>
+        <a class="article-category-link" href="/categories/NoSQL技术选型系列/">NoSQL技术选型系列</a>
+    </div>
+
+                        
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link" href="/tags/K-V数据库/">K-V数据库</a>, <a class="tag-link" href="/tags/NoSQL/">NoSQL</a>, <a class="tag-link" href="/tags/全文搜索/">全文搜索</a>, <a class="tag-link" href="/tags/列存储/">列存储</a>, <a class="tag-link" href="/tags/图形数据库/">图形数据库</a>, <a class="tag-link" href="/tags/文档数据库/">文档数据库</a>, <a class="tag-link" href="/tags/行存储/">行存储</a>
+    </div>
+
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <hr>
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>在互联网和大数据的背景下，越来越多的网站、应用系统需要支撑 <strong>海量数据存储</strong>、<strong>高并发请求</strong>、<strong>高可用</strong>、<strong>高可扩展性</strong> 等特性要求。传统的 <strong>关系型数据库</strong> 已经难以应对类似的需求，各种各样的 <code>NoSQL</code>（<code>Not Only SQL</code>）数据库因此而产生。</p>
+<a id="more"></a>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Nosql_logo.png" alt=""></p>
+<p>本文将分析 <strong>传统数据库</strong> 的存在的问题，以及几类 <code>NoSQL</code> 如何解决这些问题。在不同的 <strong>业务场景</strong> 下，作出正确的 <strong>数据存储</strong> 技术选型。</p>
+<h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="1-传统数据库缺点"><a href="#1-传统数据库缺点" class="headerlink" title="1. 传统数据库缺点"></a>1. 传统数据库缺点</h2><table>
+<thead>
+<tr>
+<th style="text-align:left">缺点</th>
+<th style="text-align:left">解释说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">大数据场景下 <code>I/O</code> 较高</td>
+<td style="text-align:left">因为数据是按 <strong>行存储</strong>，即使只针对其中 <strong>某一列</strong> 进行运算，关系型数据库也会对 <strong>整行数据</strong> 进行扫描，从存储设备中 <strong>读入内存</strong>，导致 <code>I/O</code> 较高</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>结构化存储</strong> 不够灵活</td>
+<td style="text-align:left">存储的是 <strong>行记录</strong>，无法存储 <strong>灵活的数据结构</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">表结构 <code>schema</code> 扩展不方便</td>
+<td style="text-align:left">如要需要修改 <strong>表结构</strong>，需要执行执行 <code>DDL</code>（<code>data definition language</code>）语句修改，修改期间会导致 <strong>锁表</strong>，部分服务不可用</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>全文搜索</strong> 功能较弱</td>
+<td style="text-align:left">关系型数据库只能够进行 <strong>子字符串</strong> 的 <strong>匹配查询</strong>，当表的数据逐渐变大的时候，即使在有 <strong>索引</strong> 的情况下，<code>like</code> 扫表查询的匹配会 <strong>非常慢</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">难以 <strong>存储</strong> 和 <strong>处理</strong> 复杂 <strong>关系型数据</strong></td>
+<td style="text-align:left">传统的关系数据库，并不擅长处理 <strong>数据点之间</strong> 的关系</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-NoSQL简介"><a href="#2-NoSQL简介" class="headerlink" title="2. NoSQL简介"></a>2. NoSQL简介</h2><p><code>NoSQL</code>，泛指 <strong>非关系型</strong> 的数据库，可以理解为 <strong>关系型</strong> 数据库的一个有力补充。</p>
+<p><code>NoSQL</code> 在许多方面性能大大优于 <strong>非关系型</strong> 数据库的同时，往往也伴随一些特性的缺失。比较常见的是 <strong>事务功能</strong> 的缺失。 数据库事务正确执行的四个基本要素 <code>ACID</code> 如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left"></th>
+<th style="text-align:left">名称</th>
+<th style="text-align:left">描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">A</td>
+<td style="text-align:left">Atomicity(原子性)</td>
+<td style="text-align:left">一个事务中的所有操作，要么全部完成，要么全部不完成，不会在中间某个环节结束。事务在执行过程中发生错误，会被回滚到事务开始前的状态，就像这个事务从来没有执行过一样。</td>
+</tr>
+<tr>
+<td style="text-align:left">C</td>
+<td style="text-align:left">Consistency一致性</td>
+<td style="text-align:left">在事务开始之前和事务结束以后，数据库的完整性没有被破坏。</td>
+</tr>
+<tr>
+<td style="text-align:left">I</td>
+<td style="text-align:left">Isolation隔离性</td>
+<td style="text-align:left">数据库允许多个并发事务同时对数据进行读写和修改的能力。隔离性可以防止多个事务并发执行时由于交叉执行而导致数据的不一致。</td>
+</tr>
+<tr>
+<td style="text-align:left">D</td>
+<td style="text-align:left">Durability持久性</td>
+<td style="text-align:left">事务处理结束后，对数据的修改就是永久的，即便系统故障也不会丢失。</td>
+</tr>
+</tbody>
+</table>
+<p>针对传统 <strong>关系型数据库</strong> 的不足，下面介绍常见的 <code>5</code> 大类 <code>NoSQL</code> 解决方案：</p>
+<h2 id="3-列式数据库"><a href="#3-列式数据库" class="headerlink" title="3. 列式数据库"></a>3. 列式数据库</h2><p><strong>列式数据库</strong> 是以 <strong>列相关存储架构</strong> 进行数据存储的数据库，主要适合于 <strong>批量数据处理</strong> 和 <strong>即时查询</strong>。相对应的是 <strong>行式数据库</strong>，数据以 <strong>行相关的存储架构</strong> 进行空间分配，主要适合于 <strong>小批量</strong> 的 <strong>数据处理</strong>，常用于 <strong>联机事务型数据处理</strong>。</p>
+<p>基于列式数据库的 <strong>列存储特性</strong>，可以解决某些特定场景下 <strong>关系型数据库</strong> 高 <code>I/O</code> 的问题。</p>
+<h3 id="3-1-基本原理"><a href="#3-1-基本原理" class="headerlink" title="3.1. 基本原理"></a>3.1. 基本原理</h3><p>传统关系型数据库是 <strong>按照行</strong> 来存储数据库，称为 <strong>行式数据库</strong>，而 <strong>列式数据库</strong> 是 <strong>按照列</strong> 来存储数据。</p>
+<p>将表放入存储系统中有两种方法，而我们绝大部分是采用 <strong>行存储</strong> 的。行存储法是将 <strong>各行</strong> 放入 <strong>连续的物理位置</strong>，这很像传统的记录和文件系统。</p>
+<p><strong>列存储法</strong> 是将数据 <strong>按照列</strong> 存储到数据库中，与 <strong>行存储</strong> 类似，下图是两种存储方法的图形化解释：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6c029cd0c?w=1240&amp;h=875&amp;f=webp&amp;s=60352" alt=""></p>
+<h3 id="3-2-常见列式数据库"><a href="#3-2-常见列式数据库" class="headerlink" title="3.2. 常见列式数据库"></a>3.2. 常见列式数据库</h3><h4 id="3-2-1-HBase"><a href="#3-2-1-HBase" class="headerlink" title="3.2.1. HBase"></a>3.2.1. HBase</h4><p><code>HBase</code> 是一个开源的 <strong>非关系型分布式数据库</strong>（<code>NoSQL</code>），它参考了 <strong>谷歌</strong> 的 <code>BigTable</code> 建模，实现的编程语言为 <code>Java</code>。它是 <code>Apache</code> 软件基金会的 <code>Hadoop</code> 项目的一部分，运行于 <code>HDFS</code> 文件系统之上，为 <code>Hadoop</code> 提供类似于 <code>BigTable</code> 规模的服务。因此，它可以 <strong>容错地</strong> 存储 <strong>海量稀疏</strong> 的数据。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6c29793cc?w=445&amp;h=113&amp;f=webp&amp;s=4274" alt=""></p>
+<h4 id="3-2-2-BigTable"><a href="#3-2-2-BigTable" class="headerlink" title="3.2.2. BigTable"></a>3.2.2. BigTable</h4><p><code>BigTable</code> 是一种 <strong>压缩的</strong>、<strong>高性能的</strong>、<strong>高可扩展性的</strong>，基于 <code>Google</code> 文件系统（<code>Google File System</code>，<code>GFS</code>）的数据存储系统，用于存储 <strong>大规模结构化数据</strong>，适用于云计算。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6c03c405b?w=542&amp;h=247&amp;f=webp&amp;s=6922" alt=""></p>
+<h3 id="3-3-相关特性"><a href="#3-3-相关特性" class="headerlink" title="3.3. 相关特性"></a>3.3. 相关特性</h3><h4 id="3-3-1-优点"><a href="#3-3-1-优点" class="headerlink" title="3.3.1. 优点"></a>3.3.1. 优点</h4><ul>
+<li><strong>高效的储存空间利用率</strong></li>
+</ul>
+<p><strong>列式数据库</strong> 针对不同列的 <strong>数据特征</strong> 而发明了 <strong>不同算法</strong>，使其比 <strong>行式数据库</strong> 高的多的 <strong>压缩率</strong>。普通的 <strong>行式数据库</strong> 一般压缩率在 <code>3：1</code> 到 <code>5：1</code> 左右，而 <strong>列式数据库</strong> 的压缩率一般在 <code>8：1</code> 到 <code>30：1</code> 左右。</p>
+<p>比较常见的，通过 <strong>字典表</strong> 压缩数据：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6c05cfd1a?w=1240&amp;h=861&amp;f=webp&amp;s=46642" alt=""></p>
+<p>下面才是那张表本来的样子。经过 <strong>字典表</strong> 进行 <strong>数据压缩</strong> 后，表中的 <strong>字符串</strong> 才都变成 <strong>数字</strong>。正因为每个字符串在 <strong>字典表</strong> 里只 <strong>出现了一次</strong>，所以达到了 <strong>压缩</strong> 的目的。</p>
+<ul>
+<li><strong>查询效率高</strong></li>
+</ul>
+<p>读取多条数据的 <strong>同一列效率高</strong>，因为这些列都是 <strong>存储在一起的</strong>，一次磁盘操作可以数据的 <strong>指定列</strong> 全部读取到 <strong>内存</strong> 中。 下图通过 <strong>一条查询</strong> 的执行过程说明 <strong>列式存储</strong> （以及 <strong>数据压缩</strong>）的优点。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6c2af193f?w=565&amp;h=335&amp;f=webp&amp;s=24188" alt=""></p>
+<p>执行步骤如下：</p>
+<blockquote>
+<ol>
+<li>去 <strong>字典表</strong> 里找到 <strong>字符串对应数字</strong>（只进行一次字符串比较）。</li>
+<li>用 <strong>数字</strong> 去列表里匹配，匹配上的位置设为 <code>1</code>。</li>
+<li>把 <strong>不同列</strong> 的 <strong>匹配结果</strong> 进行 <strong>位运算</strong> 得到符合所有条件的 <strong>记录下标</strong>。</li>
+<li>使用这个 <strong>下标组装</strong> 出最终的 <strong>结果集</strong>。</li>
+</ol>
+</blockquote>
+<ul>
+<li><p><strong>适合做聚合操作</strong></p>
+</li>
+<li><p><strong>适合大量的数据而不是小数据</strong></p>
+</li>
+</ul>
+<h4 id="3-3-2-缺点"><a href="#3-3-2-缺点" class="headerlink" title="3.3.2. 缺点"></a>3.3.2. 缺点</h4><ul>
+<li><p>不适合扫描 <strong>小量数据</strong></p>
+</li>
+<li><p>不适合 <strong>随机的更新</strong></p>
+</li>
+<li><p>不适合做含有删除和更新的 <strong>实时操作</strong></p>
+</li>
+<li><p><strong>单行数据</strong> 支持 <code>ACID</code> 的 <strong>事务操作</strong>，<strong>多行数据</strong> 的 <strong>事务操作</strong>，不支持事务的 <strong>正常回滚</strong>，支持 （<code>Isolation</code>）隔离性、(<code>Durability</code>）持久性，不能保证 (<code>Atomicity</code>）原子性、（<code>Consistency</code>）一致性。</p>
+</li>
+</ul>
+<h3 id="3-4-应用场景"><a href="#3-4-应用场景" class="headerlink" title="3.4. 应用场景"></a>3.4. 应用场景</h3><p>列数据库的适用场景，以 <code>HBase</code> 为例说明：</p>
+<ul>
+<li><p>适合 <strong>大数据量</strong> (<code>100TB</code> 级数据），有 <strong>快速随机访问</strong> 的需求。</p>
+</li>
+<li><p>适合 <strong>写密集型</strong> 应用，每天写入量巨大，而 <strong>读数量相对较小</strong> 的应用，比如 <code>IM</code> 的 <strong>历史消息</strong>，<strong>游戏日志</strong> 等等。</p>
+</li>
+<li><p>适合不需要 <strong>复杂查询</strong> 条件来查询数据的应用。<code>HBase</code> 只支持基于 <code>rowkey</code> 的查询，对于 <code>HBase</code> 来说，<strong>单条记录</strong> 或者 <strong>小范围的查询</strong> 是可以接受的。<strong>大范围</strong> 的查询由于 <strong>分布式</strong> 的原因，可能在 <strong>性能</strong> 上有点影响。<code>HBase</code> 不适用于有 <code>join</code>，<strong>多级索引</strong>，<strong>表关系复杂</strong> 的数据模型。</p>
+</li>
+<li><p>对 <strong>性能</strong> 和 <strong>可靠性</strong> 要求非常高的应用。</p>
+</li>
+<li><p>由于 <code>HBase</code> 本身没有 <strong>单点故障</strong>，<strong>可用性</strong> 非常高。</p>
+</li>
+<li><p>适合 <strong>数据量较大</strong>，而且 <strong>增长量</strong> 无法预估的应用，需要进行优雅的数据扩展的应用。<code>HBase</code> 支持 <strong>在线扩展</strong>，即使在一段时间内，数据量呈 <strong>井喷式增长</strong>，也可以通过 <code>HBase</code> <strong>横向扩展</strong> 来满足功能。</p>
+</li>
+<li><p>存储 <strong>结构化</strong> 和 <strong>半结构化</strong> 的数据。</p>
+</li>
+</ul>
+<h2 id="4-K-V数据库"><a href="#4-K-V数据库" class="headerlink" title="4. K-V数据库"></a>4. K-V数据库</h2><h3 id="4-1-基本概念"><a href="#4-1-基本概念" class="headerlink" title="4.1. 基本概念"></a>4.1. 基本概念</h3><p>指的是使用 <strong>键值</strong>（<code>key-value</code>）存储的数据库，其数据按照 <strong>键值对</strong> 的形式进行 <strong>组织</strong>、<strong>索引</strong> 和 <strong>存储</strong>。</p>
+<p><code>KV</code> 存储非常适合不涉及过多 <strong>数据关系</strong> 业务的数据。它能够有效减少 <strong>读写磁盘</strong> 的次数，比 <code>SQL</code> <strong>数据库存储</strong> 拥有更好的 <strong>读写性能</strong>，能够解决 <strong>关系型数据库</strong> 无法存储 <strong>数据结构</strong> 的问题。</p>
+<h3 id="4-2-常见K-V数据库"><a href="#4-2-常见K-V数据库" class="headerlink" title="4.2. 常见K-V数据库"></a>4.2. 常见K-V数据库</h3><h4 id="4-2-1-Redis"><a href="#4-2-1-Redis" class="headerlink" title="4.2.1. Redis"></a>4.2.1. Redis</h4><p><code>Redis</code> 是一个使用 <code>ANSI C</code> 编写的 <strong>开源</strong>、<strong>支持网络</strong>、<strong>基于内存</strong>、<strong>可选持久性</strong> 的 <strong>键值对存储</strong> 数据库。<code>Redis</code> 是目前最流行的 <strong>键值对存储</strong> 数据库之一。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6c2ae24e6?w=244&amp;h=206&amp;f=webp&amp;s=3554" alt=""></p>
+<h4 id="4-2-2-Cassandra"><a href="#4-2-2-Cassandra" class="headerlink" title="4.2.2. Cassandra"></a>4.2.2. Cassandra</h4><p><code>Apache Cassandra</code>（社区内一般简称为 <code>C*</code>）是一套 <strong>开源的分布式</strong> <code>NoSQL</code> 数据库系统。它最初由 <code>Facebook</code> 开发，用于储存 <strong>收件箱</strong> 等简单格式数据，集 <code>Google BigTable</code> 的 <strong>数据模型</strong> 与 <code>Amazon Dynamo</code> 的 <strong>完全分布式</strong> 架构于一身。<code>Cassandra</code> 是一种流行的 <strong>分布式结构化</strong> 数据存储方案。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb7057638ef?w=287&amp;h=145&amp;f=gif&amp;s=11172" alt=""></p>
+<h4 id="4-2-3-Memcached"><a href="#4-2-3-Memcached" class="headerlink" title="4.2.3. Memcached"></a>4.2.3. Memcached</h4><p><code>Memcached</code> 是一个 <strong>开放源代码</strong>、<strong>高性能</strong>、分配的 <strong>内存对象缓存系统</strong>。用于加速动态 <code>web</code> 应用程序，减轻关系型数据库负载。它可以应对 <strong>任意多个连接</strong>，使用 <strong>非阻塞的网络</strong> <code>IO</code>。由于它的工作机制是在内存中开辟一块空间，然后建立一个 <code>Hash</code> 表，<code>Memcached</code> 自管理这些 <code>Hash</code> 表。</p>
+<p><code>Memcached</code> 简单而强大。它简单的设计促进 <strong>迅速部署</strong>，易于发现所面临的问题，解决了很多 <strong>大型数据缓存</strong>。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb6ecdbbf58?w=480&amp;h=270&amp;f=jpeg&amp;s=4613" alt=""></p>
+<h4 id="4-2-4-LevelDB"><a href="#4-2-4-LevelDB" class="headerlink" title="4.2.4. LevelDB"></a>4.2.4. LevelDB</h4><p><code>LevelDB</code> 是一个由 <code>Google</code> 所研发的 <strong>键／值对</strong>（<code>Key/Value Pair</code>）<strong>嵌入式</strong> 数据库管理系统 <strong>编程库</strong>，以开源的 <code>BSD</code> 许可证发布。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb70c8ca0d6?w=240&amp;h=240&amp;f=webp&amp;s=2774" alt=""></p>
+<h3 id="4-3-相关特性"><a href="#4-3-相关特性" class="headerlink" title="4.3. 相关特性"></a>4.3. 相关特性</h3><p><code>K-V</code> 数据库的相关特性，以 <code>Redis</code> 为例说明：</p>
+<h4 id="4-3-1-优点"><a href="#4-3-1-优点" class="headerlink" title="4.3.1. 优点"></a>4.3.1. 优点</h4><ul>
+<li><strong>性能极高</strong> </li>
+</ul>
+<p><code>Redis</code> 单机最高能支持超过 <code>10W</code> 的 <code>TPS</code>。</p>
+<ul>
+<li><strong>丰富的数据类型</strong> </li>
+</ul>
+<p><code>Redis</code> 支持包括 <code>String</code>，<code>Hash</code>，<code>List</code>，<code>Set</code>，<code>Sorted Set</code>，<code>Bitmap</code> 和 <code>Hyperloglog</code> 等数据结构。</p>
+<ul>
+<li><strong>丰富的特性</strong></li>
+</ul>
+<p><code>Redis</code> 还支持 <code>publish/subscribe</code>，<strong>通知</strong>，<code>key</code> <strong>过期</strong> 等特性。</p>
+<h4 id="4-3-2-缺点"><a href="#4-3-2-缺点" class="headerlink" title="4.3.2. 缺点"></a>4.3.2. 缺点</h4><ul>
+<li><code>Redis</code> <strong>事务</strong> 不能支持 <strong>原子性</strong> 和 <strong>持久性</strong>（<code>A</code> 和 <code>D</code>），只支持 <strong>隔离性</strong> 和 <strong>一致性</strong>（<code>I</code> 和 <code>C</code>）。</li>
+</ul>
+<blockquote>
+<p>这里所说的 <strong>无法保证原子性</strong>，是针对 <code>Redis</code> 的 <strong>事务操作</strong>，因为事务是 <strong>不支持回滚</strong>（<code>roll back</code>），而因为 <code>Redis</code> 的 <strong>单线程模型</strong>，<code>Redis</code> 的普通操作是 <strong>原子性的</strong>。</p>
+</blockquote>
+<h3 id="4-4-应用场景"><a href="#4-4-应用场景" class="headerlink" title="4.4 应用场景"></a>4.4 应用场景</h3><h4 id="4-4-1-适用场景"><a href="#4-4-1-适用场景" class="headerlink" title="4.4.1. 适用场景"></a>4.4.1. 适用场景</h4><ul>
+<li>适合存储 <strong>用户信息</strong>（比如 <strong>会话</strong>）、<strong>配置文件</strong>、<strong>参数</strong>、<strong>购物车</strong> 等等。这些信息一般都和 <code>ID</code> 挂钩。</li>
+</ul>
+<h4 id="4-4-2-不适用场景"><a href="#4-4-2-不适用场景" class="headerlink" title="4.4.2. 不适用场景"></a>4.4.2. 不适用场景</h4><ul>
+<li><p>不适合需要通过 <strong>值</strong> 来查询，而不是 <strong>键</strong> 来查询。<code>Key-Value</code> 数据库中根本没有通过 <strong>值查询</strong> 的途径。</p>
+</li>
+<li><p>不适合需要储存 <strong>数据之间的关系</strong>。在 <code>Key-Value</code> 数据库中不能通过 <strong>两个或以上</strong> 的键来 <strong>关联数据</strong>。</p>
+</li>
+<li><p>不适合需要支持 <strong>事务</strong> 的场景。在 <code>Key-Value</code> 数据库中 <strong>故障产生</strong> 时不可以进行 <strong>回滚</strong>。</p>
+</li>
+</ul>
+<h2 id="5-文档型数据库"><a href="#5-文档型数据库" class="headerlink" title="5. 文档型数据库"></a>5. 文档型数据库</h2><h3 id="5-1-基本概念"><a href="#5-1-基本概念" class="headerlink" title="5.1. 基本概念"></a>5.1. 基本概念</h3><p><strong>文档数据库</strong> 用于将 <strong>半结构化数据</strong> 存储为 <strong>文档</strong> 的一种数据库。文档数据库通常以 <code>JSON</code> 或 <code>XML</code> 格式存储数据。</p>
+<ul>
+<li><p>由于文档数据库的 <code>no-schema</code> 特性，可以 <strong>存储</strong> 和 <strong>读取</strong> 任意数据。</p>
+</li>
+<li><p>由于使用的 <strong>数据格式</strong> 是 <code>JSON</code> 或者 <code>BSON</code>，因为 <code>JSON</code> 数据是 <strong>自描述的</strong>，无需在使用前定义字段，读取一个 <code>JSON</code> 中 <strong>不存在的字段</strong> 也不会导致 <code>SQL</code> 那样的语法错误，可以解决关系型数据库 <strong>表结构</strong> <code>schema</code> <strong>扩展不方便</strong> 的问题。</p>
+</li>
+</ul>
+<h3 id="5-2-常见文档数据库"><a href="#5-2-常见文档数据库" class="headerlink" title="5.2. 常见文档数据库"></a>5.2. 常见文档数据库</h3><h4 id="5-2-1-MongoDB"><a href="#5-2-1-MongoDB" class="headerlink" title="5.2.1. MongoDB"></a>5.2.1. MongoDB</h4><p><code>MongoDB</code> 是一个基于 <strong>分布式文件存储</strong> 的数据库。由 <code>C++</code> 语言编写。旨在为 <code>WEB</code> 应用提供可扩展的 <strong>高性能</strong> 数据存储解决方案。</p>
+<p><code>MongoDB</code> 是一个介于 <strong>关系数据库</strong> 和 <strong>非关系数据库</strong> 之间的产品，是非关系数据库当中功能 <strong>最丰富</strong>，最像关系数据库的 <code>NoSQL</code>。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb7089207ca?w=800&amp;h=278&amp;f=webp&amp;s=6392" alt=""></p>
+<h4 id="5-2-2-CouchDB"><a href="#5-2-2-CouchDB" class="headerlink" title="5.2.2. CouchDB"></a>5.2.2. CouchDB</h4><p><code>CouchDB</code> 是用 <code>Erlang</code> 开发的 <strong>面向文档</strong> 的 <strong>分布式</strong> 数据库，用于存储 <strong>半结构化</strong> 的数据，比较类似 <code>lucene</code> 的 <code>index</code> 结构。</p>
+<p><code>CouchDB</code> 支持 <code>RESTful API</code>，它使用 <code>JSON</code> 作为 <strong>存储格式</strong>，<code>JavaScript</code> 作为 <strong>查询语言</strong>，<code>MapReduce</code> 和 <code>HTTP</code> 作为 <code>API</code> 的 <code>NoSQL</code> 数据库。其中一个显著的功能就是 <strong>多主复制</strong> 功能。除此之外，<code>CouchDB</code> 构建在强大的 <code>B-</code> <strong>树储存引擎</strong> 之上。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb70ccd60c5?w=200&amp;h=200&amp;f=webp&amp;s=3940" alt=""></p>
+<h3 id="5-3-相关特性"><a href="#5-3-相关特性" class="headerlink" title="5.3. 相关特性"></a>5.3. 相关特性</h3><p><strong>文档型数据库</strong> 的相关特性，以 <code>MongoDB</code> 为例进行说明：</p>
+<h4 id="5-3-1-优点"><a href="#5-3-1-优点" class="headerlink" title="5.3.1. 优点"></a>5.3.1. 优点</h4><ul>
+<li><p>新增字段简单不需要像关系型数据库一样，先执行 <code>DDL</code> 语句 <strong>修改表结构</strong>，程序代码 <strong>直接读写</strong> 即可。</p>
+</li>
+<li><p>容易兼容 <strong>历史数据</strong>。对于历史数据，即使没有新增的字段，也不会导致错误，只会返回 <strong>空值</strong>，此时 <strong>代码兼容处理</strong> 即可。</p>
+</li>
+<li><p>容易存储复杂数据。<code>JSON</code> 是一种强大的 <strong>描述语言</strong>，能够描述复杂的 <strong>数据结构</strong>。</p>
+</li>
+</ul>
+<h4 id="5-3-2-缺点"><a href="#5-3-2-缺点" class="headerlink" title="5.3.2. 缺点"></a>5.3.2. 缺点</h4><p>相比 <strong>传统关系型数据库</strong>，文档数据库的缺点，主要是对 <strong>多条数据记录</strong> 的 <strong>事务支持较弱</strong>，具体体现如下：</p>
+<ul>
+<li><p><code>Atomicity</code>（原子性）：仅支持 <strong>单行/文档级原子性</strong>，不支持 <strong>多行</strong>、<strong>多文档</strong>、<strong>多语句原子性</strong>。</p>
+</li>
+<li><p><code>Isolation</code>（隔离性）：隔离级别仅支持 <strong>已提交读</strong>（<code>Read committed</code>）级别，可能导致 <strong>不可重复读</strong>，<strong>幻读</strong> 的问题。</p>
+</li>
+<li><p>不支持 <strong>复杂查询</strong>。例如 <code>join</code> 查询，如果需要 <code>join</code> 查询，需要 <strong>多次操作数据库</strong>。</p>
+</li>
+</ul>
+<h3 id="5-4-应用场景"><a href="#5-4-应用场景" class="headerlink" title="5.4. 应用场景"></a>5.4. 应用场景</h3><h4 id="5-4-1-适用场景"><a href="#5-4-1-适用场景" class="headerlink" title="5.4.1. 适用场景"></a>5.4.1. 适用场景</h4><ul>
+<li><p><strong>数据量</strong> 很大或者未来会变得很大。</p>
+</li>
+<li><p><strong>表结构不明确</strong>，且 <strong>字段</strong> 在 <strong>不断增加</strong>，例如内容管理系统，信息管理系统。</p>
+</li>
+</ul>
+<h4 id="5-4-2-不适用场景"><a href="#5-4-2-不适用场景" class="headerlink" title="5.4.2. 不适用场景"></a>5.4.2. 不适用场景</h4><ul>
+<li><p>在不同的文档上需要添加 <strong>事务</strong>。<code>Document-Oriented</code> 数据库并不支持 <strong>文档间的事务</strong>。</p>
+</li>
+<li><p>多个文档之间需要 <strong>复杂的查询</strong>，例如 <code>join</code> 操作。</p>
+</li>
+</ul>
+<h2 id="6-全文搜索引擎"><a href="#6-全文搜索引擎" class="headerlink" title="6. 全文搜索引擎"></a>6. 全文搜索引擎</h2><h3 id="6-1-基本概念"><a href="#6-1-基本概念" class="headerlink" title="6.1. 基本概念"></a>6.1. 基本概念</h3><p><strong>传统关系型数据库</strong>，主要通过 <strong>索引</strong> 来达到 <strong>快速查询</strong> 的目的。在 <strong>全文搜索</strong> 的业务下，<strong>索引</strong> 也无能为力，主要体现在以下几方面：</p>
+<ul>
+<li><p>全文搜索的条件，可以随意 <strong>排列组合</strong>，如果通过索引来满足，则索引的 <strong>数量非常多</strong>。</p>
+</li>
+<li><p>全文搜索的 <strong>模糊匹配方式</strong>，索引 <strong>无法满足</strong>，只能用 <code>like</code> 进行查询，而 <code>like</code> 查询是 <strong>整表扫描</strong>，<strong>效率非常低</strong>。</p>
+</li>
+</ul>
+<p>全文搜索引擎的出现，正是解决关系型数据库 <strong>全文搜索较弱</strong> 的问题。</p>
+<h3 id="6-2-基本原理"><a href="#6-2-基本原理" class="headerlink" title="6.2. 基本原理"></a>6.2. 基本原理</h3><p><strong>全文搜索引擎</strong> 的技术原理称为 <strong>倒排索引</strong>（<code>inverted index</code>），是一种 <strong>索引方法</strong>，其基本原理是建立 <strong>单词</strong> 到 <strong>文档</strong> 的索引。与之相对是，是 <strong>正排索引</strong>，其基本原理是建立 <strong>文档</strong> 到 <strong>单词</strong> 的索引。</p>
+<ul>
+<li>现在有如下文档集合：</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb7102ea703?w=1099&amp;h=543&amp;f=webp&amp;s=33952" alt=""></p>
+<ul>
+<li><strong>正排索引</strong> 得到索引如下：</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb7195de6f2?w=1127&amp;h=802&amp;f=webp&amp;s=64732" alt=""></p>
+<p>可见，<strong>正排索引</strong> 适用于根据 <strong>文档名称</strong> 查询 <strong>文档内容</strong>。</p>
+<ul>
+<li>简单的 <strong>倒排索引</strong> 如下：</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb725ff5017?w=756&amp;h=913&amp;f=webp&amp;s=27434" alt=""></p>
+<ul>
+<li>带有 <strong>单词频率</strong> 信息的 <strong>倒排索引</strong> 如下：</li>
+</ul>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb8f5156b19?w=1123&amp;h=960&amp;f=webp&amp;s=60268" alt=""></p>
+<p>可见，<strong>倒排索引</strong> 适用于根据 <strong>关键词</strong> 来查询 <strong>文档内容</strong>。</p>
+<h3 id="6-3-常见全文搜索引擎"><a href="#6-3-常见全文搜索引擎" class="headerlink" title="6.3. 常见全文搜索引擎"></a>6.3. 常见全文搜索引擎</h3><h4 id="6-3-1-ElasticSearch"><a href="#6-3-1-ElasticSearch" class="headerlink" title="6.3.1. ElasticSearch"></a>6.3.1. ElasticSearch</h4><p><code>ElasticSearch</code> 是一个基于 <code>Apache Lucene</code> 的 <strong>搜索引擎</strong>。它提供了一个 <strong>分布式</strong>，<strong>多租户</strong> 对全文搜索引擎。<code>ElasticSearch</code> 是用 <code>Java</code> 开发的，对外提供 <code>RESTful Web</code> 接口。根据 <code>DB-Engines</code> 排名，<code>ElasticSearch</code> 是最受欢迎的 <strong>企业搜索引擎</strong>。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb73448bae5?w=311&amp;h=290&amp;f=webp&amp;s=6684" alt=""></p>
+<h4 id="6-3-2-Solr"><a href="#6-3-2-Solr" class="headerlink" title="6.3.2. Solr"></a>6.3.2. Solr</h4><p><code>Solr</code> 是 <code>Apache Lucene</code> 项目的 <strong>开源企业搜索平台</strong>。其主要功能包括 <strong>全文检索</strong>、<strong>命中标示</strong>、<strong>分面搜索</strong>、<strong>动态聚类</strong>、<strong>数据库集成</strong>，以及 <strong>富文本</strong>（比如 <code>Word</code>、<code>PDF</code>）处理等等。<code>Solr</code> 是高度 <strong>可扩展</strong> 的，并提供了 <strong>分布式搜索</strong> 和 <strong>索引复制</strong>。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb739f37d12?w=270&amp;h=159&amp;f=webp&amp;s=3332" alt=""></p>
+<h3 id="6-4-相关特性"><a href="#6-4-相关特性" class="headerlink" title="6.4. 相关特性"></a>6.4. 相关特性</h3><p>全文搜索引擎，以 <code>ElasticSearch</code> 为例说明：</p>
+<h4 id="6-4-1-优点"><a href="#6-4-1-优点" class="headerlink" title="6.4.1. 优点"></a>6.4.1. 优点</h4><ul>
+<li><p><strong>查询效率高</strong>，适用于对 <strong>海量数据</strong> 进行 <strong>近实时</strong> 的处理。</p>
+</li>
+<li><p><strong>可扩展性</strong></p>
+</li>
+<li><p>基于 <strong>集群</strong> 环境可以方便 <strong>横向扩展</strong>，可以承载 <code>PB</code> 级的数据。</p>
+</li>
+<li><p>支持 <strong>高可用</strong>，<code>ElasticSearch</code> 集群弹性灵活，可以发现新的或失败的节点，<strong>重组</strong> 和 <strong>重新平衡</strong> 数据，确保数据是 <strong>安全</strong> 和 <strong>可访问的</strong>。</p>
+</li>
+</ul>
+<h4 id="6-4-2-缺点"><a href="#6-4-2-缺点" class="headerlink" title="6.4.2. 缺点"></a>6.4.2. 缺点</h4><ul>
+<li><p>事务的 <code>ACID</code> 支持不足，<strong>单一文档</strong> 的数据是支持 <code>ACID</code> 的。对于 <strong>多个文档</strong> 的 <strong>事务操作</strong>，不支持事务的 <strong>正常回滚</strong>。支持（<code>Isolation</code>）隔离性（基于 <strong>乐观锁机制</strong>）和（<code>Durability</code>）持久性，不支持（<code>Atomicity</code>）原子性，（<code>Consistency</code>）一致性。</p>
+</li>
+<li><p>对类似数据库中，通过 <strong>外键</strong> 进行 <strong>多表关联</strong>的复杂操作支持较弱。</p>
+</li>
+<li><p><strong>读写</strong> 有一定 <strong>延时</strong>，写入的数据，最快 <code>1s</code> 中能被检索到。</p>
+</li>
+<li><p><strong>更新</strong> 性能较低，底层实现是 <strong>先删数据</strong>，再 <strong>插入新数据</strong>。</p>
+</li>
+<li><p><strong>内存占用大</strong>，因为 <code>Lucene</code> 将 <strong>索引部分</strong> 加载到 <strong>内存</strong> 中。</p>
+</li>
+</ul>
+<h3 id="6-5-应用场景"><a href="#6-5-应用场景" class="headerlink" title="6.5. 应用场景"></a>6.5. 应用场景</h3><h4 id="6-5-1-适用场景"><a href="#6-5-1-适用场景" class="headerlink" title="6.5.1. 适用场景"></a>6.5.1. 适用场景</h4><ul>
+<li>分布式的 <strong>搜索引擎</strong> 和 <strong>数据分析引擎</strong>。</li>
+<li><strong>全文检索</strong>，<strong>结构化检索</strong> 以及 <strong>数据分析</strong>。</li>
+<li>对海量数据进行 <strong>近实时</strong> 的处理，可以将 <strong>海量数据</strong> 分散到 <strong>多台服务器</strong> 上去 <strong>存储</strong> 和 <strong>检索</strong>。</li>
+</ul>
+<h4 id="6-5-2-不适用场景"><a href="#6-5-2-不适用场景" class="headerlink" title="6.5.2. 不适用场景"></a>6.5.2. 不适用场景</h4><ul>
+<li><p>数据需要 <strong>频繁更新</strong>。</p>
+</li>
+<li><p>需要 <strong>复杂关联查询</strong>。</p>
+</li>
+</ul>
+<h2 id="7-图形数据库"><a href="#7-图形数据库" class="headerlink" title="7. 图形数据库"></a>7. 图形数据库</h2><h3 id="7-1-基本概念"><a href="#7-1-基本概念" class="headerlink" title="7.1. 基本概念"></a>7.1. 基本概念</h3><p><strong>图形数据库</strong> 应用 <strong>图形理论</strong> 存储 <strong>实体</strong> 之间的 <strong>关系信息</strong>。最常见例子就是 社会网络中人与人之间的关系。<strong>关系型数据库</strong> 用于存储这种 <strong>关系型数据</strong> 的效果并不好，其查询 <strong>复杂</strong>、<strong>缓慢</strong>、<strong>超出预期</strong>。</p>
+<p><strong>图形数据库</strong> 的独特设计弥补了这个缺陷，解决 <strong>关系型</strong> 数据库 <strong>存储</strong> 和 <strong>处理复杂关系型数据</strong> 功能较弱的问题。</p>
+<h3 id="7-2-常见图形数据库"><a href="#7-2-常见图形数据库" class="headerlink" title="7.2. 常见图形数据库"></a>7.2. 常见图形数据库</h3><h4 id="7-2-1-Neo4j"><a href="#7-2-1-Neo4j" class="headerlink" title="7.2.1. Neo4j"></a>7.2.1. Neo4j</h4><p><code>Neo4j</code> 是一个 <strong>高性能的</strong>，<code>NOSQL</code> <strong>图形数据库</strong>，它将 <strong>结构化数据</strong> 存储在 <strong>“图形网络上”</strong> 而不是 <strong>“表中”</strong>。它是一个 <strong>嵌入式的</strong>、<strong>基于磁盘的</strong>、具备完全的 <strong>事务特性</strong> 的 <code>Java</code> <strong>持久化引擎</strong>。</p>
+<p><code>Neo4j</code> 也可以被看作是一个 <strong>高性能的图引擎</strong>。程序员工作在一个 <strong>面向对象的</strong>、<strong>灵活的网络结构</strong> 下而不是 <strong>严格</strong>、<strong>静态</strong> 的 <strong>表中</strong>。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb7404ebf4e?w=225&amp;h=100&amp;f=png&amp;s=2522" alt=""></p>
+<h4 id="7-2-2-ArangoDB"><a href="#7-2-2-ArangoDB" class="headerlink" title="7.2.2. ArangoDB"></a>7.2.2. ArangoDB</h4><p><code>ArangoDB</code> 是一个 <strong>原生多模型</strong> 数据库系统。数据库系统支持 <strong>三个</strong> 重要的 <strong>数据模型</strong>（<strong>键/值</strong>，<strong>文档</strong>，<strong>图形</strong>）。</p>
+<p><code>ArangoDB</code> 包含一个 <strong>数据库核心</strong> 和 <strong>统一查询语言</strong> <code>AQL</code>（<code>ArangoDB</code> 查询语言）。查询语言是 <strong>声明性的</strong>，允许在 <strong>单个查询</strong> 中 <strong>组合</strong> 不同的 <strong>数据访问模式</strong>。<code>ArangoDB</code> 是一个 <code>NoSQL</code> 数据库系统，但 <code>AQL</code> 在很多方面与 <code>SQL</code> 都类似。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb7456a98e7?w=280&amp;h=264&amp;f=webp&amp;s=4700" alt=""></p>
+<h3 id="7-3-基本原理"><a href="#7-3-基本原理" class="headerlink" title="7.3. 基本原理"></a>7.3. 基本原理</h3><p>图形数据库，以 <code>Neo4j</code> 为例说明：</p>
+<ul>
+<li><p><code>Neo4j</code> 使用 <strong>数据结构</strong> 中图（<code>graph</code>）的概念来进行 <strong>建模</strong>。</p>
+</li>
+<li><p><code>Neo4j</code> 中两个最基本的概念是 <strong>节点</strong> 和 <strong>边</strong>。<strong>节点</strong> 表示 <strong>实体</strong>，<strong>边</strong> 则表示 <strong>实体之间的关系</strong>。<strong>节点</strong> 和 <strong>边</strong> 都可以有自己的 <strong>属性</strong>。不同 <strong>实体</strong> 通过各种不同的 <strong>关系</strong> 关联起来，形成复杂的 <strong>对象图</strong>。</p>
+</li>
+</ul>
+<p>针对关系数据，两种数据库的 <strong>存储结构</strong> 分别如下：</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb8f5397bed?w=549&amp;h=348&amp;f=webp&amp;s=11260" alt=""></p>
+<p>在 <code>Neo4j</code> 中，<strong>存储节点</strong> 时使用了 <code>index-free adjacency</code>，即 <strong>每个节点</strong> 都有指向其 <strong>邻居节点</strong> 的 <strong>指针</strong>。这样就可以在 <code>O(1)</code> 的 <strong>复杂度</strong> 内找到 <strong>邻居节点</strong>。另外，按照官方的说法，在 <code>Neo4j</code> 中 <strong>边</strong> s是最重要的，是 <code>first-class entities</code>，需要 <strong>单独存储</strong>。这有利于在 <strong>图遍历</strong> 的时候 <strong>提高速度</strong>，也可以很方便地以 <strong>任何方向</strong> 进行遍历。</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/8/28/1657fcb8f5435b5f?w=1240&amp;h=443&amp;f=webp&amp;s=21196" alt=""></p>
+<h3 id="7-4-相关特性"><a href="#7-4-相关特性" class="headerlink" title="7.4. 相关特性"></a>7.4. 相关特性</h3><h4 id="7-4-1-优点"><a href="#7-4-1-优点" class="headerlink" title="7.4.1. 优点"></a>7.4.1. 优点</h4><ul>
+<li><strong>高性能表现</strong></li>
+</ul>
+<p><strong>图的遍历</strong> 是 <strong>图数据结构</strong> 所具有的独特算法，即从 <strong>一个节点</strong> 开始，根据其连接的 <strong>关系</strong>，可以快速和方便地找出它的 <strong>邻近节点</strong>。这种查找数据的方法不受 <strong>数据量大小</strong> 的影响，因为 <strong>邻近查询</strong> 始终查找的是 <strong>有限的局部数据</strong>，不会对 <strong>整个数据库</strong> 进行搜索。</p>
+<ul>
+<li><strong>设计的灵活性</strong></li>
+</ul>
+<p><strong>数据结构</strong> 的自然伸展特性，以及其 <strong>非结构化</strong> 的 <strong>数据格式</strong>，让图数据库设计可以具有很大的 <strong>伸缩性</strong> 和 <strong>灵活性</strong>。因为随着需求的变化而增加的 <strong>节点</strong>、<strong>关系</strong> 及其 <strong>属性</strong>，并不会影响到 <strong>原来数据</strong> 的正常使用。</p>
+<ul>
+<li><strong>开发的敏捷性</strong></li>
+</ul>
+<p>数据模型 <strong>直接明了</strong>，从需求的讨论开始，到程序开发和实现，基本上不会有大的变化。</p>
+<ul>
+<li><strong>完全支持ACID</strong></li>
+</ul>
+<p>不像别的 <code>NoSQL</code> 数据库，<code>Neo4j</code> 还完全具有 <strong>事务管理特性</strong>，完全支持 <code>ACID</code> 事务管理。</p>
+<h4 id="7-4-2-缺点"><a href="#7-4-2-缺点" class="headerlink" title="7.4.2. 缺点"></a>7.4.2. 缺点</h4><ul>
+<li><p><strong>节点</strong>，<strong>关系</strong> 和它们的 <strong>属性</strong> 的数量被 <strong>限制</strong>。</p>
+</li>
+<li><p>不支持 <strong>拆分</strong>。</p>
+</li>
+</ul>
+<h3 id="7-5-应用场景"><a href="#7-5-应用场景" class="headerlink" title="7.5. 应用场景"></a>7.5. 应用场景</h3><h4 id="7-5-1-适用场景"><a href="#7-5-1-适用场景" class="headerlink" title="7.5.1. 适用场景"></a>7.5.1. 适用场景</h4><ul>
+<li><p>在一些 <strong>关系性强</strong> 的数据应用，例如 <strong>社交网络</strong>。</p>
+</li>
+<li><p><strong>推荐引擎</strong>，将数据以 <strong>图的形式</strong> 表现，非常有益于推荐的制定。</p>
+</li>
+</ul>
+<h4 id="7-5-2-不适用场景"><a href="#7-5-2-不适用场景" class="headerlink" title="7.5.2. 不适用场景"></a>7.5.2. 不适用场景</h4><ul>
+<li><p>记录大量 <strong>基于事件</strong> 的数据，如日志记录、传感器数据。</p>
+</li>
+<li><p>对大规模 <strong>分布式数据</strong> 进行处理，类似于 <code>Hadoop</code>。</p>
+</li>
+<li><p>不适用于应该保存在 <strong>关系型数据库</strong> 中的 <strong>结构化数据</strong>。</p>
+</li>
+<li><p><strong>二进制数据存储</strong>。</p>
+</li>
+</ul>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><p>关于 <strong>关系型数据库</strong> 和 <code>NoSQL</code> <strong>数据库</strong> 的选型，往往需要考虑几个指标：</p>
+<ul>
+<li>数据量</li>
+<li>并发量</li>
+<li>实时性</li>
+<li>一致性要求</li>
+<li>读写分布</li>
+<li>数据类型</li>
+<li>安全性</li>
+<li>运维成本</li>
+</ul>
+<p>常见的系统数据库选型参考如下：</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">系统类型</th>
+<th style="text-align:left">数据库选型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">企业内部管理系统</td>
+<td style="text-align:left">例如运营系统，数据量少，并发量小，首选考虑 <strong>关系型数据库</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">互联网大流量系统</td>
+<td style="text-align:left">例如电商单品页，后台考虑选 <strong>关系型数据库</strong>，前台考虑选 <strong>内存型数据库</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">日志型系统</td>
+<td style="text-align:left"><strong>原始数据</strong> 考虑选 <strong>列式数据库</strong>，<strong>日志搜索</strong> 考虑选 <strong>倒排索引</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">搜索型系统</td>
+<td style="text-align:left">例如站内搜索，非通用搜索，商品搜索，后台考虑选 <strong>关系型数据库</strong>，前台考虑选 <strong>倒排索引</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">事务型系统</td>
+<td style="text-align:left">例如库存管理，交易，记账，考虑选 <strong>关系型数据库</strong> + <strong>缓存数据库</strong> + <strong>一致性型协议</strong></td>
+</tr>
+<tr>
+<td style="text-align:left">离线计算</td>
+<td style="text-align:left">例如大量数据分析，考虑选 <strong>列式数据库</strong> 或者 <strong>关系型数据库</strong> 都可以</td>
+</tr>
+<tr>
+<td style="text-align:left">实时计算</td>
+<td style="text-align:left">例如实时监控，可以考虑选 <strong>内存型数据库</strong> 或者 <strong>列式数据库</strong></td>
+</tr>
+</tbody>
+</table>
+<p>设计实践中，要基于需求、业务驱动架构，无论选用 <code>RDB</code>/<code>NoSQL</code>/<code>DRDB</code>。一定是以需求为导向，最终数据存储方案，必然是考虑各种 <strong>权衡</strong> 的综合性设计。</p>
+<hr>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5dcc40392?w=258&amp;h=258&amp;f=jpeg&amp;s=16109" alt="零壹技术栈"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+    <div class="a2a_kit a2a_default_style">
+    <a class="a2a_dd" href="https://www.addtoany.com/share">Share</a>
+    <span class="a2a_divider"></span>
+    <a class="a2a_button_facebook"></a>
+    <a class="a2a_button_twitter"></a>
+    <a class="a2a_button_google_plus"></a>
+    <a class="a2a_button_pinterest"></a>
+    <a class="a2a_button_tumblr"></a>
+</div>
+<script type="text/javascript" src="//static.addtoany.com/menu/page.js"></script>
+<style>
+    .a2a_menu {
+        border-radius: 4px;
+    }
+    .a2a_menu a {
+        margin: 2px 0;
+        font-size: 14px;
+        line-height: 16px;
+        border-radius: 4px;
+        color: inherit !important;
+        font-family: 'Microsoft Yahei';
+    }
+    #a2apage_dropdown {
+        margin: 10px 0;
+    }
+    .a2a_mini_services {
+        padding: 10px;
+    }
+    a.a2a_i,
+    i.a2a_i {
+        width: 122px;
+        line-height: 16px;
+    }
+    a.a2a_i .a2a_svg,
+    a.a2a_more .a2a_svg {
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        vertical-align: top;
+        background-size: 16px;
+    }
+    a.a2a_i {
+        border: none !important;
+    }
+    a.a2a_menu_show_more_less {
+        margin: 0;
+        padding: 10px 0;
+        line-height: 16px;
+    }
+    .a2a_mini_services:after{content:".";display:block;height:0;clear:both;visibility:hidden}
+    .a2a_mini_services{*+height:1%;}
+</style>
+
+</div>
+
+            
+    
+        <a href="https://ostenant.coding.me/2018/08/26/浅谈常见的NoSQL技术方案和选型/#comments" class="article-comment-link">评论</a>
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+    
+        <a href="/2018/08/17/深入剖析Redis系列(二) - Redis哨兵模式与高可用集群/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">下一篇</strong>
+            <div class="article-nav-title">深入剖析Redis系列(二) - Redis哨兵模式与高可用集群</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+        <section id="comments">
+    <div id="lv-container" data-id="city" data-uid=MTAyMC8zNzE2NC8xMzY5OA==></div>
+</section>
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">最新文章</h3>
+        <div class="widget">
+            <ul id="recent-post" class="no-thumbnail">
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/NoSQL技术选型系列/">NoSQL技术选型系列</a></p>
+                            <p class="item-title"><a href="/2018/08/26/浅谈常见的NoSQL技术方案和选型/" class="title">浅谈常见的NoSQL技术方案和选型</a></p>
+                            <p class="item-date"><time datetime="2018-08-26T15:19:00.000Z" itemprop="datePublished">2018-08-26</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Redis学习系列/">Redis学习系列</a></p>
+                            <p class="item-title"><a href="/2018/08/17/深入剖析Redis系列(二) - Redis哨兵模式与高可用集群/" class="title">深入剖析Redis系列(二) - Redis哨兵模式与高可用集群</a></p>
+                            <p class="item-date"><time datetime="2018-08-17T15:02:00.000Z" itemprop="datePublished">2018-08-17</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Redis学习系列/">Redis学习系列</a></p>
+                            <p class="item-title"><a href="/2018/08/16/深入剖析Redis系列(一) - Redis入门简介与主从搭建/" class="title">深入剖析Redis系列(一) - Redis入门简介与主从搭建</a></p>
+                            <p class="item-date"><time datetime="2018-08-16T05:36:00.000Z" itemprop="datePublished">2018-08-16</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a></p>
+                            <p class="item-title"><a href="/2018/08/06/JVM系列(七) - JVM线上监控工具/" class="title">JVM系列(七) - JVM线上监控工具</a></p>
+                            <p class="item-date"><time datetime="2018-08-06T07:21:00.000Z" itemprop="datePublished">2018-08-06</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a></p>
+                            <p class="item-title"><a href="/2018/08/03/JVM系列(六) - JVM垃圾回收器/" class="title">JVM系列(六) - JVM垃圾回收器</a></p>
+                            <p class="item-date"><time datetime="2018-08-02T22:58:00.000Z" itemprop="datePublished">2018-08-03</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">分类</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Docker学习系列/">Docker学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程基础系列/">JAVA编程基础系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA编程进阶系列/">JAVA编程进阶系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA虚拟机系列/">JAVA虚拟机系列</a><span class="category-list-count">7</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JAVA设计模式系列/">JAVA设计模式系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/JDK1-8编程系列/">JDK1.8编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Java编程进阶系列/">Java编程进阶系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/MySQL学习系列/">MySQL学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/NoSQL技术选型系列/">NoSQL技术选型系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RPC通信框架系列/">RPC通信框架系列</a><span class="category-list-count">9</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Redis学习系列/">Redis学习系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/RxJava异步框架系列/">RxJava异步框架系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/Spring-Reactive编程系列/">Spring Reactive编程系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/任务调度框架系列/">任务调度框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/分布式系列/">分布式系列</a><span class="category-list-count">8</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/加密算法系列/">加密算法系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/实战Spring-Boot-2-0系列/">实战Spring Boot 2.0系列</a><span class="category-list-count">6</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/微服务系列/">微服务系列</a><span class="category-list-count">5</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/技术知识图谱/">技术知识图谱</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/架构学习系列/">架构学习系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/测试框架系列/">测试框架系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/消息队列系列/">消息队列系列</a><span class="category-list-count">1</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/网络协议系列/">网络协议系列</a><span class="category-list-count">3</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/认证与授权系列/">认证与授权系列</a><span class="category-list-count">2</span></li><li class="category-list-item"><a class="category-list-link" href="/categories/高并发系统系列/">高并发系统系列</a><span class="category-list-count">2</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">归档</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/08/">八月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/07/">七月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/06/">六月 2018</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/05/">五月 2018</a><span class="archive-list-count">11</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/04/">四月 2018</a><span class="archive-list-count">5</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">二月 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/01/">一月 2018</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/12/">十二月 2017</a><span class="archive-list-count">8</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/07/">七月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/06/">六月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/05/">五月 2017</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/04/">四月 2017</a><span class="archive-list-count">3</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/03/">三月 2017</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2017/02/">二月 2017</a><span class="archive-list-count">3</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/2PC/">2PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/3PC/">3PC</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/AES/">AES</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ActiveMQ/">ActiveMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Adapter/">Adapter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Android/">Android</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Apache/">Apache</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/BASE/">BASE</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Builder/">Builder</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CAP/">CAP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/CentOS/">CentOS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul/">Consul</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Consul-template/">Consul-template</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/DES/">DES</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker/">Docker</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Docker-Compose/">Docker Compose</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Filter/">Filter</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Gradle/">Gradle</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTP/">HTTP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/HTTPS/">HTTPS</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Interceptor/">Interceptor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK/">JDK</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JDK1-8/">JDK1.8</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JVM/">JVM</a><span class="tag-list-count">6</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/JWT/">JWT</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Java/">Java</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/K-V数据库/">K-V数据库</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Kafka/">Kafka</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Listener/">Listener</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MD5/">MD5</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Mockito/">Mockito</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/MySQL/">MySQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NIO/">NIO</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Nginx/">Nginx</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/NoSQL/">NoSQL</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth/">OAuth</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/OAuth-2-0/">OAuth 2.0</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Paxos/">Paxos</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Prototype/">Prototype</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Quartz/">Quartz</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RPC/">RPC</a><span class="tag-list-count">9</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RSA/">RSA</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RabbitMQ/">RabbitMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Raft/">Raft</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactive-Streams/">Reactive Streams</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reactor/">Reactor</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis/">Redis</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Redis-Sentinel/">Redis Sentinel</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Reference/">Reference</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Registrator/">Registrator</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RocketMQ/">RocketMQ</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/RxJava/">RxJava</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SAML/">SAML</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SHA1/">SHA1</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-Boot/">SOFA-Boot</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SOFA-RPC/">SOFA-RPC</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/SSO/">SSO</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/ScheduledExecutorService/">ScheduledExecutorService</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Servlet/">Servlet</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Session/">Session</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Singleton/">Singleton</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Boot-2-0/">Spring Boot 2.0</a><span class="tag-list-count">7</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Cloud/">Spring Cloud</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-Task/">Spring Task</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Spring-WebFlux/">Spring WebFlux</a><span class="tag-list-count">2</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/TCP/">TCP</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Thrift/">Thrift</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Timer/">Timer</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Unique-ID/">Unique ID</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/Web/">Web</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/WebSocket/">WebSocket</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/一致性哈希/">一致性哈希</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/主从复制/">主从复制</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/全文搜索/">全文搜索</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式/">分布式</a><span class="tag-list-count">4</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分布式存储/">分布式存储</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/分片/">分片</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/列存储/">列存储</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反向代理/">反向代理</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/反模式/">反模式</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/图形数据库/">图形数据库</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/定时任务/">定时任务</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/异步/">异步</a><span class="tag-list-count">5</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/微服务/">微服务</a><span class="tag-list-count">3</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/文档数据库/">文档数据库</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/服务器/">服务器</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/消息队列/">消息队列</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/行存储/">行存储</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/负载均衡/">负载均衡</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/限流/">限流</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高并发/">高并发</a><span class="tag-list-count">1</span></li><li class="tag-list-item"><a class="tag-list-link" href="/tags/高性能/">高性能</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">标签云</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/2PC/" style="font-size: 10px;">2PC</a> <a href="/tags/3PC/" style="font-size: 10px;">3PC</a> <a href="/tags/AES/" style="font-size: 10px;">AES</a> <a href="/tags/ActiveMQ/" style="font-size: 10px;">ActiveMQ</a> <a href="/tags/Adapter/" style="font-size: 10px;">Adapter</a> <a href="/tags/Android/" style="font-size: 12.86px;">Android</a> <a href="/tags/Apache/" style="font-size: 12.86px;">Apache</a> <a href="/tags/BASE/" style="font-size: 10px;">BASE</a> <a href="/tags/Builder/" style="font-size: 10px;">Builder</a> <a href="/tags/CAP/" style="font-size: 10px;">CAP</a> <a href="/tags/CentOS/" style="font-size: 10px;">CentOS</a> <a href="/tags/Consul/" style="font-size: 11.43px;">Consul</a> <a href="/tags/Consul-template/" style="font-size: 10px;">Consul-template</a> <a href="/tags/DES/" style="font-size: 10px;">DES</a> <a href="/tags/Docker/" style="font-size: 15.71px;">Docker</a> <a href="/tags/Docker-Compose/" style="font-size: 10px;">Docker Compose</a> <a href="/tags/Filter/" style="font-size: 10px;">Filter</a> <a href="/tags/Gradle/" style="font-size: 10px;">Gradle</a> <a href="/tags/HTTP/" style="font-size: 10px;">HTTP</a> <a href="/tags/HTTPS/" style="font-size: 10px;">HTTPS</a> <a href="/tags/Interceptor/" style="font-size: 10px;">Interceptor</a> <a href="/tags/JDK/" style="font-size: 10px;">JDK</a> <a href="/tags/JDK1-8/" style="font-size: 11.43px;">JDK1.8</a> <a href="/tags/JVM/" style="font-size: 17.14px;">JVM</a> <a href="/tags/JWT/" style="font-size: 10px;">JWT</a> <a href="/tags/Java/" style="font-size: 18.57px;">Java</a> <a href="/tags/K-V数据库/" style="font-size: 10px;">K-V数据库</a> <a href="/tags/Kafka/" style="font-size: 10px;">Kafka</a> <a href="/tags/Listener/" style="font-size: 10px;">Listener</a> <a href="/tags/MD5/" style="font-size: 10px;">MD5</a> <a href="/tags/Mockito/" style="font-size: 10px;">Mockito</a> <a href="/tags/MySQL/" style="font-size: 10px;">MySQL</a> <a href="/tags/NIO/" style="font-size: 14.29px;">NIO</a> <a href="/tags/Nginx/" style="font-size: 11.43px;">Nginx</a> <a href="/tags/NoSQL/" style="font-size: 10px;">NoSQL</a> <a href="/tags/OAuth/" style="font-size: 10px;">OAuth</a> <a href="/tags/OAuth-2-0/" style="font-size: 10px;">OAuth 2.0</a> <a href="/tags/Paxos/" style="font-size: 10px;">Paxos</a> <a href="/tags/Prototype/" style="font-size: 10px;">Prototype</a> <a href="/tags/Quartz/" style="font-size: 11.43px;">Quartz</a> <a href="/tags/RPC/" style="font-size: 20px;">RPC</a> <a href="/tags/RSA/" style="font-size: 10px;">RSA</a> <a href="/tags/RabbitMQ/" style="font-size: 10px;">RabbitMQ</a> <a href="/tags/Raft/" style="font-size: 10px;">Raft</a> <a href="/tags/Reactive-Streams/" style="font-size: 11.43px;">Reactive Streams</a> <a href="/tags/Reactor/" style="font-size: 10px;">Reactor</a> <a href="/tags/Redis/" style="font-size: 11.43px;">Redis</a> <a href="/tags/Redis-Sentinel/" style="font-size: 10px;">Redis Sentinel</a> <a href="/tags/Reference/" style="font-size: 10px;">Reference</a> <a href="/tags/Registrator/" style="font-size: 10px;">Registrator</a> <a href="/tags/RocketMQ/" style="font-size: 10px;">RocketMQ</a> <a href="/tags/RxJava/" style="font-size: 12.86px;">RxJava</a> <a href="/tags/SAML/" style="font-size: 10px;">SAML</a> <a href="/tags/SHA1/" style="font-size: 10px;">SHA1</a> <a href="/tags/SOFA-Boot/" style="font-size: 12.86px;">SOFA-Boot</a> <a href="/tags/SOFA-RPC/" style="font-size: 14.29px;">SOFA-RPC</a> <a href="/tags/SSO/" style="font-size: 10px;">SSO</a> <a href="/tags/ScheduledExecutorService/" style="font-size: 10px;">ScheduledExecutorService</a> <a href="/tags/Servlet/" style="font-size: 10px;">Servlet</a> <a href="/tags/Session/" style="font-size: 10px;">Session</a> <a href="/tags/Singleton/" style="font-size: 10px;">Singleton</a> <a href="/tags/Spring-Boot-2-0/" style="font-size: 18.57px;">Spring Boot 2.0</a> <a href="/tags/Spring-Cloud/" style="font-size: 11.43px;">Spring Cloud</a> <a href="/tags/Spring-Task/" style="font-size: 10px;">Spring Task</a> <a href="/tags/Spring-WebFlux/" style="font-size: 11.43px;">Spring WebFlux</a> <a href="/tags/TCP/" style="font-size: 10px;">TCP</a> <a href="/tags/Thrift/" style="font-size: 15.71px;">Thrift</a> <a href="/tags/Timer/" style="font-size: 10px;">Timer</a> <a href="/tags/Unique-ID/" style="font-size: 10px;">Unique ID</a> <a href="/tags/Web/" style="font-size: 10px;">Web</a> <a href="/tags/WebSocket/" style="font-size: 10px;">WebSocket</a> <a href="/tags/一致性哈希/" style="font-size: 10px;">一致性哈希</a> <a href="/tags/主从复制/" style="font-size: 10px;">主从复制</a> <a href="/tags/全文搜索/" style="font-size: 10px;">全文搜索</a> <a href="/tags/分布式/" style="font-size: 14.29px;">分布式</a> <a href="/tags/分布式存储/" style="font-size: 10px;">分布式存储</a> <a href="/tags/分片/" style="font-size: 10px;">分片</a> <a href="/tags/列存储/" style="font-size: 10px;">列存储</a> <a href="/tags/反向代理/" style="font-size: 10px;">反向代理</a> <a href="/tags/反模式/" style="font-size: 12.86px;">反模式</a> <a href="/tags/图形数据库/" style="font-size: 10px;">图形数据库</a> <a href="/tags/定时任务/" style="font-size: 10px;">定时任务</a> <a href="/tags/异步/" style="font-size: 15.71px;">异步</a> <a href="/tags/微服务/" style="font-size: 12.86px;">微服务</a> <a href="/tags/文档数据库/" style="font-size: 10px;">文档数据库</a> <a href="/tags/服务器/" style="font-size: 10px;">服务器</a> <a href="/tags/消息队列/" style="font-size: 10px;">消息队列</a> <a href="/tags/行存储/" style="font-size: 10px;">行存储</a> <a href="/tags/负载均衡/" style="font-size: 10px;">负载均衡</a> <a href="/tags/限流/" style="font-size: 10px;">限流</a> <a href="/tags/高并发/" style="font-size: 10px;">高并发</a> <a href="/tags/高性能/" style="font-size: 10px;">高性能</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">链接</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://weekly.manong.io/issues" target="_blank">码农周刊</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://www.tuicool.com/mags" target="_blank">编程狂人</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://ifeve.com" target="_blank">并发编程网</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://juejin.im" target="_blank">掘金</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.jianshu.com" target="_blank">简书</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://github.com" target="_blank">Github</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://stackoverflow.com" target="_blank">StackoverFlow</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.infoq.com" target="_blank">Infoq</a>
+                    </li>
+                
+                    <li>
+                        <a href="https://segmentfault.com" target="_blank">SegmentFault</a>
+                    </li>
+                
+                    <li>
+                        <a href="http://www.importnew.com" target="_blank">ImportNew</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fas fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Chen Icarus<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">Icarus</a><br>
+            
+    <script type="text/javascript">var cnzz_protocol = (("https:" == document.location.protocol) ? " https://" : " http://");document.write(unescape("%3Cspan id='cnzz_stat_icon_1273891841'%3E%3C/span%3E%3Cscript src='" + cnzz_protocol + "s13.cnzz.com/z_stat.php%3Fid%3D1273891841%26online%3D1%26show%3Dline' type='text/javascript'%3E%3C/script%3E"));</script>
+
+
+        </div>
+    </div>
+</footer>
+        
+    
+    
+    <!-- 来必力City版安装代码 -->
+    <script type="text/javascript">
+     (function(d, s) {
+         var j, e = d.getElementsByTagName(s)[0];
+
+         if (typeof LivereTower === 'function') { return; }
+
+         j = d.createElement(s);
+         j.src = 'https://cdn-city.livere.com/js/embed.dist.js';
+         j.async = true;
+
+         e.parentNode.insertBefore(j, e);
+     })(document, 'script');
+    </script>
+  <noscript> 为正常使用来必力评论功能请激活JavaScript</noscript>
+  <!-- City版安装代码已完成 -->
+
+
+
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
