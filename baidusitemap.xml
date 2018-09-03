@@ -4,6 +4,177 @@
 
     
   <url>
+    <loc>https://ostenant.coding.me/2018/08/29/%E6%B7%B1%E5%85%A5%E5%89%96%E6%9E%90Redis%E7%B3%BB%E5%88%97(%E4%B8%89)%20-%20Redis%E9%9B%86%E7%BE%A4%E6%A8%A1%E5%BC%8F%E6%90%AD%E5%BB%BA%E4%B8%8E%E5%8E%9F%E7%90%86%E8%AF%A6%E8%A7%A3/</loc>
+    <lastmod>2018-09-03T11:14:36.059Z</lastmod>
+    <data>
+        <display>
+        <title>深入剖析Redis系列(三) - Redis集群模式搭建与原理详解</title>
+        <pubTime>2018-08-29T13:47:00.000Z</pubTime>
+        
+        <tag>负载均衡</tag>
+         
+        <tag>Redis</tag>
+         
+        <tag>Redis Cluster</tag>
+         
+        <tag>TwemProxy</tag>
+         
+        <tag>Codis</tag>
+         
+        <tag>高可用</tag>
+         
+        <tag>动态扩容</tag>
+         
+         
+           
+             
+              <breadCrumb title="Redis学习系列" url="https://ostenant.coding.me/categories/Redis%E5%AD%A6%E4%B9%A0%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/04/28/JVM%E7%B3%BB%E5%88%97(%E4%B8%89)%20-%20JVM%E5%AF%B9%E8%B1%A1%E6%8E%A2%E7%A7%98/</loc>
+    <lastmod>2018-09-03T02:53:53.035Z</lastmod>
+    <data>
+        <display>
+        <title>JVM系列(三) - JVM对象探秘</title>
+        <pubTime>2017-04-28T04:57:00.000Z</pubTime>
+        
+        <tag>Java</tag>
+         
+        <tag>JVM</tag>
+         
+         
+           
+             
+              <breadCrumb title="JAVA虚拟机系列" url="https://ostenant.coding.me/categories/JAVA%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/12/%E8%9A%82%E8%9A%81%E9%87%91%E6%9C%8DSOFA-Boot%E6%95%B4%E5%90%88SOFA-RPC(%E4%B8%8B%E7%AF%87)/</loc>
+    <lastmod>2018-08-30T02:56:16.721Z</lastmod>
+    <data>
+        <display>
+        <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)</title>
+        <pubTime>2018-05-12T12:12:00.000Z</pubTime>
+        
+        <tag>RPC</tag>
+         
+        <tag>SOFA-RPC</tag>
+         
+        <tag>SOFA-Boot</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/09/%E8%9A%82%E8%9A%81%E9%87%91%E6%9C%8DSOFA-Boot%E6%95%B4%E5%90%88SOFA-RPC(%E4%B8%AD%E7%AF%87)/</loc>
+    <lastmod>2018-08-30T02:53:59.692Z</lastmod>
+    <data>
+        <display>
+        <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)</title>
+        <pubTime>2018-05-09T07:08:00.000Z</pubTime>
+        
+        <tag>RPC</tag>
+         
+        <tag>SOFA-RPC</tag>
+         
+        <tag>SOFA-Boot</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2018/05/08/%E8%9A%82%E8%9A%81%E9%87%91%E6%9C%8DSOFA-Boot%E6%95%B4%E5%90%88SOFA-RPC(%E4%B8%8A%E7%AF%87)/</loc>
+    <lastmod>2018-08-30T02:43:56.239Z</lastmod>
+    <data>
+        <display>
+        <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)</title>
+        <pubTime>2018-05-08T13:23:00.000Z</pubTime>
+        
+        <tag>RPC</tag>
+         
+        <tag>SOFA-RPC</tag>
+         
+        <tag>SOFA-Boot</tag>
+         
+         
+           
+             
+              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/04/25/JVM%E7%B3%BB%E5%88%97(%E4%BA%8C)%20-%20JVM%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E5%92%8C%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E5%BC%82%E5%B8%B8%E8%AF%A6%E8%A7%A3/</loc>
+    <lastmod>2018-08-29T10:58:50.008Z</lastmod>
+    <data>
+        <display>
+        <title>JVM系列(二) - JVM内存区域详解</title>
+        <pubTime>2017-04-25T09:57:00.000Z</pubTime>
+        
+        <tag>Java</tag>
+         
+        <tag>JVM</tag>
+         
+         
+           
+             
+              <breadCrumb title="JAVA虚拟机系列" url="https://ostenant.coding.me/categories/JAVA%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
+    <loc>https://ostenant.coding.me/2017/04/22/JVM%E7%B3%BB%E5%88%97(%E4%B8%80)%20-%20JVM%E6%80%BB%E4%BD%93%E6%A6%82%E8%BF%B0/</loc>
+    <lastmod>2018-08-29T10:51:13.799Z</lastmod>
+    <data>
+        <display>
+        <title>JVM系列(一) - JVM总体概述</title>
+        <pubTime>2017-04-22T06:55:00.000Z</pubTime>
+        
+        <tag>Java</tag>
+         
+        <tag>JVM</tag>
+         
+         
+           
+             
+              <breadCrumb title="JAVA虚拟机系列" url="https://ostenant.coding.me/categories/JAVA%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
+          
+        </display>
+    </data>
+    </url>
+
+    
+  <url>
     <loc>https://ostenant.coding.me/2017/12/18/Java%E5%9F%BA%E7%A1%80%E7%AF%87%20-%20%E5%BC%BA%E5%BC%95%E7%94%A8%E3%80%81%E5%BC%B1%E5%BC%95%E7%94%A8%E3%80%81%E8%BD%AF%E5%BC%95%E7%94%A8%E5%92%8C%E8%99%9A%E5%BC%95%E7%94%A8/</loc>
     <lastmod>2018-08-28T10:22:07.653Z</lastmod>
     <data>
@@ -86,72 +257,6 @@
         <display>
         <title>JVM系列(四) - JVM垃圾回收算法</title>
         <pubTime>2017-05-02T10:09:00.000Z</pubTime>
-        
-        <tag>Java</tag>
-         
-        <tag>JVM</tag>
-         
-         
-           
-             
-              <breadCrumb title="JAVA虚拟机系列" url="https://ostenant.coding.me/categories/JAVA%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://ostenant.coding.me/2017/04/28/JVM%E7%B3%BB%E5%88%97(%E4%B8%89)%20-%20JVM%E5%AF%B9%E8%B1%A1%E6%8E%A2%E7%A7%98/</loc>
-    <lastmod>2018-08-23T06:37:46.121Z</lastmod>
-    <data>
-        <display>
-        <title>JVM系列(三) - JVM对象探秘</title>
-        <pubTime>2017-04-28T03:22:00.000Z</pubTime>
-        
-        <tag>Java</tag>
-         
-        <tag>JVM</tag>
-         
-         
-           
-             
-              <breadCrumb title="JAVA虚拟机系列" url="https://ostenant.coding.me/categories/JAVA%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://ostenant.coding.me/2017/04/25/JVM%E7%B3%BB%E5%88%97(%E4%BA%8C)%20-%20JVM%E5%86%85%E5%AD%98%E5%8C%BA%E5%9F%9F%E5%92%8C%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA%E5%BC%82%E5%B8%B8%E8%AF%A6%E8%A7%A3/</loc>
-    <lastmod>2018-08-23T06:35:59.026Z</lastmod>
-    <data>
-        <display>
-        <title>JVM系列(二) - JVM内存区域详解</title>
-        <pubTime>2017-04-25T09:57:00.000Z</pubTime>
-        
-        <tag>Java</tag>
-         
-        <tag>JVM</tag>
-         
-         
-           
-             
-              <breadCrumb title="JAVA虚拟机系列" url="https://ostenant.coding.me/categories/JAVA%E8%99%9A%E6%8B%9F%E6%9C%BA%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://ostenant.coding.me/2017/04/22/JVM%E7%B3%BB%E5%88%97(%E4%B8%80)%20-%20JVM%E6%80%BB%E4%BD%93%E6%A6%82%E8%BF%B0/</loc>
-    <lastmod>2018-08-23T06:13:32.714Z</lastmod>
-    <data>
-        <display>
-        <title>JVM系列(一) - JVM总体概述</title>
-        <pubTime>2017-04-22T06:55:00.000Z</pubTime>
         
         <tag>Java</tag>
          
@@ -527,7 +632,6 @@
     </url>
 
     
-    
   <url>
     <loc>https://ostenant.coding.me/2018/06/25/%E5%AE%9E%E6%88%98Spring%20Boot%202.0%E7%B3%BB%E5%88%97(%E5%85%AD)%20-%20%E5%8D%95%E6%9C%BA%E5%AE%9A%E6%97%B6%E4%BB%BB%E5%8A%A1%E7%9A%84%E5%87%A0%E7%A7%8D%E5%AE%9E%E7%8E%B0/</loc>
     <lastmod>2018-06-26T06:09:32.482Z</lastmod>
@@ -604,78 +708,6 @@
     </url>
 
     
-    
-  <url>
-    <loc>https://ostenant.coding.me/2018/05/09/%E8%9A%82%E8%9A%81%E9%87%91%E6%9C%8DSOFA-Boot%E6%95%B4%E5%90%88SOFA-RPC(%E4%B8%AD%E7%AF%87)/</loc>
-    <lastmod>2018-06-18T02:00:18.984Z</lastmod>
-    <data>
-        <display>
-        <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(中篇)</title>
-        <pubTime>2018-05-09T07:08:00.000Z</pubTime>
-        
-        <tag>RPC</tag>
-         
-        <tag>SOFA-RPC</tag>
-         
-        <tag>SOFA-Boot</tag>
-         
-         
-           
-             
-              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://ostenant.coding.me/2018/05/12/%E8%9A%82%E8%9A%81%E9%87%91%E6%9C%8DSOFA-Boot%E6%95%B4%E5%90%88SOFA-RPC(%E4%B8%8B%E7%AF%87)/</loc>
-    <lastmod>2018-06-18T02:00:01.633Z</lastmod>
-    <data>
-        <display>
-        <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(下篇)</title>
-        <pubTime>2018-05-12T12:12:00.000Z</pubTime>
-        
-        <tag>RPC</tag>
-         
-        <tag>SOFA-RPC</tag>
-         
-        <tag>SOFA-Boot</tag>
-         
-         
-           
-             
-              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
-    
-  <url>
-    <loc>https://ostenant.coding.me/2018/05/08/%E8%9A%82%E8%9A%81%E9%87%91%E6%9C%8DSOFA-Boot%E6%95%B4%E5%90%88SOFA-RPC(%E4%B8%8A%E7%AF%87)/</loc>
-    <lastmod>2018-06-18T01:59:49.466Z</lastmod>
-    <data>
-        <display>
-        <title>蚂蚁金服SOFA-Boot整合SOFA-RPC(上篇)</title>
-        <pubTime>2018-05-08T13:23:00.000Z</pubTime>
-        
-        <tag>RPC</tag>
-         
-        <tag>SOFA-RPC</tag>
-         
-        <tag>SOFA-Boot</tag>
-         
-         
-           
-             
-              <breadCrumb title="RPC通信框架系列" url="https://ostenant.coding.me/categories/RPC%E9%80%9A%E4%BF%A1%E6%A1%86%E6%9E%B6%E7%B3%BB%E5%88%97/"/>
-          
-        </display>
-    </data>
-    </url>
-
     
   <url>
     <loc>https://ostenant.coding.me/2018/04/29/%E8%9A%82%E8%9A%81%E9%87%91%E6%9C%8DRPC%E6%A1%86%E6%9E%B6SOFA-RPC%20-%20%E5%88%9D%E4%BD%93%E9%AA%8C/</loc>
@@ -1387,9 +1419,9 @@
         <title>Apache Thrift系列详解(一) - 概述与入门</title>
         <pubTime>2018-01-08T02:14:00.000Z</pubTime>
         
-        <tag>Thrift</tag>
-         
         <tag>Apache</tag>
+         
+        <tag>Thrift</tag>
          
         <tag>RPC</tag>
          
@@ -1411,9 +1443,9 @@
         <title>Apache Thrift系列详解(三) - 序列化机制</title>
         <pubTime>2018-01-16T07:37:00.000Z</pubTime>
         
-        <tag>Thrift</tag>
-         
         <tag>Apache</tag>
+         
+        <tag>Thrift</tag>
          
         <tag>RPC</tag>
          
@@ -1435,9 +1467,9 @@
         <title>Apache Thrift系列详解(二) - 网络服务模型</title>
         <pubTime>2018-01-11T09:36:00.000Z</pubTime>
         
-        <tag>Thrift</tag>
-         
         <tag>Apache</tag>
+         
+        <tag>Thrift</tag>
          
         <tag>RPC</tag>
          
