@@ -18,10 +18,14 @@
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Client-Sharding.jpg">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/twem.jpg">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/codis.jpg">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/redis_cluster3.jpg">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/PartitionRule.jpg">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/HashMod3.jpg">
-<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/RingHash2.jpg">
-<meta property="og:updated_time" content="2018-09-03T11:14:36.059Z">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/RingHash4.jpg">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/virtual_slot2.jpg">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Slot_data.jpg">
+<meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5dcc40392?w=258&h=258&f=jpeg&s=16109">
+<meta property="og:updated_time" content="2018-09-03T14:45:16.131Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="深入剖析Redis系列(三) - Redis集群模式搭建与原理详解">
 <meta name="twitter:description" content="前言在 Redis 3.0 之前，使用 哨兵（sentinel）机制来监控各个节点之间的状态。Redis Cluster 是 Redis 的 分布式解决方案，在 3.0 版本正式推出，有效地解决了 Redis 在 分布式 方面的需求。当遇到 单机内存、并发、流量 等瓶颈时，可以采用 Cluster 架构方案达到 负载均衡 的目的。">
@@ -330,7 +334,8 @@ ga('send', 'pageview');
 <li><p><strong>缺点</strong>：<strong>部署架构</strong> 和 <strong>配置</strong> 复杂，不支持 <strong>跨机房</strong> 和 <strong>多租户</strong>，不支持 <strong>鉴权管理</strong>。</p>
 </li>
 </ul>
-<h3 id="1-3-客户端服务端协作"><a href="#1-3-客户端服务端协作" class="headerlink" title="1.3. 客户端服务端协作"></a>1.3. 客户端服务端协作</h3><h2 id="2-数据分布"><a href="#2-数据分布" class="headerlink" title="2. 数据分布"></a>2. 数据分布</h2><h3 id="2-1-数据分布理论"><a href="#2-1-数据分布理论" class="headerlink" title="2.1. 数据分布理论"></a>2.1. 数据分布理论</h3><p><strong>分布式数据库</strong> 首先要解决把 <strong>整个数据集</strong> 按照 <strong>分区规则</strong> 映射到 <strong>多个节点</strong> 的问题，即把 <strong>数据集</strong> 划分到 <strong>多个节点</strong> 上，每个节点负责 <strong>整体数据</strong> 的一个 <strong>子集</strong>。</p>
+<h3 id="1-3-客户端服务端协作"><a href="#1-3-客户端服务端协作" class="headerlink" title="1.3. 客户端服务端协作"></a>1.3. 客户端服务端协作</h3><p><img src="http://ols3fdyll.bkt.clouddn.com/redis_cluster3.jpg" alt=""></p>
+<h2 id="2-数据分布"><a href="#2-数据分布" class="headerlink" title="2. 数据分布"></a>2. 数据分布</h2><h3 id="2-1-数据分布理论"><a href="#2-1-数据分布理论" class="headerlink" title="2.1. 数据分布理论"></a>2.1. 数据分布理论</h3><p><strong>分布式数据库</strong> 首先要解决把 <strong>整个数据集</strong> 按照 <strong>分区规则</strong> 映射到 <strong>多个节点</strong> 的问题，即把 <strong>数据集</strong> 划分到 <strong>多个节点</strong> 上，每个节点负责 <strong>整体数据</strong> 的一个 <strong>子集</strong>。</p>
 <p><img src="http://ols3fdyll.bkt.clouddn.com/PartitionRule.jpg" alt=""></p>
 <p>数据分布通常有 <strong>哈希分区</strong> 和 <strong>顺序分区</strong> 两种方式，对比如下：</p>
 <table>
@@ -366,7 +371,7 @@ ga('send', 'pageview');
 </ul>
 <p>当 <strong>节点数量</strong> 变化时，如 <strong>扩容</strong> 或 <strong>收缩</strong> 节点，数据节点 <strong>映射关系</strong> 需要重新计算，会导致数据的 <strong>重新迁移</strong>。</p>
 <h4 id="2-1-2-一致性哈希分区"><a href="#2-1-2-一致性哈希分区" class="headerlink" title="2.1.2. 一致性哈希分区"></a>2.1.2. 一致性哈希分区</h4><p><strong>一致性哈希</strong> 可以很好的解决 <strong>稳定性问题</strong>，可以将所有的 <strong>存储节点</strong> 排列在 <strong>收尾相接</strong> 的 <code>Hash</code> 环上，每个 <code>key</code> 在计算 <code>Hash</code> 后会 <strong>顺时针</strong> 找到 <strong>临接</strong> 的 <strong>存储节点</strong> 存放。而当有节点 <strong>加入</strong> 或 <strong>退出</strong> 时，仅影响该节点在 <code>Hash</code> 环上 <strong>顺时针相邻</strong> 的 <strong>后续节点</strong>。</p>
-<p><img src="http://ols3fdyll.bkt.clouddn.com/RingHash2.jpg" alt=""></p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/RingHash4.jpg" alt=""></p>
 <ul>
 <li><strong>优点</strong></li>
 </ul>
@@ -378,8 +383,46 @@ ga('send', 'pageview');
 <blockquote>
 <p><strong>注意</strong>：因为 <strong>一致性哈希分区</strong> 的这些缺点，一些分布式系统采用 <strong>虚拟槽</strong> 对 <strong>一致性哈希</strong> 进行改进，比如 <code>Dynamo</code> 系统。</p>
 </blockquote>
-<h4 id="2-1-3-虚拟槽分区"><a href="#2-1-3-虚拟槽分区" class="headerlink" title="2.1.3. 虚拟槽分区"></a>2.1.3. 虚拟槽分区</h4><p><strong>虚拟槽分区</strong> 巧妙地使用了 <strong>哈希空间</strong>，使用 <strong>分散度良好</strong> 的 <strong>哈希函数</strong> 把所有数据 <strong>映射</strong> 到一个 <strong>固定范围</strong> 的 <strong>整数集合</strong> 中，整数定义为 <strong>槽</strong>（<code>slot</code>）。这个范围一般 <strong>远远大于</strong> 节点数，比如 <code>Redis Cluster</code> 槽范围是 <code>0~16383</code>。<strong>槽</strong> 是集群内 <strong>数据管理</strong> 和 <strong>迁移</strong> 的 <strong>基本单位</strong>。采用 <strong>大范围槽</strong> 的主要目的是为了方便 <strong>数据拆分</strong> 和 <strong>集群扩展</strong>。每个节点会负责 <strong>一定数量的槽</strong>，如图所示：</p>
-<h3 id="2-2-Redis的数据分区"><a href="#2-2-Redis的数据分区" class="headerlink" title="2.2. Redis的数据分区"></a>2.2. Redis的数据分区</h3><h3 id="2-3-集群的功能限制"><a href="#2-3-集群的功能限制" class="headerlink" title="2.3. 集群的功能限制"></a>2.3. 集群的功能限制</h3><h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1>
+<h4 id="2-1-3-虚拟槽分区"><a href="#2-1-3-虚拟槽分区" class="headerlink" title="2.1.3. 虚拟槽分区"></a>2.1.3. 虚拟槽分区</h4><p><strong>虚拟槽分区</strong> 巧妙地使用了 <strong>哈希空间</strong>，使用 <strong>分散度良好</strong> 的 <strong>哈希函数</strong> 把所有数据 <strong>映射</strong> 到一个 <strong>固定范围</strong> 的 <strong>整数集合</strong> 中，整数定义为 <strong>槽</strong>（<code>slot</code>）。这个范围一般 <strong>远远大于</strong> 节点数，比如 <code>Redis Cluster</code> 槽范围是 <code>0 ~ 16383</code>。<strong>槽</strong> 是集群内 <strong>数据管理</strong> 和 <strong>迁移</strong> 的 <strong>基本单位</strong>。采用 <strong>大范围槽</strong> 的主要目的是为了方便 <strong>数据拆分</strong> 和 <strong>集群扩展</strong>。每个节点会负责 <strong>一定数量的槽</strong>，如图所示：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/virtual_slot2.jpg" alt=""></p>
+<p>当前集群有 <code>5</code> 个节点，每个节点平均大约负责 <code>3276</code> 个 <strong>槽</strong>。由于采用 <strong>高质量</strong> 的 <strong>哈希算法</strong>，每个槽所映射的数据通常比较 <strong>均匀</strong>，将数据平均划分到 <code>5</code> 个节点进行 <strong>数据分区</strong>。<code>Redis Cluster</code> 就是采用 <strong>虚拟槽分区</strong>，下面就介绍 <code>Redis</code> 数据分区方法。</p>
+<h3 id="2-2-Redis的数据分区"><a href="#2-2-Redis的数据分区" class="headerlink" title="2.2. Redis的数据分区"></a>2.2. Redis的数据分区</h3><p><code>Redis Cluster</code> 采用 <strong>虚拟槽分区</strong>，所有的 <strong>键</strong> 根据 <strong>哈希函数</strong> 映射到 <code>0~16383</code> 整数槽内，计算公式：<code>slot = CRC16（key）&amp; 16383</code>。每个节点负责维护一部分槽以及槽所映射的 <strong>键值数据</strong>，如图所示：</p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Slot_data.jpg" alt=""></p>
+<h4 id="2-2-1-Redis虚拟槽分区的特点"><a href="#2-2-1-Redis虚拟槽分区的特点" class="headerlink" title="2.2.1. Redis虚拟槽分区的特点"></a>2.2.1. Redis虚拟槽分区的特点</h4><ul>
+<li><p>解耦 <strong>数据</strong> 和 <strong>节点</strong> 之间的关系，简化了节点 <strong>扩容</strong> 和 <strong>收缩</strong> 难度。</p>
+</li>
+<li><p><strong>节点自身</strong> 维护槽的 <strong>映射关系</strong>，不需要 <strong>客户端</strong> 或者 <strong>代理服务</strong> 维护 <strong>槽分区元数据</strong>。</p>
+</li>
+<li><p>支持 <strong>节点</strong>、<strong>槽</strong>、<strong>键</strong> 之间的 <strong>映射查询</strong>，用于 <strong>数据路由</strong>、<strong>在线伸缩</strong> 等场景。</p>
+</li>
+</ul>
+<h3 id="2-3-集群的功能限制"><a href="#2-3-集群的功能限制" class="headerlink" title="2.3. 集群的功能限制"></a>2.3. 集群的功能限制</h3><p><code>Redis</code> 集群相对 <strong>单机</strong> 在功能上存在一些限制，需要 <strong>开发人员</strong> 提前了解，在使用时做好规避。</p>
+<ul>
+<li><code>key</code> <strong>批量操作</strong> 支持有限。</li>
+</ul>
+<p>类似 <code>mset</code>、<code>mget</code> 操作，目前只支持对具有相同 <code>slot</code> 值的 <code>key</code> 执行 <strong>批量操作</strong>。对于 <strong>映射为不同</strong> <code>slot</code> 值的 <code>key</code> 由于执行 <code>mget</code>、<code>mget</code> 等操作可能存在于多个节点上，因此不被支持。</p>
+<ul>
+<li><code>key</code> <strong>事务操作</strong> 支持有限。</li>
+</ul>
+<p>只支持 <strong>多</strong> <code>key</code> 在 <strong>同一节点上</strong> 的 <strong>事务操作</strong>，当多个 <code>key</code> 分布在 <strong>不同</strong> 的节点上时 <strong>无法</strong> 使用事务功能。</p>
+<ul>
+<li><code>key</code> 作为 <strong>数据分区</strong> 的最小粒度</li>
+</ul>
+<p>不能将一个 <strong>大的键值</strong> 对象如 <code>hash</code>、<code>list</code> 等映射到 <strong>不同的节点</strong>。</p>
+<ul>
+<li>不支持 <strong>多数据库空间</strong></li>
+</ul>
+<p><strong>单机</strong> 下的 <code>Redis</code> 可以支持 <code>16</code> 个数据库（<code>db0 ~ db15</code>），<strong>集群模式</strong> 下只能使用 <strong>一个</strong> 数据库空间，即 <code>db0</code>。</p>
+<ul>
+<li><strong>复制结构</strong> 只支持一层</li>
+</ul>
+<p><strong>从节点</strong> 只能复制 <strong>主节点</strong>，不支持 <strong>嵌套树状复制</strong> 结构。</p>
+<h1 id="小结"><a href="#小结" class="headerlink" title="小结"></a>小结</h1><h1 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h1><p>《Redis 开发与运维》</p>
+<hr>
+<p>欢迎关注技术公众号： 零壹技术栈</p>
+<p><img src="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5dcc40392?w=258&amp;h=258&amp;f=jpeg&amp;s=16109" alt="零壹技术栈"></p>
+<p>本帐号将持续分享后端技术干货，包括虚拟机基础，多线程编程，高性能框架，异步、缓存和消息中间件，分布式和微服务，架构学习和进阶等学习资料和文章。</p>
+
         
         </div>
         <footer class="article-footer">
