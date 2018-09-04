@@ -14,7 +14,7 @@
 <meta property="og:description" content="前言在 Redis 3.0 之前，使用 哨兵（sentinel）机制来监控各个节点之间的状态。Redis Cluster 是 Redis 的 分布式解决方案，在 3.0 版本正式推出，有效地解决了 Redis 在 分布式 方面的需求。当遇到 单机内存、并发、流量 等瓶颈时，可以采用 Cluster 架构方案达到 负载均衡 的目的。">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/22/16560ce61de7471a?w=1772&h=591&f=jpeg&s=46258">
-<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Redis-Client.jpg">
+<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Redis-Client2.jpg">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Client-Sharding.jpg">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/twem.jpg">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/codis.jpg">
@@ -25,7 +25,7 @@
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/virtual_slot2.jpg">
 <meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/Slot_data.jpg">
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/7/1/16455ec5dcc40392?w=258&h=258&f=jpeg&s=16109">
-<meta property="og:updated_time" content="2018-09-04T00:04:33.230Z">
+<meta property="og:updated_time" content="2018-09-04T00:07:19.702Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="深入剖析Redis系列(三) - Redis集群模式搭建与原理详解">
 <meta name="twitter:description" content="前言在 Redis 3.0 之前，使用 哨兵（sentinel）机制来监控各个节点之间的状态。Redis Cluster 是 Redis 的 分布式解决方案，在 3.0 版本正式推出，有效地解决了 Redis 在 分布式 方面的需求。当遇到 单机内存、并发、流量 等瓶颈时，可以采用 Cluster 架构方案达到 负载均衡 的目的。">
@@ -301,7 +301,7 @@ ga('send', 'pageview');
 <p>本文将从 <strong>集群方案</strong>、<strong>数据分布</strong>、<strong>搭建集群</strong>、<strong>节点通信</strong>、<strong>集群伸缩</strong>、<strong>请求路由</strong>、<strong>故障转移</strong>、<strong>集群运维</strong> 等几个方面介绍 <code>Redis Cluster</code>。</p>
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="1-Redis集群方案"><a href="#1-Redis集群方案" class="headerlink" title="1. Redis集群方案"></a>1. Redis集群方案</h2><p><code>Redis Cluster</code> 集群模式通常具有 <strong>高可用</strong>、<strong>可扩展性</strong>、<strong>分布式</strong>、<strong>容错</strong> 等特性。<code>Redis</code> 分布式方案一般有两种：</p>
 <h3 id="1-1-客户端分区方案"><a href="#1-1-客户端分区方案" class="headerlink" title="1.1 客户端分区方案"></a>1.1 客户端分区方案</h3><p>其主要思想是采用 <strong>哈希算法</strong> 将 <code>Redis</code> 数据的 <code>key</code> 进行散列，通过 <code>hash</code> 函数，特定的 <code>key</code>会 <strong>映射</strong> 到特定的 <code>Redis</code> 节点上。<code>Java</code> 的 <code>Redis</code> 客户端驱动库 <code>Jedis</code>，支持 <code>Redis Sharding</code> 功能，即 <code>ShardedJedis</code> 以及 <strong>结合缓存池</strong> 的 <code>ShardedJedisPool</code>。</p>
-<p><img src="http://ols3fdyll.bkt.clouddn.com/Redis-Client.jpg" alt=""></p>
+<p><img src="http://ols3fdyll.bkt.clouddn.com/Redis-Client2.jpg" alt=""></p>
 <p><strong>客户端分区方案</strong> 的代表为 <code>Redis Sharding</code>，<code>Redis Sharding</code> 是 <code>Redis Cluster</code> 出来之前，业界普遍使用的 <code>Redis</code> <strong>多实例集群</strong> 方法。</p>
 <ul>
 <li><strong>优点</strong></li>
