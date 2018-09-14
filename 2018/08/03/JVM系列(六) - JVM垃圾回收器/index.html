@@ -13,7 +13,6 @@
 <meta property="og:site_name" content="Icarus&#39;s Blog">
 <meta property="og:description" content="前言在之前的几篇博客中，我们大致介绍了，常见的 垃圾回收算法 及 JVM 中常见的分类回收算法。这些都是从算法和规范上分析 Java 中的垃圾回收，属于方法论。在 JVM 中，垃圾回收的具体实现是由 垃圾回收器（Garbage Collector）负责。">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://ols3fdyll.bkt.clouddn.com/JVM.jpg">
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/4/16502c7b876b28f6?w=720&h=281&f=jpeg&s=24288">
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/4/16502c7b87f0e86b?w=720&h=457&f=jpeg&s=40109">
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/4/16502c7b885c24bf?w=720&h=379&f=jpeg&s=31098">
@@ -25,11 +24,11 @@
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/4/16502c7bb00da43d?w=1038&h=337&f=png&s=38094">
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/4/16502c7bb5454a60?w=678&h=380&f=jpeg&s=29106">
 <meta property="og:image" content="https://user-gold-cdn.xitu.io/2018/8/4/16502c7bd1fd0856?w=258&h=258&f=jpeg&s=16109">
-<meta property="og:updated_time" content="2018-08-04T02:43:52.468Z">
+<meta property="og:updated_time" content="2018-09-06T06:04:45.828Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM系列(六) - JVM垃圾回收器">
 <meta name="twitter:description" content="前言在之前的几篇博客中，我们大致介绍了，常见的 垃圾回收算法 及 JVM 中常见的分类回收算法。这些都是从算法和规范上分析 Java 中的垃圾回收，属于方法论。在 JVM 中，垃圾回收的具体实现是由 垃圾回收器（Garbage Collector）负责。">
-<meta name="twitter:image" content="http://ols3fdyll.bkt.clouddn.com/JVM.jpg">
+<meta name="twitter:image" content="https://user-gold-cdn.xitu.io/2018/8/4/16502c7b876b28f6?w=720&h=281&f=jpeg&s=24288">
     
 
     
@@ -297,7 +296,6 @@ ga('send', 'pageview');
             <hr>
 <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在之前的几篇博客中，我们大致介绍了，常见的 <strong>垃圾回收算法</strong> 及 <code>JVM</code> 中常见的分类回收算法。这些都是从算法和规范上分析 <code>Java</code> 中的垃圾回收，属于方法论。在 <code>JVM</code> 中，垃圾回收的具体实现是由 <strong>垃圾回收器</strong>（<code>Garbage Collector</code>）负责。</p>
 <a id="more"></a>
-<p><img src="http://ols3fdyll.bkt.clouddn.com/JVM.jpg" alt=""></p>
 <h1 id="正文"><a href="#正文" class="headerlink" title="正文"></a>正文</h1><h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>在了解 <strong>垃圾回收器</strong> 之前，首先得了解一下垃圾回收器的几个名词。</p>
 <h3 id="1-吞吐量"><a href="#1-吞吐量" class="headerlink" title="1. 吞吐量"></a>1. 吞吐量</h3><p><code>CPU</code> 用于运行用户代码的时间与 <code>CPU</code> 总消耗时间的比值。比如说虚拟机总运行了 <code>100</code> 分钟，<strong>用户代码</strong> 时间 <code>99</code> 分钟，<strong>垃圾回收</strong> 时间 <code>1</code> 分钟，那么吞吐量就是 <code>99%</code>。</p>
 <blockquote>
@@ -640,7 +638,7 @@ ga('send', 'pageview');
                         
                         <div class="item-inner">
                             <p class="item-category"><a class="article-category-link" href="/categories/Redis学习系列/">Redis学习系列</a></p>
-                            <p class="item-title"><a href="/2018/08/16/深入剖析Redis系列(一) - Redis入门简介与主从搭建/" class="title">深入剖析Redis系列(一) - Redis入门简介与主从搭建</a></p>
+                            <p class="item-title"><a href="/2018/08/16/深入剖析Redis系列(一) - Redis入门简介与主从搭建/" class="title">深入剖析Redis系列(一) - Redis入门简介与主从搭建</a></p>
                             <p class="item-date"><time datetime="2018-08-16T05:36:00.000Z" itemprop="datePublished">2018-08-16</time></p>
                         </div>
                     </li>
